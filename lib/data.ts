@@ -17,35 +17,49 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'danske-dk', name: 'Danske Bank', shortName: 'Danske Bank', type: 'bank', country: 'DK', description: "Denmark's largest bank", founded: 1871 },
   { id: 'jyske-dk', name: 'Jyske Bank', shortName: 'Jyske Bank', type: 'bank', country: 'DK', description: "Denmark's third largest bank", founded: 1967 },
   { id: 'nykredit-dk', name: 'Nykredit', shortName: 'Nykredit', type: 'bank', country: 'DK', description: 'Leading Danish mortgage institution', founded: 1985 },
-  { id: 'tryg-dk', name: 'Tryg Forsikring', shortName: 'Tryg', type: 'insurance', country: 'DK', description: 'Nordic insurance company offering consumer credit', founded: 1731 },
-  { id: 'topdanmark-dk', name: 'Topdanmark', shortName: 'Topdanmark', type: 'insurance', country: 'DK', description: 'Danish insurance with financial services', founded: 1898 },
+  { id: 'arbejdernes-dk', name: 'Arbejdernes Landsbank', shortName: 'AL Bank', type: 'bank', country: 'DK', description: 'Workers bank focused on fair pricing and transparency', founded: 1919 },
+  { id: 'sparekassen-dk', name: 'Sparekassen Kronjylland', shortName: 'Sparekassen KJ', type: 'cooperative', country: 'DK', description: 'Regional Danish savings bank with strong local presence', founded: 1872 },
+  { id: 'middelfart-dk', name: 'Middelfart Sparekasse', shortName: 'Middelfart Spar.', type: 'cooperative', country: 'DK', description: 'Independent Danish savings bank with competitive personal loans', founded: 1857 },
+  { id: 'tryg-dk', name: 'Tryg Forsikring', shortName: 'Tryg', type: 'insurance', country: 'DK', description: 'Nordic insurance company offering consumer credit products', founded: 1731 },
+  { id: 'topdanmark-dk', name: 'Topdanmark', shortName: 'Topdanmark', type: 'insurance', country: 'DK', description: 'Danish insurance company with credit products for existing customers', founded: 1898 },
+  { id: 'pfa-dk', name: 'PFA Pension', shortName: 'PFA', type: 'insurance', country: 'DK', description: "Denmark's largest commercial pension and insurance company, offers member loans", founded: 1917 },
 
   // FINLAND
-  { id: 'op-fi', name: 'OP Financial Group', shortName: 'OP', type: 'bank', country: 'FI', description: "Finland's largest financial services group", founded: 1902 },
+  { id: 'op-fi', name: 'OP Financial Group', shortName: 'OP', type: 'cooperative', country: 'FI', description: "Finland's largest financial services group — a cooperative bank", founded: 1902 },
   { id: 'nordea-fi', name: 'Nordea Finland', shortName: 'Nordea', type: 'bank', country: 'FI', description: 'Major Nordic bank operating in Finland', founded: 2000 },
-  { id: 'danske-fi', name: 'Danske Bank Finland', shortName: 'Danske Bank', type: 'bank', country: 'FI', description: 'Nordic banking group in Finland', founded: 2012 },
-  { id: 'tapiola-fi', name: 'LähiTapiola', shortName: 'LähiTapiola', type: 'insurance', country: 'FI', description: 'Finnish insurance group offering consumer credit', founded: 2013 },
-  { id: 'mandatum-fi', name: 'Mandatum Life', shortName: 'Mandatum', type: 'insurance', country: 'FI', description: 'Finnish life insurance with investment services', founded: 1990 },
+  { id: 'aktia-fi', name: 'Aktia Bank', shortName: 'Aktia', type: 'bank', country: 'FI', description: 'Finnish savings bank with strong private and business banking', founded: 1825 },
+  { id: 'oma-fi', name: 'Oma Säästöpankki', shortName: 'Oma Sp', type: 'cooperative', country: 'FI', description: 'Finnish savings bank (säästöpankki) focused on retail banking', founded: 1992 },
+  { id: 'handelsbanken-fi', name: 'Handelsbanken Finland', shortName: 'Handelsbanken', type: 'bank', country: 'FI', description: 'Swedish bank with strong Finnish operations', founded: 1982 },
+  { id: 'tapiola-fi', name: 'LähiTapiola', shortName: 'LähiTapiola', type: 'insurance', country: 'FI', description: 'Finnish mutual insurance group offering personal credit products', founded: 2013 },
+  { id: 'if-fi', name: 'If Vahinkovakuutus', shortName: 'If Insurance FI', type: 'insurance', country: 'FI', description: 'Leading Nordic P&C insurer offering credit to customers in Finland', founded: 1999 },
+  { id: 'mandatum-fi', name: 'Mandatum Life', shortName: 'Mandatum', type: 'insurance', country: 'FI', description: 'Finnish life insurance offering collateral-backed loans to policyholders', founded: 1990 },
 
   // ICELAND
-  { id: 'islandsbanki-is', name: 'Íslandsbanki', shortName: 'Íslandsbanki', type: 'bank', country: 'IS', description: 'Icelandic commercial bank', founded: 2008 },
-  { id: 'arion-is', name: 'Arion banki', shortName: 'Arion banki', type: 'bank', country: 'IS', description: 'Icelandic commercial bank', founded: 2008 },
-  { id: 'landsbankinn-is', name: 'Landsbankinn', shortName: 'Landsbankinn', type: 'bank', country: 'IS', description: "Iceland's largest bank", founded: 1886 },
-  { id: 'kvika-is', name: 'Kvika banki', shortName: 'Kvika', type: 'bank', country: 'IS', description: 'Icelandic investment and commercial bank', founded: 2006 },
+  { id: 'islandsbanki-is', name: 'Íslandsbanki', shortName: 'Íslandsbanki', type: 'bank', country: 'IS', description: 'Icelandic commercial bank — strong retail and business banking', founded: 2008 },
+  { id: 'arion-is', name: 'Arion banki', shortName: 'Arion banki', type: 'bank', country: 'IS', description: 'Icelandic commercial bank — digital-first approach', founded: 2008 },
+  { id: 'landsbankinn-is', name: 'Landsbankinn', shortName: 'Landsbankinn', type: 'bank', country: 'IS', description: "Iceland's largest state-owned bank", founded: 1886 },
+  { id: 'kvika-is', name: 'Kvika banki', shortName: 'Kvika', type: 'bank', country: 'IS', description: 'Icelandic investment and commercial bank targeting growth companies', founded: 2006 },
+  { id: 'spron-is', name: 'Sparisjóður Reykjavíkur og nágrennis', shortName: 'SPRON', type: 'cooperative', country: 'IS', description: 'Icelandic savings bank cooperative with community focus', founded: 1886 },
 
   // NORWAY
   { id: 'dnb-no', name: 'DNB Bank', shortName: 'DNB', type: 'bank', country: 'NO', description: "Norway's largest financial services group", founded: 1822 },
   { id: 'nordea-no', name: 'Nordea Norway', shortName: 'Nordea', type: 'bank', country: 'NO', description: 'Major Nordic bank in Norway', founded: 2000 },
-  { id: 'sparebank-no', name: 'SpareBank 1', shortName: 'SpareBank 1', type: 'bank', country: 'NO', description: 'Norwegian savings bank alliance', founded: 1823 },
-  { id: 'gjensidige-no', name: 'Gjensidige Bank', shortName: 'Gjensidige', type: 'insurance', country: 'NO', description: 'Nordic insurance group with banking services', founded: 1816 },
-  { id: 'if-no', name: 'If Skadeforsikring', shortName: 'If Insurance', type: 'insurance', country: 'NO', description: 'Leading Nordic insurance company', founded: 1999 },
+  { id: 'sparebank-no', name: 'SpareBank 1', shortName: 'SpareBank 1', type: 'cooperative', country: 'NO', description: 'Norwegian savings bank alliance — largest savings bank group', founded: 1823 },
+  { id: 'bank-norwegian', name: 'Bank Norwegian', shortName: 'Bank Norwegian', type: 'bank', country: 'NO', description: 'Digital Norwegian bank specialising in consumer credit and credit cards', founded: 2007 },
+  { id: 'storebrand-no', name: 'Storebrand Bank', shortName: 'Storebrand', type: 'insurance', country: 'NO', description: 'Norwegian life insurance and pension company with banking services', founded: 1767 },
+  { id: 'komplett-no', name: 'Komplett Bank', shortName: 'Komplett Bank', type: 'bank', country: 'NO', description: 'Norwegian digital bank with competitive consumer loan rates', founded: 2014 },
+  { id: 'gjensidige-no', name: 'Gjensidige Bank', shortName: 'Gjensidige', type: 'insurance', country: 'NO', description: 'Nordic insurance group with banking — strong auto financing', founded: 1816 },
+  { id: 'if-no', name: 'If Skadeforsikring', shortName: 'If Insurance', type: 'insurance', country: 'NO', description: 'Leading Nordic P&C insurance company with credit products', founded: 1999 },
 
   // SWEDEN
   { id: 'nordea-se', name: 'Nordea Sverige', shortName: 'Nordea', type: 'bank', country: 'SE', description: 'Major Nordic bank in Sweden', founded: 2000 },
-  { id: 'seb-se', name: 'SEB', shortName: 'SEB', type: 'bank', country: 'SE', description: 'Swedish banking and financial services group', founded: 1856 },
-  { id: 'handelsbanken-se', name: 'Handelsbanken', shortName: 'Handelsbanken', type: 'bank', country: 'SE', description: 'Swedish commercial bank', founded: 1871 },
-  { id: 'swedbank-se', name: 'Swedbank', shortName: 'Swedbank', type: 'bank', country: 'SE', description: 'Swedish savings bank', founded: 1820 },
-  { id: 'lansforsakringar-se', name: 'Länsförsäkringar Bank', shortName: 'Länsförsäkringar', type: 'insurance', country: 'SE', description: 'Swedish insurance-owned bank', founded: 1996 },
+  { id: 'seb-se', name: 'SEB', shortName: 'SEB', type: 'bank', country: 'SE', description: 'Swedish banking and financial services group — 156+ years', founded: 1856 },
+  { id: 'handelsbanken-se', name: 'Handelsbanken', shortName: 'Handelsbanken', type: 'bank', country: 'SE', description: 'Swedish commercial bank with decentralised branch model', founded: 1871 },
+  { id: 'swedbank-se', name: 'Swedbank', shortName: 'Swedbank', type: 'cooperative', country: 'SE', description: 'Swedish savings bank cooperative — largest retail bank', founded: 1820 },
+  { id: 'sbab-se', name: 'SBAB Bank', shortName: 'SBAB', type: 'government', country: 'SE', description: 'Swedish state-owned mortgage bank promoting competition', founded: 1993 },
+  { id: 'skandia-se', name: 'Skandiabanken', shortName: 'Skandia', type: 'insurance', country: 'SE', description: 'Insurance-owned digital bank with competitive mortgage rates', founded: 1994 },
+  { id: 'lansforsakringar-se', name: 'Länsförsäkringar Bank', shortName: 'Länsförsäkringar', type: 'insurance', country: 'SE', description: 'Swedish mutual insurance company with banking — 0.2% mortgage discount for insurance customers', founded: 1996 },
+  { id: 'resurs-se', name: 'Resurs Bank', shortName: 'Resurs Bank', type: 'bank', country: 'SE', description: 'Swedish consumer credit specialist — retail finance and personal loans', founded: 1977 },
 
   // ESTONIA
   { id: 'swedbank-ee', name: 'Swedbank Eesti', shortName: 'Swedbank', type: 'bank', country: 'EE', description: 'Leading bank in Estonia', founded: 1992 },
@@ -54,19 +68,32 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'luminor-ee', name: 'Luminor Estonia', shortName: 'Luminor', type: 'bank', country: 'EE', description: 'Baltic banking group', founded: 2017 },
   { id: 'bigbank-ee', name: 'Bigbank', shortName: 'Bigbank', type: 'bank', country: 'EE', description: 'Estonian consumer credit specialist', founded: 1992 },
 
+  // ESTONIA
+  { id: 'swedbank-ee', name: 'Swedbank Eesti', shortName: 'Swedbank', type: 'bank', country: 'EE', description: 'Leading bank in Estonia — largest market share', founded: 1992 },
+  { id: 'seb-ee', name: 'SEB Pank', shortName: 'SEB', type: 'bank', country: 'EE', description: 'Swedish bank in Estonia with strong business banking', founded: 1995 },
+  { id: 'lhv-ee', name: 'LHV Pank', shortName: 'LHV', type: 'bank', country: 'EE', description: 'Estonian bank — go-to for e-residents and startups', founded: 1999, isDigitalFriendly: true, isEResidentFriendly: true },
+  { id: 'luminor-ee', name: 'Luminor Estonia', shortName: 'Luminor', type: 'bank', country: 'EE', description: 'Baltic banking group with pan-Baltic presence', founded: 2017 },
+  { id: 'bigbank-ee', name: 'Bigbank', shortName: 'Bigbank', type: 'bank', country: 'EE', description: 'Estonian consumer credit specialist operating in Baltics', founded: 1992 },
+  { id: 'inbank-ee', name: 'Inbank', shortName: 'Inbank', type: 'bank', country: 'EE', description: 'Estonian digital consumer bank operating in EE, LV, LT, PL', founded: 2015, isDigitalFriendly: true },
+  { id: 'coop-ee', name: 'Coop Pank', shortName: 'Coop Pank', type: 'cooperative', country: 'EE', description: 'Estonian cooperative bank serving rural and local communities', founded: 2018 },
+
   // LATVIA
-  { id: 'swedbank-lv', name: 'Swedbank Latvija', shortName: 'Swedbank', type: 'bank', country: 'LV', description: 'Leading bank in Latvia', founded: 1992 },
-  { id: 'seb-lv', name: 'SEB banka', shortName: 'SEB', type: 'bank', country: 'LV', description: 'Swedish bank in Latvia', founded: 1994 },
-  { id: 'luminor-lv', name: 'Luminor Latvia', shortName: 'Luminor', type: 'bank', country: 'LV', description: 'Baltic banking group in Latvia', founded: 2017 },
-  { id: 'citadele-lv', name: 'Citadele banka', shortName: 'Citadele', type: 'bank', country: 'LV', description: 'Latvian bank with Baltic presence', founded: 2010 },
-  { id: 'industra-lv', name: 'Industra Bank', shortName: 'Industra', type: 'bank', country: 'LV', description: 'Latvian private bank focused on business', founded: 2006 },
+  { id: 'swedbank-lv', name: 'Swedbank Latvija', shortName: 'Swedbank', type: 'bank', country: 'LV', description: 'Leading bank in Latvia by deposits and loans', founded: 1992 },
+  { id: 'seb-lv', name: 'SEB banka', shortName: 'SEB', type: 'bank', country: 'LV', description: 'Swedish bank with strong Latvian retail and corporate banking', founded: 1994 },
+  { id: 'luminor-lv', name: 'Luminor Latvia', shortName: 'Luminor', type: 'bank', country: 'LV', description: 'Baltic banking group combining former DNB/Nordea operations', founded: 2017 },
+  { id: 'citadele-lv', name: 'Citadele banka', shortName: 'Citadele', type: 'bank', country: 'LV', description: 'Latvian bank with innovative digital mortgage', founded: 2010 },
+  { id: 'industra-lv', name: 'Industra Bank', shortName: 'Industra', type: 'bank', country: 'LV', description: 'Latvian private bank — corporate and real estate focus', founded: 2006 },
+  { id: 'bluor-lv', name: 'BluOr Bank', shortName: 'BluOr', type: 'bank', country: 'LV', description: 'Latvian bank focused on digital and private banking', founded: 2009, isDigitalFriendly: true },
+  { id: 'rig-invest-lv', name: 'Reģionālā investīciju banka', shortName: 'RIB Bank', type: 'bank', country: 'LV', description: 'Latvian regional investment and business bank', founded: 1995 },
 
   // LITHUANIA
-  { id: 'swedbank-lt', name: 'Swedbank Lietuva', shortName: 'Swedbank', type: 'bank', country: 'LT', description: 'Major bank in Lithuania', founded: 1992 },
-  { id: 'seb-lt', name: 'SEB Lietuva', shortName: 'SEB', type: 'bank', country: 'LT', description: 'Swedish bank in Lithuania', founded: 1995 },
+  { id: 'swedbank-lt', name: 'Swedbank Lietuva', shortName: 'Swedbank', type: 'bank', country: 'LT', description: 'Major bank in Lithuania — widest branch network', founded: 1992 },
+  { id: 'seb-lt', name: 'SEB Lietuva', shortName: 'SEB', type: 'bank', country: 'LT', description: 'Swedish bank with deep Lithuanian market presence', founded: 1995 },
   { id: 'luminor-lt', name: 'Luminor Lithuania', shortName: 'Luminor', type: 'bank', country: 'LT', description: 'Baltic banking group in Lithuania', founded: 2017 },
-  { id: 'siauliu-lt', name: 'Šiaulių bankas', shortName: 'Šiaulių bankas', type: 'bank', country: 'LT', description: 'Lithuanian commercial bank', founded: 1992 },
-  { id: 'citadele-lt', name: 'Citadele Lietuva', shortName: 'Citadele', type: 'bank', country: 'LT', description: 'Baltic bank with Lithuanian operations', founded: 2012 },
+  { id: 'siauliu-lt', name: 'Šiaulių bankas', shortName: 'Šiaulių bankas', type: 'bank', country: 'LT', description: 'Only fully Lithuanian-owned commercial bank', founded: 1992 },
+  { id: 'citadele-lt', name: 'Citadele Lietuva', shortName: 'Citadele', type: 'bank', country: 'LT', description: 'Baltic bank with strong SME lending in Lithuania', founded: 2012 },
+  { id: 'medicinos-lt', name: 'Medicinos bankas', shortName: 'Medicinos bankas', type: 'bank', country: 'LT', description: 'Lithuanian private commercial bank — strong in healthcare and SME', founded: 1992 },
+  { id: 'revolut-lt', name: 'Revolut Bank UAB', shortName: 'Revolut', type: 'fintech', country: 'LT', description: 'EU-licensed digital bank (Lithuanian license) serving 40M+ customers globally', founded: 2018, isDigitalFriendly: true, isEResidentFriendly: true },
 ];
 
 export const PRODUCTS: LoanProduct[] = [
@@ -78,6 +105,13 @@ export const PRODUCTS: LoanProduct[] = [
   { id: 'danske-dk-p1', institutionId: 'danske-dk', name: 'FlexLoan Personal', type: 'personal', customerType: 'individual', rateMin: 6.99, rateMax: 18.49, limitMin: 15000, limitMax: 600000, termMin: 12, termMax: 144, currency: 'DKK', features: ['No early repayment fee', 'Digital management', '24h approval'], collateralRequired: false, updatedAt: '2025-11-20', isPromoted: true },
   { id: 'danske-dk-m1', institutionId: 'danske-dk', name: 'RealKredit Mortgage', type: 'mortgage', customerType: 'individual', rateMin: 2.99, rateMax: 5.49, limitMin: 300000, limitMax: 12000000, termMin: 60, termMax: 360, currency: 'DKK', features: ['Competitive rates', 'Green mortgage options', 'Up to 80% LTV'], collateralRequired: true, processingFeePercent: 0.4, updatedAt: '2025-11-19' },
   { id: 'danske-dk-b1', institutionId: 'danske-dk', name: 'Business Credit Line', type: 'business', customerType: 'corporate', rateMin: 4.99, rateMax: 9.99, limitMin: 50000, limitMax: 5000000, termMin: 12, termMax: 84, currency: 'DKK', features: ['Revolving credit', 'Online management', 'Quick disbursement'], collateralRequired: false, updatedAt: '2025-11-15' },
+
+  // New DK institutions
+  { id: 'arbejdernes-dk-p1', institutionId: 'arbejdernes-dk', name: 'AL Forbrugslån', type: 'personal', customerType: 'individual', rateMin: 7.5, rateMax: 18.9, limitMin: 10000, limitMax: 400000, termMin: 12, termMax: 120, currency: 'DKK', features: ['Workers union partner rates', 'Fair and transparent', 'No hidden fees'], collateralRequired: false, updatedAt: '2025-11-18' },
+  { id: 'arbejdernes-dk-m1', institutionId: 'arbejdernes-dk', name: 'Boliglån', type: 'mortgage', customerType: 'individual', rateMin: 3.2, rateMax: 5.4, limitMin: 200000, limitMax: 7000000, termMin: 60, termMax: 360, currency: 'DKK', features: ['Social responsibility focus', 'Member discounts', 'Up to 80% LTV'], collateralRequired: true, updatedAt: '2025-11-16' },
+  { id: 'sparekassen-dk-p1', institutionId: 'sparekassen-dk', name: 'Privatlån', type: 'personal', customerType: 'individual', rateMin: 8.9, rateMax: 22.5, limitMin: 10000, limitMax: 250000, termMin: 12, termMax: 84, currency: 'DKK', features: ['Local bank expertise', 'Community-owned', 'Personalised service'], collateralRequired: false, updatedAt: '2025-11-10' },
+  { id: 'middelfart-dk-p1', institutionId: 'middelfart-dk', name: 'Privatlån', type: 'personal', customerType: 'individual', rateMin: 9.5, rateMax: 23.9, limitMin: 5000, limitMax: 200000, termMin: 12, termMax: 84, currency: 'DKK', features: ['Long history since 1857', 'Community savings bank', 'Personal advisor'], collateralRequired: false, updatedAt: '2025-11-08' },
+  { id: 'pfa-dk-p1', institutionId: 'pfa-dk', name: 'PFA Member Loan', type: 'personal', customerType: 'individual', rateMin: 8.0, rateMax: 16.0, limitMin: 20000, limitMax: 300000, termMin: 12, termMax: 96, currency: 'DKK', features: ['Pension customer rate', 'No application fee', 'Automatic eligibility check'], collateralRequired: false, updatedAt: '2025-11-09' },
 
   { id: 'jyske-dk-p1', institutionId: 'jyske-dk', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 8.49, rateMax: 21.99, limitMin: 10000, limitMax: 300000, termMin: 12, termMax: 96, currency: 'DKK', features: ['Fast decision', 'Transparent pricing', 'Flexible amounts'], collateralRequired: false, updatedAt: '2025-11-12' },
   { id: 'jyske-dk-m1', institutionId: 'jyske-dk', name: 'JyskeRealkredit', type: 'mortgage', customerType: 'individual', rateMin: 3.25, rateMax: 5.75, limitMin: 250000, limitMax: 10000000, termMin: 60, termMax: 360, currency: 'DKK', features: ['Fixed and variable rates', 'Refinancing options', 'Nordic expertise'], collateralRequired: true, updatedAt: '2025-11-14' },
@@ -187,4 +221,38 @@ export const PRODUCTS: LoanProduct[] = [
 
   { id: 'citadele-lt-p1', institutionId: 'citadele-lt', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 12.9, rateMax: 27.9, limitMin: 300, limitMax: 18000, termMin: 6, termMax: 84, currency: 'EUR', features: ['Digital banking', 'Baltic network', 'Personalized approach'], collateralRequired: false, updatedAt: '2025-11-12' },
   { id: 'citadele-lt-b1', institutionId: 'citadele-lt', name: 'Business Loan', type: 'business', customerType: 'corporate', rateMin: 7.5, rateMax: 15.0, limitMin: 5000, limitMax: 400000, termMin: 12, termMax: 60, currency: 'EUR', features: ['SME specialist', 'Factoring', 'Invoice finance'], collateralRequired: false, updatedAt: '2025-11-11' },
+  { id: 'medicinos-lt-b1', institutionId: 'medicinos-lt', name: 'Business Loan', type: 'business', customerType: 'corporate', rateMin: 7.0, rateMax: 14.0, limitMin: 5000, limitMax: 500000, termMin: 12, termMax: 72, currency: 'EUR', features: ['Healthcare sector specialist', 'SME-friendly', 'Local expertise'], collateralRequired: false, updatedAt: '2025-11-10' },
+  { id: 'medicinos-lt-p1', institutionId: 'medicinos-lt', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 12.0, rateMax: 26.9, limitMin: 500, limitMax: 20000, termMin: 6, termMax: 72, currency: 'EUR', features: ['Lithuanian bank', 'Community focus', 'Personal advisor'], collateralRequired: false, updatedAt: '2025-11-08' },
+  { id: 'revolut-lt-b1', institutionId: 'revolut-lt', name: 'Revolut Business Loan', type: 'business', customerType: 'corporate', rateMin: 8.9, rateMax: 19.9, limitMin: 1000, limitMax: 100000, termMin: 3, termMax: 24, currency: 'EUR', features: ['100% digital', 'Instant decision', 'EU banking license', 'Multi-currency'], collateralRequired: false, updatedAt: '2025-11-20', isPromoted: true },
+
+  // ==================== NEW: FINLAND LOCAL ====================
+  { id: 'aktia-fi-p1', institutionId: 'aktia-fi', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 7.9, rateMax: 20.9, limitMin: 2000, limitMax: 50000, termMin: 12, termMax: 96, currency: 'EUR', features: ['Finnish savings bank heritage', 'Personalised service', 'Nordic values'], collateralRequired: false, updatedAt: '2025-11-14' },
+  { id: 'aktia-fi-m1', institutionId: 'aktia-fi', name: 'Home Loan', type: 'mortgage', customerType: 'individual', rateMin: 3.6, rateMax: 5.9, limitMin: 20000, limitMax: 1200000, termMin: 60, termMax: 300, currency: 'EUR', features: ['EURIBOR-based', 'Coastal Finland expertise', 'Bilingual service (FI/SV)'], collateralRequired: true, updatedAt: '2025-11-15' },
+  { id: 'oma-fi-p1', institutionId: 'oma-fi', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 8.5, rateMax: 21.5, limitMin: 1000, limitMax: 35000, termMin: 6, termMax: 96, currency: 'EUR', features: ['Community savings bank', 'Local advisory', 'Competitive rates'], collateralRequired: false, updatedAt: '2025-11-12' },
+  { id: 'if-fi-p1', institutionId: 'if-fi', name: 'Insurance Customer Loan', type: 'personal', customerType: 'individual', rateMin: 9.9, rateMax: 23.9, limitMin: 1000, limitMax: 25000, termMin: 6, termMax: 72, currency: 'EUR', features: ['If insurance customer discount', 'Quick online process', 'Bundle with insurance'], collateralRequired: false, updatedAt: '2025-11-09' },
+
+  // ==================== NEW: NORWAY LOCAL ====================
+  { id: 'bank-norwegian-p1', institutionId: 'bank-norwegian', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 6.9, rateMax: 21.9, limitMin: 10000, limitMax: 500000, termMin: 12, termMax: 60, currency: 'NOK', features: ['100% digital bank', 'No fees', 'Instant credit decision'], collateralRequired: false, updatedAt: '2025-11-21', isPromoted: true },
+  { id: 'storebrand-no-p1', institutionId: 'storebrand-no', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 8.5, rateMax: 20.9, limitMin: 20000, limitMax: 400000, termMin: 12, termMax: 84, currency: 'NOK', features: ['Insurance bundle discount', 'Pension customer rate', 'Sustainable finance'], collateralRequired: false, updatedAt: '2025-11-13' },
+  { id: 'storebrand-no-m1', institutionId: 'storebrand-no', name: 'Green Mortgage', type: 'mortgage', customerType: 'individual', rateMin: 3.9, rateMax: 6.1, limitMin: 200000, limitMax: 12000000, termMin: 60, termMax: 300, currency: 'NOK', features: ['Green home 0.2% discount', 'Pension customer rate', 'Digital first'], collateralRequired: true, updatedAt: '2025-11-14' },
+  { id: 'komplett-no-p1', institutionId: 'komplett-no', name: 'Forbrukslån', type: 'personal', customerType: 'individual', rateMin: 7.9, rateMax: 22.9, limitMin: 10000, limitMax: 500000, termMin: 12, termMax: 60, currency: 'NOK', features: ['Digital bank', 'No monthly fee', 'Flexible repayment'], collateralRequired: false, updatedAt: '2025-11-20' },
+
+  // ==================== NEW: SWEDEN LOCAL ====================
+  { id: 'sbab-se-m1', institutionId: 'sbab-se', name: 'Bolån (Government Bank)', type: 'mortgage', customerType: 'individual', rateMin: 3.5, rateMax: 5.6, limitMin: 200000, limitMax: 15000000, termMin: 60, termMax: 360, currency: 'SEK', features: ['State-owned — promotes competition', 'Green mortgage bonus', 'Transparent pricing', 'No lock-in'], collateralRequired: true, updatedAt: '2025-11-21', isPromoted: true },
+  { id: 'sbab-se-p1', institutionId: 'sbab-se', name: 'Privatlån', type: 'personal', customerType: 'individual', rateMin: 6.99, rateMax: 17.9, limitMin: 10000, limitMax: 500000, termMin: 12, termMax: 96, currency: 'SEK', features: ['State-owned stability', 'Competitive rates', 'BankID application'], collateralRequired: false, updatedAt: '2025-11-19' },
+  { id: 'skandia-se-m1', institutionId: 'skandia-se', name: 'Bolån', type: 'mortgage', customerType: 'individual', rateMin: 3.65, rateMax: 5.8, limitMin: 200000, limitMax: 15000000, termMin: 60, termMax: 360, currency: 'SEK', features: ['Insurance bundle discount', 'Digital-first', 'Skandia insurance customer rate'], collateralRequired: true, updatedAt: '2025-11-20' },
+  { id: 'resurs-se-p1', institutionId: 'resurs-se', name: 'Privatlån', type: 'personal', customerType: 'individual', rateMin: 8.9, rateMax: 26.9, limitMin: 5000, limitMax: 350000, termMin: 12, termMax: 84, currency: 'SEK', features: ['Retail finance specialist', 'Quick decision', 'Flexible amounts'], collateralRequired: false, updatedAt: '2025-11-17' },
+
+  // ==================== NEW: ESTONIA LOCAL ====================
+  { id: 'inbank-ee-p1', institutionId: 'inbank-ee', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 12.9, rateMax: 28.9, limitMin: 500, limitMax: 20000, termMin: 3, termMax: 84, currency: 'EUR', features: ['Digital bank', 'Smart-ID', 'Operates in EE, LV, LT, PL'], collateralRequired: false, updatedAt: '2025-11-18' },
+  { id: 'inbank-ee-a1', institutionId: 'inbank-ee', name: 'Auto Loan', type: 'auto', customerType: 'individual', rateMin: 9.9, rateMax: 21.9, limitMin: 1000, limitMax: 50000, termMin: 12, termMax: 72, currency: 'EUR', features: ['Baltic coverage', 'New and used vehicles', 'Fast approval'], collateralRequired: true, updatedAt: '2025-11-16' },
+  { id: 'coop-ee-p1', institutionId: 'coop-ee', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 10.9, rateMax: 24.9, limitMin: 300, limitMax: 15000, termMin: 6, termMax: 84, currency: 'EUR', features: ['Coop member rates', 'Rural Estonia focus', 'Community bank'], collateralRequired: false, updatedAt: '2025-11-14' },
+
+  // ==================== NEW: LATVIA LOCAL ====================
+  { id: 'bluor-lv-p1', institutionId: 'bluor-lv', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 13.9, rateMax: 29.9, limitMin: 500, limitMax: 15000, termMin: 6, termMax: 60, currency: 'EUR', features: ['Digital-first bank', 'Quick online approval', 'Transparent pricing'], collateralRequired: false, updatedAt: '2025-11-15' },
+  { id: 'bluor-lv-b1', institutionId: 'bluor-lv', name: 'Business Loan', type: 'business', customerType: 'corporate', rateMin: 7.9, rateMax: 15.9, limitMin: 10000, limitMax: 500000, termMin: 12, termMax: 60, currency: 'EUR', features: ['Private banking approach', 'Digital Latvia', 'Tailored terms'], collateralRequired: false, updatedAt: '2025-11-12' },
+  { id: 'rib-lv-b1', institutionId: 'rig-invest-lv', name: 'Investment Loan', type: 'business', customerType: 'corporate', rateMin: 6.5, rateMax: 12.5, limitMin: 20000, limitMax: 1500000, termMin: 12, termMax: 84, currency: 'EUR', features: ['Regional expertise', 'Real estate focus', 'SME-friendly'], collateralRequired: true, updatedAt: '2025-11-10' },
+
+  // ==================== NEW: ICELAND LOCAL ====================
+  { id: 'spron-is-p1', institutionId: 'spron-is', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 9.9, rateMax: 22.9, limitMin: 100000, limitMax: 6000000, termMin: 12, termMax: 84, currency: 'ISK', features: ['Reykjavik community focus', 'Savings bank tradition', 'Personalised service'], collateralRequired: false, updatedAt: '2025-11-11' },
 ];

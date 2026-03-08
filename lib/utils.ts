@@ -15,6 +15,8 @@ export const LOAN_TYPE_LABELS: Record<LoanType, string> = {
   auto: 'Auto Loan',
   business: 'Business Loan',
   student: 'Student Loan',
+  startup: 'Startup Loan',
+  microloan: 'Microloan',
 };
 
 export const LOAN_TYPE_ICONS: Record<LoanType, string> = {
@@ -23,12 +25,18 @@ export const LOAN_TYPE_ICONS: Record<LoanType, string> = {
   auto: '🚗',
   business: '🏢',
   student: '🎓',
+  startup: '🚀',
+  microloan: '💡',
 };
 
 export const INSTITUTION_TYPE_LABELS: Record<InstitutionType, string> = {
   bank: 'Bank',
   insurance: 'Insurance',
   credit_union: 'Credit Union',
+  government: 'Government',
+  fintech: 'Fintech',
+  eu_fund: 'EU Fund',
+  cooperative: 'Cooperative',
 };
 
 export const CUSTOMER_TYPE_LABELS: Record<CustomerType, string> = {
@@ -74,6 +82,8 @@ export function getLoanTypeBadgeClass(type: LoanType): string {
     auto: 'bg-orange-100 text-orange-800',
     business: 'bg-purple-100 text-purple-800',
     student: 'bg-yellow-100 text-yellow-800',
+    startup: 'bg-amber-100 text-amber-800',
+    microloan: 'bg-cyan-100 text-cyan-800',
   };
   return map[type];
 }
@@ -83,6 +93,10 @@ export function getInstitutionTypeBadgeClass(type: InstitutionType): string {
     bank: 'bg-slate-100 text-slate-700',
     insurance: 'bg-teal-100 text-teal-700',
     credit_union: 'bg-rose-100 text-rose-700',
+    government: 'bg-blue-100 text-blue-700',
+    fintech: 'bg-violet-100 text-violet-700',
+    eu_fund: 'bg-yellow-100 text-yellow-700',
+    cooperative: 'bg-green-100 text-green-700',
   };
   return map[type];
 }

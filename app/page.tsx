@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
+import { PROGRAMS } from '@/lib/programs-data';
 import { getCountryStats, getInstitution, getCountry, formatAmount, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
 import RateCard from '@/components/RateCard';
 import CountryCard from '@/components/CountryCard';
+import LiveRatesBanner from '@/components/LiveRatesBanner';
 
 export default function HomePage() {
   // Stats
@@ -78,9 +80,15 @@ export default function HomePage() {
             <Link href="/business" className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
               🏢 Business Loans
             </Link>
+            <Link href="/programs" className="bg-amber-500 hover:bg-amber-400 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+              🚀 Programs & Visas
+            </Link>
           </div>
         </div>
       </section>
+
+      {/* ========== LIVE RATES BANNER ========== */}
+      <LiveRatesBanner />
 
       {/* ========== STATS BAR ========== */}
       <section className="bg-white border-b border-slate-200">
@@ -243,6 +251,35 @@ export default function HomePage() {
                 <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== PROGRAMS TEASER ========== */}
+      <section className="py-12 px-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold">🚀 For Entrepreneurs & Digital Nomads</h2>
+              <p className="text-slate-400 text-sm mt-1">Government loans, digital nomad visas, e-Residency, and EU funding programs</p>
+            </div>
+            <Link href="/programs" className="text-sky-400 hover:text-sky-300 font-medium text-sm">
+              All {PROGRAMS.length} programs →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: '🌐', title: 'Digital Nomad Visas', desc: 'Estonia, Latvia, Lithuania & Iceland — stay up to 1 year and work remotely in the EU', href: '/programs?tab=digital_nomad', color: 'from-sky-900 to-sky-800' },
+              { icon: '🪪', title: 'e-Residency (Estonia)', desc: 'Register an EU company online. 100K+ e-residents from 170+ countries already use it', href: '/programs?tab=e_residency', color: 'from-cyan-900 to-cyan-800' },
+              { icon: '🏦', title: 'Government Loans', desc: 'State-backed startup and SME loans from Finnvera, Innovasjon Norge, Almi and more', href: '/programs?tab=government', color: 'from-purple-900 to-purple-800' },
+              { icon: '🇪🇺', title: 'EU Funds', desc: 'EIB, EIF, Horizon Europe — access billions in EU financing across all 8 countries', href: '/programs?tab=eu', color: 'from-yellow-900 to-yellow-800' },
+            ].map(({ icon, title, desc, href, color }) => (
+              <Link key={title} href={href} className={`bg-gradient-to-br ${color} rounded-2xl p-5 hover:opacity-90 transition-opacity group`}>
+                <div className="text-3xl mb-3">{icon}</div>
+                <h3 className="font-bold text-white mb-2 group-hover:text-sky-300 transition-colors">{title}</h3>
+                <p className="text-xs text-slate-300 leading-relaxed">{desc}</p>
+              </Link>
             ))}
           </div>
         </div>

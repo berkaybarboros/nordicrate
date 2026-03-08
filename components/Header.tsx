@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-const navLinks = [
+const navLinks: { href: string; label: string; highlight?: boolean }[] = [
   { href: '/loans', label: 'Personal Loans' },
   { href: '/mortgage', label: 'Mortgage' },
   { href: '/business', label: 'Business' },
   { href: '/countries', label: 'Countries' },
+  { href: '/programs', label: '🚀 Programs', highlight: true },
 ];
 
 export default function Header() {
@@ -38,6 +39,8 @@ export default function Header() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
                     ? 'bg-sky-600 text-white'
+                    : link.highlight
+                    ? 'text-amber-300 hover:text-white hover:bg-slate-800 border border-amber-600/40'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
               >
