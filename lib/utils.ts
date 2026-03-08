@@ -133,6 +133,13 @@ export function getProductsForPage(
   });
 }
 
+// Monthly payment using standard amortisation formula
+export function calculateMonthlyPayment(principal: number, annualRatePercent: number, months: number): number {
+  if (annualRatePercent === 0) return principal / months;
+  const r = annualRatePercent / 100 / 12;
+  return (principal * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+}
+
 export function getCountryStats(countryCode: string) {
   const countryInstitutions = INSTITUTIONS.filter((i) => i.country === countryCode);
   const institutionIds = countryInstitutions.map((i) => i.id);
