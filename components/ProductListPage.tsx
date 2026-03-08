@@ -23,6 +23,8 @@ const DEFAULT_FILTERS: FilterState = {
   institutionTypes: [],
   loanTypes: [],
   sortBy: 'rateMin',
+  amountMin: 0,
+  amountMax: 1000000,
 };
 
 export default function ProductListPage({
@@ -65,6 +67,14 @@ export default function ProductListPage({
       });
     }
 
+    // Amount range filter
+    if (filters.amountMin > 0) {
+      result = result.filter((p) => p.limitMax >= filters.amountMin);
+    }
+    if (filters.amountMax < 1000000) {
+      result = result.filter((p) => p.limitMin <= filters.amountMax);
+    }
+
     // Sort
     result.sort((a, b) => {
       if (filters.sortBy === 'rateMin') return a.rateMin - b.rateMin;
@@ -79,7 +89,9 @@ export default function ProductListPage({
     filters.countries.length > 0 ||
     filters.customerType !== 'all' ||
     filters.institutionTypes.length > 0 ||
-    filters.loanTypes.length > 0;
+    filters.loanTypes.length > 0 ||
+    filters.amountMin > 0 ||
+    filters.amountMax < 1000000;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

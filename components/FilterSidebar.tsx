@@ -11,6 +11,8 @@ export interface FilterState {
   institutionTypes: InstitutionType[];
   loanTypes: LoanType[];
   sortBy: 'rateMin' | 'limitMax' | 'updatedAt';
+  amountMin: number;
+  amountMax: number;
 }
 
 interface FilterSidebarProps {
@@ -22,6 +24,9 @@ interface FilterSidebarProps {
 const INSTITUTION_TYPE_OPTIONS: { value: InstitutionType; label: string }[] = [
   { value: 'bank', label: '🏦 Bank' },
   { value: 'insurance', label: '🛡️ Insurance' },
+  { value: 'cooperative', label: '🤝 Cooperative' },
+  { value: 'fintech', label: '📱 Fintech' },
+  { value: 'government', label: '🏛️ Government' },
 ];
 
 export default function FilterSidebar({ filters, onChange, availableLoanTypes }: FilterSidebarProps) {
@@ -66,6 +71,8 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
       institutionTypes: [],
       loanTypes: [],
       sortBy: 'rateMin',
+      amountMin: 0,
+      amountMax: 1000000,
     });
   }
 
@@ -79,6 +86,51 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
         <button onClick={clearAll} className="text-xs text-sky-600 hover:text-sky-800 font-medium">
           Clear all
         </button>
+      </div>
+
+      {/* Loan amount range */}
+      <div>
+        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+          Loan Amount
+        </label>
+        <div className="space-y-3">
+          <div>
+            <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Min amount</span>
+              <span className="font-semibold text-slate-700">
+                {filters.amountMin > 0 ? `€${(filters.amountMin / 1000).toFixed(0)}K` : 'Any'}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={200000}
+              step={5000}
+              value={filters.amountMin}
+              onChange={(e) => onChange({ ...filters, amountMin: Number(e.target.value) })}
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              style={{ accentColor: '#0284c7' }}
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Max amount</span>
+              <span className="font-semibold text-slate-700">
+                {filters.amountMax < 1000000 ? `€${(filters.amountMax / 1000).toFixed(0)}K` : 'Any'}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={5000}
+              max={1000000}
+              step={5000}
+              value={filters.amountMax}
+              onChange={(e) => onChange({ ...filters, amountMax: Number(e.target.value) })}
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              style={{ accentColor: '#0284c7' }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Sort */}

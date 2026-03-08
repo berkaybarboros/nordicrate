@@ -56,6 +56,7 @@ export interface Institution {
   country: CountryCode;
   description: string;
   founded?: number;
+  website?: string;
   isDigitalFriendly?: boolean;
   isEResidentFriendly?: boolean;
 }

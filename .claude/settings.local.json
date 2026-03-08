@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install)",
+      "Bash(node node_modules/.bin/next:*)",
+      "Bash(npm run build:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(git add app/globals.css app/layout.tsx app/page.tsx app/business/ app/countries/ app/loans/ app/mortgage/ components/ lib/)",
+      "Bash(git commit:*)",
+      "Bash(git config user.email \"berka@nordicrate.dev\")",
+      "Bash(git config user.name \"berka\")",
+      "Bash(git add app/page.tsx components/Header.tsx lib/data.ts lib/types.ts lib/utils.ts app/api/ app/programs/ components/LiveRatesBanner.tsx components/ProgramCard.tsx lib/programs-data.ts)",
+      "Bash(git stash)",
+      "Bash(git merge claude/loving-poincare --no-ff -m \"Merge NordicRate platform from claude/loving-poincare\")",
+      "Bash(del \"app\\\\loans\\\\page.tsx\")",
+      "Bash(del \"lib\\\\utils.ts\")",
+      "WebFetch(domain:www.lendo.se)",
+      "WebFetch(domain:altero.ee)",
+      "WebFetch(domain:www.nerdwallet.com)",
+      "WebFetch(domain:www.moneysupermarket.com)",
+      "WebFetch(domain:www.sambla.se)",
+      "Bash(node node_modules/next/dist/bin/next build)",
+      "Bash(git add -A)"
+    ]
+  }
+}
