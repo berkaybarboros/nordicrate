@@ -10,7 +10,9 @@ import {
   INSTITUTION_TYPE_LABELS,
   LOAN_TYPE_ICONS,
   calculateMonthlyPayment,
+  buildUTMLink,
 } from '@/lib/utils';
+import CountryFlag from './CountryFlag';
 
 interface RateCardProps {
   product: LoanProduct;
@@ -47,6 +49,9 @@ export default function RateCard({ product, institution, country }: RateCardProp
   const repMonthly = calculateMonthlyPayment(repPrincipal, product.rateMin, repMonths);
   const repTotal = repMonthly * repMonths;
 
+  // UTM-tagged link to the institution's official website
+  const applyUrl = buildUTMLink(institution.website, institution.id, product.type);
+
   return (
     <div
       className={`bg-white rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col ${
@@ -81,8 +86,9 @@ export default function RateCard({ product, institution, country }: RateCardProp
             </div>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <div className="flex items-center gap-1">
-              <span className="text-lg">{country.flag}</span>
+            {/* Real flag image from flagcdn.com */}
+            <div className="flex items-center gap-1.5">
+              <CountryFlag code={country.code} size={28} rounded="sm" />
               <span className="text-xs font-semibold text-slate-500">{country.code}</span>
             </div>
             <StarRating rate={product.rateMin} />
@@ -156,9 +162,9 @@ export default function RateCard({ product, institution, country }: RateCardProp
         {/* CTA + date */}
         <div className="border-t border-slate-100 pt-3 mt-auto">
           <a
-            href={institution.website ?? '#'}
-            target={institution.website ? '_blank' : undefined}
-            rel={institution.website ? 'noopener noreferrer' : undefined}
+            href={applyUrl}
+            target={applyUrl !== '#' ? '_blank' : undefined}
+            rel={applyUrl !== '#' ? 'noopener noreferrer' : undefined}
             className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-3 rounded-xl text-center transition-colors shadow-md shadow-sky-100 mb-2"
           >
             Apply Now →

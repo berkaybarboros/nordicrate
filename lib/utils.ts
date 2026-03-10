@@ -133,6 +133,38 @@ export function getProductsForPage(
   });
 }
 
+/**
+ * Build an affiliate / UTM link to an institution's official website.
+ *
+ * UTM parameter conventions:
+ *  utm_source   = "nordicrate"          (our site)
+ *  utm_medium   = "comparison"          (comparison table / card)
+ *  utm_campaign = loan type slug         (e.g. "personal-loan", "mortgage")
+ *  utm_content  = institution id         (e.g. "nordea-dk")
+ *
+ * If baseUrl is missing/undefined a "#" href is returned so the button is
+ * still renderable without crashing.
+ */
+export function buildUTMLink(
+  baseUrl: string | undefined,
+  institutionId: string,
+  loanType?: string
+): string {
+  if (!baseUrl) return '#';
+  try {
+    const url = new URL(baseUrl);
+    url.searchParams.set('utm_source', 'nordicrate');
+    url.searchParams.set('utm_medium', 'comparison');
+    if (loanType) {
+      url.searchParams.set('utm_campaign', loanType.replace(/_/g, '-'));
+    }
+    url.searchParams.set('utm_content', institutionId);
+    return url.toString();
+  } catch {
+    return baseUrl; // malformed URL — return as-is
+  }
+}
+
 // Monthly payment using standard amortisation formula
 export function calculateMonthlyPayment(principal: number, annualRatePercent: number, months: number): number {
   if (annualRatePercent === 0) return principal / months;
