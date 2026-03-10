@@ -4,6 +4,7 @@ import { PROGRAMS } from '@/lib/programs-data';
 import { getCountryStats, getInstitution, getCountry, formatAmount, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
 import RateCard from '@/components/RateCard';
 import CountryCard from '@/components/CountryCard';
+import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
 import TrustBar from '@/components/TrustBar';
@@ -117,7 +118,7 @@ export default function HomePage() {
                   href={`/loans?country=${c.code}`}
                   className="flex items-center gap-1.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl px-3 py-1.5 transition-colors text-sm"
                 >
-                  <span className="text-xl">{c.flag}</span>
+                  <CountryFlag code={c.code} size={24} rounded="sm" />
                   <span className="font-medium text-slate-200">{c.name}</span>
                 </Link>
               ))}
@@ -159,7 +160,7 @@ export default function HomePage() {
                       <span>{icon}</span>
                       <span>{label}</span>
                     </div>
-                    {country && <span className="text-2xl">{country.flag}</span>}
+                    {country && <CountryFlag code={country.code} size={32} rounded="sm" />}
                   </div>
                   <p className={`text-4xl font-extrabold text-${accent}-600 mb-1`}>
                     {formatRate(product.rateMin)}

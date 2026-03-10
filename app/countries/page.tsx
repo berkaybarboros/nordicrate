@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { COUNTRIES } from '@/lib/data';
 import { getCountryStats } from '@/lib/utils';
 import CountryCard from '@/components/CountryCard';
+import CountryFlag from '@/components/CountryFlag';
 import type { Region } from '@/lib/types';
 
 export default function CountriesPage() {
@@ -47,9 +48,9 @@ export default function CountriesPage() {
             welfare systems, and mature, well-regulated financial markets. Mortgage markets are highly
             developed, with rates typically below the European average.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             {COUNTRIES.filter((c) => c.region === 'nordic').map((c) => (
-              <span key={c.code} className="text-xl" title={c.name}>{c.flag}</span>
+              <CountryFlag key={c.code} code={c.code} size={32} rounded="sm" alt={c.name} />
             ))}
           </div>
         </div>
@@ -67,9 +68,9 @@ export default function CountriesPage() {
             increasingly sophisticated credit markets. Consumer and business loan rates are generally
             higher than in the Nordics but are converging.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             {COUNTRIES.filter((c) => c.region === 'baltic').map((c) => (
-              <span key={c.code} className="text-xl" title={c.name}>{c.flag}</span>
+              <CountryFlag key={c.code} code={c.code} size={32} rounded="sm" alt={c.name} />
             ))}
           </div>
         </div>
@@ -128,7 +129,8 @@ export default function CountriesPage() {
                 <tr key={c.code} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="py-2.5 pr-4">
                     <span className="flex items-center gap-2">
-                      {c.flag} <span className="font-medium text-slate-900">{c.name}</span>
+                      <CountryFlag code={c.code} size={24} rounded="sm" />
+                      <span className="font-medium text-slate-900">{c.name}</span>
                     </span>
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-slate-700">{c.currency}</td>
