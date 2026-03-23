@@ -39,7 +39,7 @@ function parseECBResponse(json: Record<string, unknown>, label: string) {
 }
 
 async function fetchEuribor(series: string, label: string) {
-  const url = `https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.RT0.MM.${series}_.HSTA?lastNObservations=1&format=jsondata`;
+  const url = `https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.RT.MM.${series}_.HSTA?lastNObservations=1&format=jsondata`;
   const res = await fetch(url, {
     next: { revalidate: 3600 },
     headers: { Accept: 'application/json' },
