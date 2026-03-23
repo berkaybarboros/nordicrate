@@ -1,5 +1,6 @@
 import type { GovernmentProgram } from '@/lib/types';
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_ICONS, AUDIENCE_LABELS } from '@/lib/programs-data';
+import CountryFlag from './CountryFlag';
 
 interface ProgramCardProps {
   program: GovernmentProgram;
@@ -45,7 +46,12 @@ export default function ProgramCard({ program }: ProgramCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">{program.flag}</span>
+            {/* EU uses 🇪🇺 emoji; country-specific programs use real flag image */}
+            {program.country === 'EU' ? (
+              <span className="text-2xl" aria-label="EU flag">🇪🇺</span>
+            ) : (
+              <CountryFlag code={program.country} size={36} rounded="sm" />
+            )}
             <div>
               <p className="text-xs text-slate-500 font-medium">{program.institution}</p>
             </div>

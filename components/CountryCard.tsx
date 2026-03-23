@@ -1,5 +1,6 @@
 import type { CountryInfo } from '@/lib/types';
 import Link from 'next/link';
+import CountryFlag from './CountryFlag';
 
 interface CountryCardProps {
   country: CountryInfo;
@@ -26,7 +27,7 @@ export default function CountryCard({
       <div className="p-5">
         {/* Flag + name */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{country.flag}</span>
+          <CountryFlag code={country.code} size={52} rounded="md" />
           <div>
             <h3 className="text-lg font-bold text-slate-900">{country.name}</h3>
             <div className="flex items-center gap-2">

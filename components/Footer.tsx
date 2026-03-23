@@ -1,4 +1,18 @@
 import Link from 'next/link';
+import CountryFlag from './CountryFlag';
+
+const COUNTRY_CODES = [
+  { code: 'DK', name: 'Denmark' },
+  { code: 'FI', name: 'Finland' },
+  { code: 'IS', name: 'Iceland' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'EE', name: 'Estonia' },
+  { code: 'LV', name: 'Latvia' },
+  { code: 'LT', name: 'Lithuania' },
+];
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
   return (
@@ -16,11 +30,21 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm leading-relaxed">
-              The leading credit comparison platform for Nordic & Baltic markets. Compare rates from 40+ banks and insurers.
+              The leading credit comparison platform for Nordic &amp; Baltic markets.
+              Compare rates from 50+ banks and insurers.
             </p>
-            <div className="flex gap-2 mt-4 flex-wrap">
-              {['🇩🇰', '🇫🇮', '🇮🇸', '🇳🇴', '🇸🇪', '🇪🇪', '🇱🇻', '🇱🇹'].map((flag) => (
-                <span key={flag} className="text-lg">{flag}</span>
+            {/* Real flag images — clickable shortcut to each country */}
+            <div className="flex gap-1.5 mt-4 flex-wrap items-center">
+              {COUNTRY_CODES.map(({ code, name }) => (
+                <Link
+                  key={code}
+                  href={`/loans?country=${code}`}
+                  title={`Loans in ${name}`}
+                  aria-label={`View loans in ${name}`}
+                  className="opacity-80 hover:opacity-100 transition-opacity"
+                >
+                  <CountryFlag code={code} size={22} rounded="sm" alt={name} />
+                </Link>
               ))}
             </div>
           </div>
@@ -33,6 +57,7 @@ export default function Footer() {
               <li><Link href="/mortgage" className="hover:text-white transition-colors">Mortgage Rates</Link></li>
               <li><Link href="/business" className="hover:text-white transition-colors">Business Loans</Link></li>
               <li><Link href="/loans?type=auto" className="hover:text-white transition-colors">Auto Finance</Link></li>
+              <li><Link href="/programs" className="hover:text-white transition-colors">🚀 Gov. Programs</Link></li>
             </ul>
           </div>
 
@@ -43,6 +68,7 @@ export default function Footer() {
               <li><Link href="/countries?region=nordic" className="hover:text-white transition-colors">Nordic Region</Link></li>
               <li><Link href="/countries?region=baltic" className="hover:text-white transition-colors">Baltic Region</Link></li>
               <li><Link href="/countries" className="hover:text-white transition-colors">All Countries</Link></li>
+              <li><Link href="/programs?tab=e_residency" className="hover:text-white transition-colors">🪪 e-Residency Hub</Link></li>
             </ul>
           </div>
 
@@ -50,17 +76,17 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold text-sm mb-4">Information</h3>
             <ul className="space-y-2 text-sm">
-              <li><span className="cursor-default">About NordicRate</span></li>
-              <li><span className="cursor-default">Methodology</span></li>
-              <li><span className="cursor-default">Privacy Policy</span></li>
-              <li><span className="cursor-default">Terms of Use</span></li>
+              <li><Link href="/programs" className="hover:text-white transition-colors">About NordicRate</Link></li>
+              <li><span className="cursor-default opacity-50">Methodology</span></li>
+              <li><span className="cursor-default opacity-50">Privacy Policy</span></li>
+              <li><span className="cursor-default opacity-50">Terms of Use</span></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
-          <p>© 2025 NordicRate. All rights reserved.</p>
-          <p className="text-center">
+          <p>© {CURRENT_YEAR} NordicRate. All rights reserved.</p>
+          <p className="text-center text-slate-500">
             Rates are indicative only. Always verify directly with the institution before applying.
           </p>
         </div>
