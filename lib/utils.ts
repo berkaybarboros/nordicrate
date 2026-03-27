@@ -172,6 +172,41 @@ export function calculateMonthlyPayment(principal: number, annualRatePercent: nu
   return (principal * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
 }
 
+// Format a number as a currency string (e.g. €1,234.56)
+export function formatCurrency(amount: number, currencyCode = 'EUR'): string {
+  return new Intl.NumberFormat('en-EU', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+// Approximate APR (includes origination fee spread over loan term)
+export function calculateAPR(
+  principal: number,
+  annualRatePercent: number,
+  months: number,
+  originationFeePercent = 0
+): number {
+  const fee = principal * (originationFeePercent / 100);
+  const netPrincipal = principal - fee;
+  if (netPrincipal <= 0 || months <= 0) return annualRatePercent;
+  const monthlyPayment = calculateMonthlyPayment(principal, annualRatePercent, months);
+  // Newton-Raphson to find monthly rate r such that PV(r, months, monthlyPayment) = netPrincipal
+  let r = annualRatePercent / 100 / 12;
+  for (let i = 0; i < 100; i++) {
+    const pv = monthlyPayment * (1 - Math.pow(1 + r, -months)) / r;
+    const dpv = monthlyPayment * (
+      Math.pow(1 + r, -months) * months / r - (1 - Math.pow(1 + r, -months)) / (r * r)
+    );
+    const rNew = r - (pv - netPrincipal) / dpv;
+    if (Math.abs(rNew - r) < 1e-8) { r = rNew; break; }
+    r = rNew;
+  }
+  return parseFloat((r * 12 * 100).toFixed(2));
+}
+
 export function getCountryStats(countryCode: string) {
   const countryInstitutions = INSTITUTIONS.filter((i) => i.country === countryCode);
   const institutionIds = countryInstitutions.map((i) => i.id);
