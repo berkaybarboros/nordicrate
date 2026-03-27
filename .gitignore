@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# macOS metadata files
+._*
+.DS_Store
+
+# Claude IDE files
+.claude/
+.claire/
