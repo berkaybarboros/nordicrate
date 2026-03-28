@@ -15,6 +15,11 @@ export const lv: Translations = {
     homeInsurance: "Mājas apdrošināšana",
     healthInsurance: "Veselības apdrošināšana",
     language: "Valoda",
+    business: "Uzņēmumu kredīti",
+    countries: "Valstis",
+    programs: "🚀 Programmas",
+    getQuote: "Saņemt bezmaksas piedāvājumu →",
+    updatedDaily: "● Atjaunots katru dienu",
   },
   hero: {
     badge: "Igaunijas #1 finanšu produktu salīdzināšanas platforma",

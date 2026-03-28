@@ -52,7 +52,7 @@ export default function Navbar() {
     { href: "/insurance/health", label: t.nav.healthInsurance, icon: "❤️", desc: "Private healthcare" },
   ];
 
-  const locales: Locale[] = ["en", "et", "fi", "lv"];
+  const locales: Locale[] = ["en", "et", "fi"];
 
   return (
     <>

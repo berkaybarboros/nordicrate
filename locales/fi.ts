@@ -15,6 +15,11 @@ export const fi: Translations = {
     homeInsurance: "Kotivakuutus",
     healthInsurance: "Sairausvakuutus",
     language: "Kieli",
+    business: "Yritysluotot",
+    countries: "Maat",
+    programs: "🚀 Ohjelmat",
+    getQuote: "Pyydä ilmainen tarjous →",
+    updatedDaily: "● Päivitetään päivittäin",
   },
   hero: {
     badge: "Viron #1 rahoitustuotteiden vertailupalvelu",

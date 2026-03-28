@@ -15,6 +15,11 @@ export const et: Translations = {
     homeInsurance: "Kodukindlustus",
     healthInsurance: "Ravikindlustus",
     language: "Keel",
+    business: "Ärilaenud",
+    countries: "Riigid",
+    programs: "🚀 Programmid",
+    getQuote: "Hangi tasuta hinnapakkumine →",
+    updatedDaily: "● Uuendatakse iga päev",
   },
   hero: {
     badge: "Eesti #1 finantstoodete võrdlusplatvorm",

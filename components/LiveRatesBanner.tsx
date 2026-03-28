@@ -1,43 +1,15 @@
-import type { LiveRatesData } from '@/lib/types';
+import { fetchAllRates } from '@/lib/rates';
 
-async function fetchRates(): Promise<LiveRatesData | null> {
-  try {
-    // In production this calls our own /api/rates route (server-side)
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const res = await fetch(`${baseUrl}/api/rates`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+export const dynamic = 'force-dynamic';
 
 export default async function LiveRatesBanner() {
-  const data = await fetchRates();
+  // Direct function call — no HTTP self-call, always fresh
+  const data = await fetchAllRates();
 
-  // Fallback if API unreachable at SSR time
-  const euribor = data?.euribor ?? {
-    euribor3m: { label: 'EURIBOR 3M', rate: 2.456, period: '2025-10' },
-    euribor6m: { label: 'EURIBOR 6M', rate: 2.589, period: '2025-10' },
-    euribor12m: { label: 'EURIBOR 12M', rate: 2.734, period: '2025-10' },
-  };
-  const cbRates = data?.centralBankRates ?? {
-    norges: { label: 'Norges Bank', rate: 4.5, currency: 'NOK', period: '2025-11' },
-    riksbank: { label: 'Riksbank', rate: 2.75, currency: 'SEK', period: '2025-11' },
-    nationalbank: { label: 'Danmarks Nationalbank', rate: 3.1, currency: 'DKK', period: '2025-10' },
-    centralbank_is: { label: 'Central Bank of Iceland', rate: 9.0, currency: 'ISK', period: '2025-11' },
-    ecb: { label: 'ECB Deposit Rate', rate: 3.15, currency: 'EUR', period: '2025-10' },
-  };
-
-  const fetchedAt = data?.fetchedAt ? new Date(data.fetchedAt) : new Date();
-  const isLive = data?.success ?? false;
-
-  const euriborRates = [euribor.euribor3m, euribor.euribor6m, euribor.euribor12m];
-  const centralRates = Object.values(cbRates);
+  const euriborRates = [data.euribor.euribor3m, data.euribor.euribor6m, data.euribor.euribor12m];
+  const centralRates = Object.values(data.centralBankRates);
+  const fetchedAt = new Date(data.fetchedAt);
+  const isLive = data.success;
 
   return (
     <div className="bg-slate-900 text-white">

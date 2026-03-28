@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { en, et, fi, lv } from "@/locales";
-import type { Translations, Locale } from "@/locales";
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { en, et, fi, type Translations, type Locale } from '@/locales';
 
-const translations: Record<Locale, Translations> = { en, et, fi, lv };
+const translations: Record<Locale, Translations> = { en, et, fi };
 
 interface LanguageContextType {
   locale: Locale;
@@ -13,19 +12,18 @@ interface LanguageContextType {
 }
 
 const LanguageContext = createContext<LanguageContextType>({
-  locale: "en",
+  locale: 'en',
   t: en,
   setLocale: () => {},
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>('en');
 
-  // Load saved locale from localStorage on mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("balticrate-locale") as Locale | null;
-      if (saved && ["en", "et", "fi", "lv"].includes(saved)) {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nordicrate-locale') as Locale | null;
+      if (saved && ['en', 'fi', 'et'].includes(saved)) {
         setLocaleState(saved);
       }
     }
@@ -33,15 +31,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("balticrate-locale", newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nordicrate-locale', newLocale);
     }
   }, []);
 
   return (
-    <LanguageContext.Provider
-      value={{ locale, t: translations[locale], setLocale }}
-    >
+    <LanguageContext.Provider value={{ locale, t: translations[locale], setLocale }}>
       {children}
     </LanguageContext.Provider>
   );

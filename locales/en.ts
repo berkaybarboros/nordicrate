@@ -13,6 +13,11 @@ export const en = {
     homeInsurance: "Home Insurance",
     healthInsurance: "Health Insurance",
     language: "Language",
+    business: "Business",
+    countries: "Countries",
+    programs: "🚀 Programs",
+    getQuote: "Get Free Quote →",
+    updatedDaily: "● Updated daily",
   },
   hero: {
     badge: "Estonia's #1 Financial Comparison Platform",
