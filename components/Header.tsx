@@ -61,10 +61,9 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 text-xs text-slate-300 border border-slate-700 hover:border-slate-500 rounded-lg px-2.5 py-1.5 transition-colors"
+                className="flex items-center gap-1 text-xs text-slate-300 border border-slate-700 hover:border-slate-500 rounded-lg px-2 py-1.5 transition-colors"
               >
-                <span>{LOCALE_FLAGS[locale]}</span>
-                <span className="font-medium uppercase">{locale}</span>
+                <span className="text-lg leading-none">{LOCALE_FLAGS[locale]}</span>
                 <svg
                   className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -152,7 +151,8 @@ export default function Header() {
                       : 'border-slate-700 text-slate-400 hover:border-slate-500'
                   }`}
                 >
-                  {LOCALE_FLAGS[loc]} {loc.toUpperCase()}
+                  <span className="text-lg leading-none">{LOCALE_FLAGS[loc]}</span>
+                  <span>{LOCALE_NAMES[loc]}</span>
                 </button>
               ))}
             </div>
