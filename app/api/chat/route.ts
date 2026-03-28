@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const systemPrompt = buildSystemPrompt(mode);
 
     const stream = await anthropic.messages.stream({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-haiku-4-5',
       max_tokens: 1024,
       system: systemPrompt,
       messages: messages.map((m) => ({
