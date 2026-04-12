@@ -1,12 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { buildSystemPrompt, type AssistantMode } from '@/lib/ai-context';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -23,30 +18,66 @@ export async function POST(req: Request) {
 
     const systemPrompt = buildSystemPrompt(mode);
 
-    const stream = await anthropic.messages.stream({
-      model: 'claude-haiku-4-5',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1024,
+        stream: true,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      }),
     });
 
-    // Return a streaming response
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Groq error:', err);
+      return Response.json({ error: 'AI service error' }, { status: 502 });
+    }
+
+    // Forward Groq SSE stream, converting to our format
     const readableStream = new ReadableStream({
       async start(controller) {
+        const reader = res.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
         try {
-          for await (const chunk of stream) {
-            if (
-              chunk.type === 'content_block_delta' &&
-              chunk.delta.type === 'text_delta'
-            ) {
-              const data = JSON.stringify({ text: chunk.delta.text });
-              controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith('data:')) continue;
+              const json = trimmed.slice(5).trim();
+              if (json === '[DONE]') {
+                controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+                continue;
+              }
+              try {
+                const parsed = JSON.parse(json);
+                const text = parsed.choices?.[0]?.delta?.content;
+                if (text) {
+                  controller.enqueue(
+                    new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`)
+                  );
+                }
+              } catch {
+                // skip malformed chunk
+              }
             }
           }
-          controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
           controller.close();
         } catch (err) {
           controller.error(err);
@@ -63,9 +94,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error('Chat API error:', error);
-    return Response.json(
-      { error: 'Failed to process request' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'Failed to process request' }, { status: 500 });
   }
 }
