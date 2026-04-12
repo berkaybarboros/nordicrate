@@ -1,4 +1,5 @@
 import { buildSystemPrompt, type AssistantMode } from '@/lib/ai-context';
+import type { LiveRatesData } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -6,6 +7,17 @@ export const maxDuration = 30;
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+}
+
+async function fetchLiveRates(): Promise<LiveRatesData | undefined> {
+  try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3001';
+    const res = await fetch(`${base}/api/rates`, { next: { revalidate: 3600 } });
+    if (!res.ok) return undefined;
+    return await res.json();
+  } catch {
+    return undefined;
+  }
 }
 
 export async function POST(req: Request) {
@@ -16,7 +28,8 @@ export async function POST(req: Request) {
       return Response.json({ error: 'No messages provided' }, { status: 400 });
     }
 
-    const systemPrompt = buildSystemPrompt(mode);
+    const liveRates = await fetchLiveRates();
+    const systemPrompt = buildSystemPrompt(mode, liveRates);
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',

@@ -1,79 +1,81 @@
 import { PRODUCTS, INSTITUTIONS, COUNTRIES } from '@/lib/data';
 import { PROGRAMS } from '@/lib/programs-data';
+import type { LiveRatesData } from '@/lib/types';
 
 export type AssistantMode = 'personal' | 'corporate';
 
-function buildDataContext(): string {
+function formatProduct(p: typeof PRODUCTS[0]) {
+  const inst = INSTITUTIONS.find(i => i.id === p.institutionId);
+  const country = COUNTRIES.find(c => c.code === inst?.country);
+  const website = inst?.website ? ` | ${inst.website}` : '';
+  const eRes = inst?.isEResidentFriendly ? ' | ✅ e-Resident friendly' : '';
+  const digital = inst?.isDigitalFriendly ? ' | 📱 Digital-first' : '';
+  return `  - ${inst?.shortName} (${country?.flag}${country?.code}): ${p.name}, APR ${p.rateMin}%–${p.rateMax}%, ${p.currency} ${(p.limitMin/1000).toFixed(0)}k–${(p.limitMax/1000).toFixed(0)}k, term ${p.termMin}–${p.termMax}mo${p.collateralRequired ? ', collateral req.' : ''}${eRes}${digital}${website}`;
+}
+
+function buildDataContext(liveRates?: LiveRatesData): string {
+  // Live rates block
+  let liveRatesBlock = '';
+  if (liveRates?.success) {
+    const { euribor3m, euribor6m, euribor12m } = liveRates.euribor;
+    const cbRates = Object.values(liveRates.centralBankRates)
+      .map(r => `  ${r.label}: ${r.rate}% ${r.currency} (${r.period ?? ''})`)
+      .join('\n');
+    liveRatesBlock = `
+LIVE MARKET RATES (as of ${new Date(liveRates.fetchedAt).toLocaleDateString('en-GB')}):
+  EURIBOR 3M:  ${euribor3m.rate}% (${euribor3m.period})
+  EURIBOR 6M:  ${euribor6m.rate}% (${euribor6m.period})
+  EURIBOR 12M: ${euribor12m.rate}% (${euribor12m.period})
+CENTRAL BANK RATES:
+${cbRates}
+NOTE: Variable-rate mortgages in Nordic/Baltic countries are typically EURIBOR + bank margin (0.5%–2.5%).`;
+  }
+
   // Country summary
   const countryLines = COUNTRIES.map(c => {
     const insts = INSTITUTIONS.filter(i => i.country === c.code);
-    const prods = PRODUCTS.filter(p => {
-      const inst = INSTITUTIONS.find(i => i.id === p.institutionId);
-      return inst?.country === c.code;
-    });
-    const personalRates = prods.filter(p => p.type === 'personal');
-    const mortgageRates = prods.filter(p => p.type === 'mortgage');
-    const businessRates = prods.filter(p => p.type === 'business');
-
-    const avgPersonal = personalRates.length
-      ? (personalRates.reduce((a, b) => a + b.rateMin, 0) / personalRates.length).toFixed(2)
-      : 'N/A';
-    const avgMortgage = mortgageRates.length
-      ? (mortgageRates.reduce((a, b) => a + b.rateMin, 0) / mortgageRates.length).toFixed(2)
-      : 'N/A';
-    const avgBusiness = businessRates.length
-      ? (businessRates.reduce((a, b) => a + b.rateMin, 0) / businessRates.length).toFixed(2)
-      : 'N/A';
-
-    return `${c.flag} ${c.name} (${c.code}) — ${c.currency}, EU:${c.inEU}, Eurozone:${c.inEurozone}, ${insts.length} banks, ${prods.length} products | Avg rates: personal ${avgPersonal}%, mortgage ${avgMortgage}%, business ${avgBusiness}%`;
+    const prods = PRODUCTS.filter(p => INSTITUTIONS.find(i => i.id === p.institutionId)?.country === c.code);
+    const personalMin = prods.filter(p => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin)[0];
+    const mortgageMin = prods.filter(p => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin)[0];
+    const businessMin = prods.filter(p => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin)[0];
+    return `${c.flag} ${c.name} (${c.code}) | ${c.currency} | EU:${c.inEU} | Eurozone:${c.inEurozone} | ${insts.length} institutions | Best: personal from ${personalMin?.rateMin ?? 'N/A'}%, mortgage from ${mortgageMin?.rateMin ?? 'N/A'}%, business from ${businessMin?.rateMin ?? 'N/A'}%`;
   }).join('\n');
 
-  // Best products per type
-  const bestPersonal = [...PRODUCTS].filter(p => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin).slice(0, 5);
-  const bestMortgage = [...PRODUCTS].filter(p => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin).slice(0, 5);
-  const bestBusiness = [...PRODUCTS].filter(p => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin).slice(0, 5);
+  // All products grouped by type
+  const allPersonal = [...PRODUCTS].filter(p => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin);
+  const allMortgage = [...PRODUCTS].filter(p => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin);
+  const allBusiness = [...PRODUCTS].filter(p => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin);
 
-  function formatProduct(p: typeof PRODUCTS[0]) {
-    const inst = INSTITUTIONS.find(i => i.id === p.institutionId);
-    const country = COUNTRIES.find(c => c.code === inst?.country);
-    return `  - ${inst?.shortName} (${country?.flag}${country?.code}): ${p.name}, APR ${p.rateMin}%–${p.rateMax}%, ${p.currency} ${(p.limitMin/1000).toFixed(0)}k–${(p.limitMax/1000).toFixed(0)}k, term ${p.termMin}–${p.termMax}mo${p.collateralRequired ? ', collateral required' : ''}`;
-  }
-
-  // Program types summary
-  const programTypes = [...new Set(PROGRAMS.map(p => p.type))];
-  const programSummary = programTypes.map(type => {
-    const progs = PROGRAMS.filter(p => p.type === type);
-    return `  ${type}: ${progs.map(p => `${p.flag}${p.name} (${p.country})`).join(', ')}`;
-  }).join('\n');
+  // Programs with full detail
+  const programLines = PROGRAMS.map(p =>
+    `  ${p.flag} [${p.country}] ${p.name} (${p.type}) — audience: ${p.audience.join(', ')}${p.maxAmount ? ` | max: ${p.maxAmount.toLocaleString()} ${p.currency}` : ''}${p.rateMin != null ? ` | rate: ${p.rateMin}%${p.rateMax ? `–${p.rateMax}%` : ''}` : ''} | ${p.description.slice(0, 120)}...`
+  ).join('\n');
 
   return `
 === NORDICRATE PLATFORM DATA ===
+${liveRatesBlock}
 
-COUNTRIES COVERED:
+COUNTRIES (8 total — 5 Nordic + 3 Baltic):
 ${countryLines}
 
-TOP 5 PERSONAL LOANS (by lowest APR):
-${bestPersonal.map(formatProduct).join('\n')}
+ALL PERSONAL LOANS (${allPersonal.length} products, sorted by lowest APR):
+${allPersonal.map(formatProduct).join('\n')}
 
-TOP 5 MORTGAGE RATES (by lowest APR):
-${bestMortgage.map(formatProduct).join('\n')}
+ALL MORTGAGE PRODUCTS (${allMortgage.length} products, sorted by lowest APR):
+${allMortgage.map(formatProduct).join('\n')}
 
-TOP 5 BUSINESS LOANS (by lowest APR):
-${bestBusiness.map(formatProduct).join('\n')}
+ALL BUSINESS LOANS (${allBusiness.length} products, sorted by lowest APR):
+${allBusiness.map(formatProduct).join('\n')}
 
 GOVERNMENT & SPECIAL PROGRAMS (${PROGRAMS.length} total):
-${programSummary}
+${programLines}
 
-TOTAL PLATFORM STATS:
-- ${INSTITUTIONS.length} financial institutions
-- ${PRODUCTS.length} loan products
-- ${PROGRAMS.length} government programs
-- 8 countries (5 Nordic + 3 Baltic)
+PLATFORM STATS: ${INSTITUTIONS.length} institutions | ${PRODUCTS.length} loan products | ${PROGRAMS.length} government programs
 `.trim();
 }
 
-export function buildSystemPrompt(mode: AssistantMode): string {
-  const data = buildDataContext();
+export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData): string {
+  const data = buildDataContext(liveRates);
 
   const sharedRules = `
 RESPONSE RULES:
