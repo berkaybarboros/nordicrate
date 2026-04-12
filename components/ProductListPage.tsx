@@ -6,6 +6,7 @@ import { INSTITUTIONS, COUNTRIES } from '@/lib/data';
 import { getInstitution, getCountry } from '@/lib/utils';
 import RateCard from './RateCard';
 import FilterSidebar, { type FilterState } from './FilterSidebar';
+import DataFreshnessBadge from './DataFreshnessBadge';
 
 interface ProductListPageProps {
   title: string;
@@ -101,7 +102,10 @@ export default function ProductListPage({
           <span className="text-3xl">{icon}</span>
           <h1 className="text-3xl font-extrabold text-slate-900">{title}</h1>
         </div>
-        <p className="text-slate-500">{subtitle}</p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <p className="text-slate-500">{subtitle}</p>
+          <DataFreshnessBadge />
+        </div>
       </div>
 
       {/* Mobile filter toggle */}

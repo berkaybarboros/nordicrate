@@ -169,12 +169,24 @@ export default function RateCard({ product, institution, country }: RateCardProp
           >
             Apply Now →
           </a>
-          <p className="text-center text-xs text-slate-400">
-            Updated {new Date(product.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {new Date(product.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
+            </span>
             {institution.isDigitalFriendly && (
-              <span className="ml-2 text-sky-500 font-medium">· 📱 100% Online</span>
+              <span className="inline-flex items-center gap-1 text-xs text-sky-600 bg-sky-50 border border-sky-100 rounded-full px-2 py-0.5 font-medium">
+                📱 100% Online
+              </span>
             )}
-          </p>
+            {institution.isEResidentFriendly && (
+              <span className="inline-flex items-center gap-1 text-xs text-violet-600 bg-violet-50 border border-violet-100 rounded-full px-2 py-0.5 font-medium">
+                🌐 e-Resident OK
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
