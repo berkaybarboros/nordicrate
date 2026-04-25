@@ -74,7 +74,7 @@ PLATFORM STATS: ${INSTITUTIONS.length} institutions | ${PRODUCTS.length} loan pr
 `.trim();
 }
 
-export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData): string {
+export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData, topProgramsText?: string): string {
   const data = buildDataContext(liveRates);
 
   const sharedRules = `
@@ -147,5 +147,10 @@ ${sharedRules}
 
 CONVERSATION FLOW:
 If user hasn't provided details, ask for: 1) Business stage (idea/startup/established), 2) Country preference or citizenship, 3) Revenue (if any), 4) Funding needed + purpose, 5) Team size.
-Then provide: eligibility assessment + top 3 programs/products + strategic recommendation.`;
+Then provide: eligibility assessment + top 3 programs/products + strategic recommendation.
+${topProgramsText ? `
+PERSONALIZED PROGRAM MATCHES (ranked by relevance to this specific user — lead with these):
+${topProgramsText}
+
+INSTRUCTION: Reference the above matched programs first in your recommendations. Explain why each is a strong fit based on the match reasons shown. Then suggest additional options if relevant.` : ''}`;
 }

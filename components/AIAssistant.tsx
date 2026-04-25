@@ -5,7 +5,10 @@ import type { ChatMessage } from '@/app/api/chat/route';
 import type { AssistantMode } from '@/lib/ai-context';
 import type { UserProfile, EligibilityResult } from '@/lib/profile';
 import { calculateEligibility } from '@/lib/profile';
+import type { CorporateProfile, ProgramMatch } from '@/lib/corporate-profile';
+import { matchPrograms } from '@/lib/corporate-profile';
 import EligibilityPanel from '@/components/EligibilityPanel';
+import ProgramMatchPanel from '@/components/ProgramMatchPanel';
 
 const WELCOME_MESSAGES: Record<AssistantMode, string> = {
   personal: `👋 Hi! I'm **NordicAI**, your personal finance assistant.
@@ -83,6 +86,8 @@ export default function AIAssistant() {
   const abortRef = useRef<AbortController | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile>({});
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
+  const [corporateProfile, setCorporateProfile] = useState<CorporateProfile>({});
+  const [programMatches, setProgramMatches] = useState<ProgramMatch[]>([]);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -116,6 +121,14 @@ export default function AIAssistant() {
     setEligibilityResult(result.score !== 'insufficient_data' ? result : null);
   }, [userProfile]);
 
+  useEffect(() => {
+    if (Object.keys(corporateProfile).length === 0) {
+      setProgramMatches([]);
+      return;
+    }
+    setProgramMatches(matchPrograms(corporateProfile, 5));
+  }, [corporateProfile]);
+
   const handleOpen = () => {
     setIsOpen(true);
     setHasUnread(false);
@@ -128,15 +141,18 @@ export default function AIAssistant() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgs }),
+        body: JSON.stringify({ messages: msgs, mode }),
       });
       if (!res.ok) return;
-      const extracted: UserProfile = await res.json();
-      if (Object.keys(extracted).length > 0) {
-        setUserProfile(prev => ({ ...prev, ...extracted }));
+      const extracted = await res.json() as Record<string, unknown>;
+      if (Object.keys(extracted).length === 0) return;
+      if (mode === 'personal') {
+        setUserProfile(prev => ({ ...prev, ...(extracted as UserProfile) }));
+      } else {
+        setCorporateProfile(prev => ({ ...prev, ...(extracted as CorporateProfile) }));
       }
     } catch { /* silent — profile is best-effort */ }
-  }, []);
+  }, [mode]);
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || isLoading) return;
@@ -165,6 +181,9 @@ export default function AIAssistant() {
         body: JSON.stringify({
           messages: currentMessages.map(m => ({ role: m.role, content: m.content })),
           mode,
+          ...(mode === 'corporate' && Object.keys(corporateProfile).length > 0
+            ? { corporateProfile }
+            : {}),
         }),
         signal: abortRef.current.signal,
       });
@@ -223,7 +242,7 @@ export default function AIAssistant() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, mode, fetchProfile]);
+  }, [input, isLoading, messages, mode, corporateProfile, fetchProfile]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -237,6 +256,8 @@ export default function AIAssistant() {
     setMode(newMode);
     setUserProfile({});
     setEligibilityResult(null);
+    setCorporateProfile({});
+    setProgramMatches([]);
   };
 
   return (
@@ -369,9 +390,14 @@ export default function AIAssistant() {
             </div>
           )}
 
-          {/* Eligibility Panel */}
+          {/* Eligibility Panel — personal mode */}
           {eligibilityResult && mode === 'personal' && (
             <EligibilityPanel profile={userProfile} result={eligibilityResult} />
+          )}
+
+          {/* Program Match Panel — corporate mode */}
+          {programMatches.length > 0 && mode === 'corporate' && (
+            <ProgramMatchPanel matches={programMatches} />
           )}
 
           {/* Input */}

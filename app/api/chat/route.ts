@@ -1,5 +1,6 @@
 import { buildSystemPrompt, type AssistantMode } from '@/lib/ai-context';
 import type { LiveRatesData } from '@/lib/types';
+import { matchPrograms, type CorporateProfile } from '@/lib/corporate-profile';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -22,14 +23,37 @@ async function fetchLiveRates(): Promise<LiveRatesData | undefined> {
 
 export async function POST(req: Request) {
   try {
-    const { messages, mode = 'personal' }: { messages: ChatMessage[]; mode: AssistantMode } = await req.json();
+    const {
+      messages,
+      mode = 'personal',
+      corporateProfile,
+    }: { messages: ChatMessage[]; mode: AssistantMode; corporateProfile?: CorporateProfile } = await req.json();
 
     if (!messages || messages.length === 0) {
       return Response.json({ error: 'No messages provided' }, { status: 400 });
     }
 
     const liveRates = await fetchLiveRates();
-    const systemPrompt = buildSystemPrompt(mode, liveRates);
+
+    let topProgramsText: string | undefined;
+    if (mode === 'corporate' && corporateProfile && Object.keys(corporateProfile).length > 0) {
+      const matches = matchPrograms(corporateProfile, 5);
+      if (matches.length > 0) {
+        topProgramsText = matches
+          .map((m, i) => {
+            const amtStr = m.program.maxAmount
+              ? ` | max: ${m.program.maxAmount.toLocaleString()} ${m.program.currency ?? 'EUR'}`
+              : '';
+            const rateStr = m.program.rateMin != null
+              ? ` | rate: ${m.program.rateMin}${m.program.rateMax ? `–${m.program.rateMax}` : ''}%`
+              : '';
+            return `${i + 1}. ${m.program.flag} ${m.program.name} [${m.program.country}] (relevance: ${m.score}/100)\n   Why: ${m.matchReasons.join(' · ')}${amtStr}${rateStr}`;
+          })
+          .join('\n');
+      }
+    }
+
+    const systemPrompt = buildSystemPrompt(mode, liveRates, topProgramsText);
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
