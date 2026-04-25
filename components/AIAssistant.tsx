@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ChatMessage } from '@/app/api/chat/route';
 import type { AssistantMode } from '@/lib/ai-context';
+import type { UserProfile, EligibilityResult } from '@/lib/profile';
+import { calculateEligibility } from '@/lib/profile';
+import EligibilityPanel from '@/components/EligibilityPanel';
 
 const WELCOME_MESSAGES: Record<AssistantMode, string> = {
   personal: `👋 Hi! I'm **NordicAI**, your personal finance assistant.
@@ -78,6 +81,8 @@ export default function AIAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile>({});
+  const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -102,11 +107,36 @@ export default function AIAssistant() {
     }
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    if (Object.keys(userProfile).length === 0) {
+      setEligibilityResult(null);
+      return;
+    }
+    const result = calculateEligibility(userProfile);
+    setEligibilityResult(result.score !== 'insufficient_data' ? result : null);
+  }, [userProfile]);
+
   const handleOpen = () => {
     setIsOpen(true);
     setHasUnread(false);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
+
+  const fetchProfile = useCallback(async (msgs: Array<{ role: string; content: string }>) => {
+    if (msgs.length < 2) return;
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: msgs }),
+      });
+      if (!res.ok) return;
+      const extracted: UserProfile = await res.json();
+      if (Object.keys(extracted).length > 0) {
+        setUserProfile(prev => ({ ...prev, ...extracted }));
+      }
+    } catch { /* silent — profile is best-effort */ }
+  }, []);
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || isLoading) return;
@@ -144,6 +174,7 @@ export default function AIAssistant() {
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let fullContent = '';
 
       while (reader) {
         const { done, value } = await reader.read();
@@ -159,6 +190,7 @@ export default function AIAssistant() {
             if (data === '[DONE]') continue;
             try {
               const { text } = JSON.parse(data);
+              fullContent += text;
               setMessages(prev =>
                 prev.map(m =>
                   m.id === assistantId
@@ -171,6 +203,12 @@ export default function AIAssistant() {
             }
           }
         }
+      }
+      if (fullContent) {
+        fetchProfile([
+          ...currentMessages.map(m => ({ role: m.role, content: m.content })),
+          { role: 'assistant' as const, content: fullContent },
+        ]);
       }
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
@@ -185,7 +223,7 @@ export default function AIAssistant() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, mode]);
+  }, [input, isLoading, messages, mode, fetchProfile]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -197,7 +235,8 @@ export default function AIAssistant() {
   const handleModeSwitch = (newMode: AssistantMode) => {
     if (newMode === mode) return;
     setMode(newMode);
-    // messages reset via useEffect
+    setUserProfile({});
+    setEligibilityResult(null);
   };
 
   return (
@@ -328,6 +367,11 @@ export default function AIAssistant() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Eligibility Panel */}
+          {eligibilityResult && mode === 'personal' && (
+            <EligibilityPanel profile={userProfile} result={eligibilityResult} />
           )}
 
           {/* Input */}
