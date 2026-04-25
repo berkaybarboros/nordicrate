@@ -1,18 +1,36 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { LOCALE_FLAGS, LOCALE_NAMES, type Locale } from '@/locales';
+import { supabase } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 const LOCALES: Locale[] = ['en', 'fi', 'et'];
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const { locale, t, setLocale } = useTranslation();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  }
 
   const navLinks = [
     { href: '/loans', label: t.nav.personalLoans },
@@ -95,12 +113,35 @@ export default function Header() {
             <span className="text-xs bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded px-2 py-1 font-medium">
               {t.nav.updatedDaily}
             </span>
-            <Link
-              href="/loans"
-              className="ml-1 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-sky-900/40"
-            >
-              {t.nav.getQuote}
-            </Link>
+
+            {user ? (
+              <div className="flex items-center gap-2 ml-1">
+                <span className="text-xs text-slate-400 truncate max-w-[120px]">
+                  {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 ml-1">
+                <Link
+                  href="/login"
+                  className="text-xs text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-sky-900/40"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -157,14 +198,37 @@ export default function Header() {
               ))}
             </div>
 
-            <div className="pt-2 px-4">
-              <Link
-                href="/loans"
-                onClick={() => setMenuOpen(false)}
-                className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors"
-              >
-                {t.nav.getQuote}
-              </Link>
+            <div className="pt-2 px-4 space-y-2">
+              {user ? (
+                <>
+                  <p className="text-xs text-slate-400 px-1">
+                    {user.user_metadata?.full_name ?? user.email}
+                  </p>
+                  <button
+                    onClick={() => { handleLogout(); setMenuOpen(false); }}
+                    className="block w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
