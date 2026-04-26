@@ -6,58 +6,52 @@ import { supabase } from '@/lib/supabase';
 import { upsertUserProfile } from '@/lib/db';
 import { COUNTRIES } from '@/lib/data';
 
-type Mode = 'personal' | 'corporate';
-type Step = 1 | 2;
+type Step = 1 | 2 | 3 | 4;
 
-const EMPLOYMENT_TYPES = [
-  { value: 'employed',     label: 'Employed (salary)' },
-  { value: 'self_employed',label: 'Self-employed' },
-  { value: 'freelancer',   label: 'Freelancer / contractor' },
-  { value: 'student',      label: 'Student' },
+const LOAN_TYPES = [
+  { value: 'personal', icon: '💳', label: 'Personal loan', desc: 'Cash for any purpose', route: '/loans/personal' },
+  { value: 'mortgage', icon: '🏠', label: 'Mortgage', desc: 'Buy or refinance a home', route: '/loans/mortgage' },
+  { value: 'auto',     icon: '🚗', label: 'Car loan', desc: 'New or used vehicle', route: '/loans/car' },
+  { value: 'business', icon: '🏢', label: 'Business loan', desc: 'Fund your company', route: '/loans/business' },
+] as const;
+
+type LoanType = typeof LOAN_TYPES[number]['value'];
+
+const AMOUNT_OPTIONS = [
+  { label: 'Under €5,000',        value: 3000 },
+  { label: '€5,000 – €15,000',   value: 10000 },
+  { label: '€15,000 – €30,000',  value: 22000 },
+  { label: '€30,000 – €75,000',  value: 50000 },
+  { label: '€75,000 – €200,000', value: 130000 },
+  { label: 'Over €200,000',       value: 300000 },
 ];
 
-const BUSINESS_STAGES = [
-  { value: 'idea',        label: 'Idea stage' },
-  { value: 'startup',     label: 'Startup (< 2 yrs)' },
-  { value: 'growth',      label: 'Growth (2–7 yrs)' },
-  { value: 'established', label: 'Established (7+ yrs)' },
+const INCOME_OPTIONS = [
+  { label: 'Under €1,000',        value: 800 },
+  { label: '€1,000 – €2,000',    value: 1500 },
+  { label: '€2,000 – €3,500',    value: 2750 },
+  { label: '€3,500 – €5,000',    value: 4250 },
+  { label: '€5,000 – €7,500',    value: 6000 },
+  { label: 'Over €7,500',         value: 10000 },
 ];
 
-const SECTORS = [
-  { value: 'tech',           label: 'Tech / Software' },
-  { value: 'fintech',        label: 'Fintech' },
-  { value: 'saas',           label: 'SaaS' },
-  { value: 'ecommerce',      label: 'E-commerce' },
-  { value: 'manufacturing',  label: 'Manufacturing' },
-  { value: 'services',       label: 'Professional services' },
-  { value: 'agriculture',    label: 'Agriculture' },
-  { value: 'tourism',        label: 'Tourism & hospitality' },
-  { value: 'other',          label: 'Other' },
-];
+const STEP_LABELS = ['Loan type', 'Country', 'Amount', 'Income'];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep]               = useState<Step>(1);
-  const [mode, setMode]               = useState<Mode>('personal');
-  const [country, setCountry]         = useState('');
-  const [employmentType, setEmplType] = useState('');
-  const [incomeRange, setIncomeRange] = useState('');
-  const [businessStage, setBizStage]  = useState('');
-  const [sector, setSector]           = useState('');
-  const [fundingNeeded, setFunding]   = useState('');
-  const [isEResident, setEResident]   = useState(false);
-  const [isNomad, setNomad]           = useState(false);
-  const [saving, setSaving]           = useState(false);
-  const [error, setError]             = useState('');
-  const [authChecked, setAuthChecked] = useState(false);
+  const [step, setStep]           = useState<Step>(1);
+  const [loanType, setLoanType]   = useState<LoanType | ''>('');
+  const [country, setCountry]     = useState('');
+  const [amount, setAmount]       = useState<number | null>(null);
+  const [income, setIncome]       = useState<number | null>(null);
+  const [saving, setSaving]       = useState(false);
+  const [error, setError]         = useState('');
+  const [authChecked, setAuth]    = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        router.replace('/register');
-      } else {
-        setAuthChecked(true);
-      }
+      if (!data.session) router.replace('/register');
+      else setAuth(true);
     });
   }, [router]);
 
@@ -67,28 +61,35 @@ export default function OnboardingPage() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { router.replace('/login'); return; }
 
-    const incomeNum = incomeRange ? parseInt(incomeRange) : undefined;
-    const fundingNum = fundingNeeded ? parseInt(fundingNeeded) : undefined;
-
     const { error: dbError } = await upsertUserProfile({
-      userId:             session.user.id,
-      email:              session.user.email,
-      name:               session.user.user_metadata?.full_name as string | undefined,
-      country:            country || undefined,
-      employmentType:     mode === 'personal' ? employmentType || undefined : undefined,
-      monthlyIncome:      mode === 'personal' ? incomeNum : undefined,
-      businessStage:      mode === 'corporate' ? businessStage || undefined : undefined,
-      sector:             mode === 'corporate' ? sector || undefined : undefined,
-      fundingNeeded:      mode === 'corporate' ? fundingNum : undefined,
-      isEResident,
-      isDigitalNomad:     isNomad,
-      preferredMode:      mode,
+      userId:              session.user.id,
+      email:               session.user.email,
+      name:                session.user.user_metadata?.full_name as string | undefined,
+      country:             country || undefined,
+      preferredLoanTypes:  loanType ? [loanType] : [],
+      preferredMode:       loanType === 'business' ? 'corporate' : 'personal',
+      monthlyIncome:       income ?? undefined,
       onboardingCompleted: true,
     });
+
     setSaving(false);
     if (dbError) { setError(dbError); return; }
-    router.push('/');
+
+    const route = LOAN_TYPES.find(t => t.value === loanType)?.route ?? '/loans';
+    router.push(route);
     router.refresh();
+  }
+
+  function canAdvance() {
+    if (step === 1) return loanType !== '';
+    if (step === 2) return true; // country is optional
+    if (step === 3) return amount !== null;
+    return true;
+  }
+
+  function advance() {
+    if (step < 4) setStep((step + 1) as Step);
+    else handleFinish();
   }
 
   if (!authChecked) {
@@ -99,33 +100,45 @@ export default function OnboardingPage() {
     );
   }
 
+  const progressPct = ((step - 1) / 3) * 100;
+
   return (
     <div className="min-h-[calc(100vh-130px)] flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
-        {/* Progress */}
-        <div className="flex items-center gap-3 mb-8">
-          {[1, 2].map(n => (
-            <div key={n} className="flex items-center gap-3 flex-1">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
-                step >= n ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-500'
-              }`}>
-                {n}
-              </div>
-              {n < 2 && <div className={`flex-1 h-0.5 transition-colors ${step > n ? 'bg-sky-600' : 'bg-slate-200'}`} />}
-            </div>
+
+        {/* Step labels */}
+        <div className="flex justify-between mb-2 px-0.5">
+          {STEP_LABELS.map((label, i) => (
+            <span key={label} className={`text-xs font-medium transition-colors ${
+              i + 1 === step ? 'text-sky-600' : i + 1 < step ? 'text-slate-400' : 'text-slate-300'
+            }`}>
+              {label}
+            </span>
           ))}
-          <span className="text-xs text-slate-400 shrink-0">Step {step} of 2</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-1.5 bg-slate-200 rounded-full mb-8 overflow-hidden">
+          <div
+            className="h-full bg-sky-600 rounded-full transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-6">
+            <p className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Step {step} of 4</p>
             <h1 className="text-lg font-bold text-white">
-              {step === 1 ? 'How will you use NordicRate?' : 'A few more details'}
+              {step === 1 && 'What are you looking for?'}
+              {step === 2 && 'Which country interests you?'}
+              {step === 3 && 'How much do you need?'}
+              {step === 4 && 'What is your monthly income?'}
             </h1>
             <p className="text-slate-400 text-sm mt-0.5">
-              {step === 1
-                ? 'We personalise your experience based on your goal.'
-                : 'Help us find your best matches.'}
+              {step === 1 && 'We\'ll show you the best matching rates.'}
+              {step === 2 && 'We\'ll prioritise products from that market.'}
+              {step === 3 && 'Helps us filter relevant loan limits.'}
+              {step === 4 && 'Used to estimate your eligibility — never shared.'}
             </p>
           </div>
 
@@ -136,251 +149,124 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* ── Step 1: mode selection ───────────────────────── */}
+            {/* ── Step 1: Loan type ── */}
             {step === 1 && (
+              <div className="grid grid-cols-2 gap-3">
+                {LOAN_TYPES.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setLoanType(opt.value)}
+                    className={`text-left rounded-xl border-2 px-4 py-4 transition-all ${
+                      loanType === opt.value
+                        ? 'border-sky-500 bg-sky-50'
+                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{opt.icon}</div>
+                    <p className="font-semibold text-slate-800 text-sm">{opt.label}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-snug">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* ── Step 2: Country ── */}
+            {step === 2 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {(
-                    [
-                      {
-                        value: 'personal',
-                        icon: '👤',
-                        title: 'Personal',
-                        desc: 'Personal loans, mortgages, auto finance',
-                      },
-                      {
-                        value: 'corporate',
-                        icon: '🏢',
-                        title: 'Business',
-                        desc: 'Startup loans, SME credit, EU programs',
-                      },
-                    ] as const
-                  ).map(opt => (
+                <div className="grid grid-cols-2 gap-2">
+                  {COUNTRIES.map(c => (
                     <button
-                      key={opt.value}
-                      onClick={() => setMode(opt.value)}
-                      className={`text-left rounded-xl border-2 px-4 py-5 transition-all ${
-                        mode === opt.value
-                          ? 'border-sky-500 bg-sky-50'
-                          : 'border-slate-200 hover:border-slate-300'
+                      key={c.code}
+                      onClick={() => setCountry(country === c.code ? '' : c.code)}
+                      className={`flex items-center gap-2.5 rounded-xl border-2 px-3 py-2.5 text-sm transition-all ${
+                        country === c.code
+                          ? 'border-sky-500 bg-sky-50 text-sky-800 font-medium'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
                       }`}
                     >
-                      <div className="text-2xl mb-2">{opt.icon}</div>
-                      <p className="font-bold text-slate-800 text-sm">{opt.title}</p>
-                      <p className="text-xs text-slate-500 mt-0.5 leading-snug">{opt.desc}</p>
+                      <span className="text-xl leading-none">{c.flag}</span>
+                      <span>{c.name}</span>
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-slate-400 text-center">Optional — tap again to deselect</p>
+              </div>
+            )}
 
-                <div className="space-y-1.5 mt-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Country of interest{' '}
-                    <span className="text-slate-400 font-normal">(optional)</span>
-                  </label>
-                  <select
-                    value={country}
-                    onChange={e => setCountry(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+            {/* ── Step 3: Amount ── */}
+            {step === 3 && (
+              <div className="grid grid-cols-2 gap-2">
+                {AMOUNT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setAmount(opt.value)}
+                    className={`rounded-xl border-2 px-3 py-3 text-sm transition-all text-left ${
+                      amount === opt.value
+                        ? 'border-sky-500 bg-sky-50 text-sky-800 font-medium'
+                        : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                    }`}
                   >
-                    <option value="">Any country</option>
-                    {COUNTRIES.map(c => (
-                      <option key={c.code} value={c.code}>
-                        {c.flag} {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
+            {/* ── Step 4: Income ── */}
+            {step === 4 && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  {INCOME_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setIncome(opt.value)}
+                      className={`rounded-xl border-2 px-3 py-3 text-sm transition-all text-left ${
+                        income === opt.value
+                          ? 'border-sky-500 bg-sky-50 text-sky-800 font-medium'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
                 <button
-                  onClick={() => setStep(2)}
-                  className="w-full mt-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-colors"
+                  onClick={() => setIncome(-1)}
+                  className={`w-full rounded-xl border-2 px-3 py-3 text-sm transition-all text-slate-500 ${
+                    income === -1
+                      ? 'border-slate-400 bg-slate-50'
+                      : 'border-slate-200 hover:border-slate-300'
+                  }`}
                 >
-                  Continue →
+                  Prefer not to say
                 </button>
               </div>
             )}
 
-            {/* ── Step 2: details ──────────────────────────────── */}
-            {step === 2 && mode === 'personal' && (
-              <div className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Employment type
-                  </label>
-                  <select
-                    value={employmentType}
-                    onChange={e => setEmplType(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                  >
-                    <option value="">Select…</option>
-                    {EMPLOYMENT_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Monthly net income (EUR)
-                  </label>
-                  <select
-                    value={incomeRange}
-                    onChange={e => setIncomeRange(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                  >
-                    <option value="">Prefer not to say</option>
-                    <option value="1000">Under €1,000</option>
-                    <option value="2000">€1,000 – €2,000</option>
-                    <option value="3500">€2,000 – €3,500</option>
-                    <option value="5000">€3,500 – €5,000</option>
-                    <option value="7500">€5,000 – €7,500</option>
-                    <option value="10000">Over €7,500</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    id="e-res"
-                    type="checkbox"
-                    checked={isEResident}
-                    onChange={e => setEResident(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                  />
-                  <label htmlFor="e-res" className="text-sm text-slate-700">
-                    I have (or want) Estonian e-Residency
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    id="nomad"
-                    type="checkbox"
-                    checked={isNomad}
-                    onChange={e => setNomad(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                  />
-                  <label htmlFor="nomad" className="text-sm text-slate-700">
-                    I work remotely / digital nomad lifestyle
-                  </label>
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium rounded-xl py-2.5 text-sm transition-colors"
-                  >
-                    ← Back
-                  </button>
-                  <button
-                    onClick={handleFinish}
-                    disabled={saving}
-                    className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:bg-slate-300 text-white font-semibold rounded-xl py-2.5 text-sm transition-colors"
-                  >
-                    {saving ? 'Saving…' : 'Finish setup'}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && mode === 'corporate' && (
-              <div className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Business stage
-                  </label>
-                  <select
-                    value={businessStage}
-                    onChange={e => setBizStage(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                  >
-                    <option value="">Select…</option>
-                    {BUSINESS_STAGES.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Sector
-                  </label>
-                  <select
-                    value={sector}
-                    onChange={e => setSector(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                  >
-                    <option value="">Select…</option>
-                    {SECTORS.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Funding needed (EUR){' '}
-                    <span className="text-slate-400 font-normal">(optional)</span>
-                  </label>
-                  <select
-                    value={fundingNeeded}
-                    onChange={e => setFunding(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
-                  >
-                    <option value="">Not sure yet</option>
-                    <option value="25000">Under €25,000</option>
-                    <option value="75000">€25,000 – €75,000</option>
-                    <option value="200000">€75,000 – €200,000</option>
-                    <option value="500000">€200,000 – €500,000</option>
-                    <option value="1000000">€500,000 – €1M</option>
-                    <option value="5000000">Over €1M</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    id="e-res-biz"
-                    type="checkbox"
-                    checked={isEResident}
-                    onChange={e => setEResident(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                  />
-                  <label htmlFor="e-res-biz" className="text-sm text-slate-700">
-                    I have (or want) Estonian e-Residency
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <input
-                    id="nomad-biz"
-                    type="checkbox"
-                    checked={isNomad}
-                    onChange={e => setNomad(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                  />
-                  <label htmlFor="nomad-biz" className="text-sm text-slate-700">
-                    Location-independent / digital-first business
-                  </label>
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium rounded-xl py-2.5 text-sm transition-colors"
-                  >
-                    ← Back
-                  </button>
-                  <button
-                    onClick={handleFinish}
-                    disabled={saving}
-                    className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:bg-slate-300 text-white font-semibold rounded-xl py-2.5 text-sm transition-colors"
-                  >
-                    {saving ? 'Saving…' : 'Finish setup'}
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Navigation */}
+            <div className="flex gap-3 mt-6">
+              {step > 1 && (
+                <button
+                  onClick={() => setStep((step - 1) as Step)}
+                  className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium rounded-xl py-2.5 text-sm transition-colors"
+                >
+                  ← Back
+                </button>
+              )}
+              <button
+                onClick={advance}
+                disabled={!canAdvance() || saving}
+                className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold rounded-xl py-2.5 text-sm transition-colors"
+              >
+                {saving ? 'Saving…' : step === 4 ? 'Show me rates →' : 'Continue →'}
+              </button>
+            </div>
           </div>
         </div>
+
+        <p className="text-center text-xs text-slate-400 mt-5">
+          You can update these preferences anytime from your profile.
+        </p>
       </div>
     </div>
   );
