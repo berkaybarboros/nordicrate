@@ -47,3 +47,6 @@ next-env.d.ts
 # Claude IDE files
 .claude/
 .claire/
+.agents/
+.mcp.json
+skills-lock.json

@@ -11,7 +11,7 @@ module.exports = {
       max_memory_restart: '512M',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3001,
         NEXT_PUBLIC_BASE_URL: 'https://nordicrate.berkaybarboros.com',
       },
     },

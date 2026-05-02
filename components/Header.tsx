@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/contexts/LanguageContext';
-import { LOCALE_FLAGS, LOCALE_NAMES, type Locale } from '@/locales';
+import { LOCALE_NAMES, type Locale } from '@/locales';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 const LOCALES: Locale[] = ['en', 'fi', 'et'];
+
+const LOCALE_FLAG_CODES: Record<Locale, string> = { en: 'gb', fi: 'fi', et: 'ee' };
 
 export default function Header() {
   const pathname = usePathname();
@@ -81,7 +83,11 @@ export default function Header() {
                 onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-1 text-xs text-slate-300 border border-slate-700 hover:border-slate-500 rounded-lg px-2 py-1.5 transition-colors"
               >
-                <span className="text-lg leading-none">{LOCALE_FLAGS[locale]}</span>
+                <img
+                  src={`https://flagcdn.com/20x15/${LOCALE_FLAG_CODES[locale]}.png`}
+                  width={20} height={15} alt={locale}
+                  className="rounded-sm object-cover"
+                />
                 <svg
                   className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -102,7 +108,11 @@ export default function Header() {
                           : 'text-slate-300 hover:bg-slate-700'
                       }`}
                     >
-                      <span>{LOCALE_FLAGS[loc]}</span>
+                      <img
+                        src={`https://flagcdn.com/20x15/${LOCALE_FLAG_CODES[loc]}.png`}
+                        width={20} height={15} alt={loc}
+                        className="rounded-sm object-cover"
+                      />
                       <span>{LOCALE_NAMES[loc]}</span>
                     </button>
                   ))}
@@ -203,7 +213,11 @@ export default function Header() {
                       : 'border-slate-700 text-slate-400 hover:border-slate-500'
                   }`}
                 >
-                  <span className="text-lg leading-none">{LOCALE_FLAGS[loc]}</span>
+                  <img
+                    src={`https://flagcdn.com/20x15/${LOCALE_FLAG_CODES[loc]}.png`}
+                    width={20} height={15} alt={loc}
+                    className="rounded-sm object-cover"
+                  />
                   <span>{LOCALE_NAMES[loc]}</span>
                 </button>
               ))}
