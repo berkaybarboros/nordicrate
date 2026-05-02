@@ -2,15 +2,18 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ChatMessage } from '@/app/api/chat/route';
-import type { AssistantMode } from '@/lib/ai-context';
+import type { AssistantMode, OnboardingContext } from '@/lib/ai-context';
 import type { UserProfile, EligibilityResult } from '@/lib/profile';
 import { calculateEligibility } from '@/lib/profile';
 import type { CorporateProfile, ProgramMatch } from '@/lib/corporate-profile';
 import { matchPrograms } from '@/lib/corporate-profile';
 import EligibilityPanel from '@/components/EligibilityPanel';
 import ProgramMatchPanel from '@/components/ProgramMatchPanel';
+import { supabase } from '@/lib/supabase';
+import { getUserProfile } from '@/lib/db';
+import { COUNTRIES } from '@/lib/data';
 
-const WELCOME_MESSAGES: Record<AssistantMode, string> = {
+const DEFAULT_WELCOME: Record<AssistantMode, string> = {
   personal: `👋 Hi! I'm **NordicAI**, your personal finance assistant.
 
 I can help you:
@@ -31,6 +34,44 @@ I can help you:
 
 Tell me about your business — stage, country, funding need & purpose.`,
 };
+
+function buildPersonalizedWelcome(profile: OnboardingContext, mode: AssistantMode): string {
+  const firstName = profile.name?.split(' ')[0];
+  const country = profile.country
+    ? COUNTRIES.find(c => c.code === profile.country)
+    : undefined;
+  const loanType = profile.preferredLoanTypes?.[0];
+
+  const greeting = firstName ? `👋 Hi **${firstName}**!` : '👋 Hi!';
+  const context = [
+    country  && `${country.flag} **${country.name}**`,
+    loanType && `**${loanType} loan**`,
+  ].filter(Boolean).join(' · ');
+
+  if (mode === 'personal') {
+    return `${greeting} I'm **NordicAI**, your personal finance assistant.
+
+I've loaded your profile${context ? ` — ${context}` : ''}.
+
+I can help you right now:
+- 🔍 Show the best rates matching your profile
+- ✅ Estimate your loan eligibility
+- 📊 Calculate monthly payments
+
+What would you like to know?`;
+  }
+
+  return `${greeting} I'm **NordicAI**, your corporate finance assistant.
+
+I've loaded your profile${context ? ` — ${context}` : ''}.
+
+I can help you right now:
+- 🚀 Find the best business loans & programs
+- 🇪🇺 Match EU funds & government grants
+- 🪪 Guide you on e-Residency setup
+
+What would you like to explore?`;
+}
 
 interface Message extends ChatMessage {
   id: string;
@@ -88,17 +129,33 @@ export default function AIAssistant() {
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
   const [corporateProfile, setCorporateProfile] = useState<CorporateProfile>({});
   const [programMatches, setProgramMatches] = useState<ProgramMatch[]>([]);
+  const [onboardingData, setOnboardingData] = useState<OnboardingContext | null>(null);
 
-  // Initialize with welcome message
+  // Load Supabase profile once on mount
   useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: WELCOME_MESSAGES[mode],
-      },
-    ]);
-  }, [mode]);
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const profile = await getUserProfile(data.session.user.id);
+      if (!profile?.onboardingCompleted) return;
+      const ctx: OnboardingContext = {
+        name:               profile.name,
+        country:            profile.country,
+        preferredLoanTypes: profile.preferredLoanTypes,
+        monthlyIncome:      profile.monthlyIncome,
+        preferredMode:      profile.preferredMode,
+      };
+      setOnboardingData(ctx);
+      if (profile.preferredMode) setMode(profile.preferredMode);
+    });
+  }, []);
+
+  // Initialize welcome message (re-runs when mode or onboardingData changes)
+  useEffect(() => {
+    const content = onboardingData
+      ? buildPersonalizedWelcome(onboardingData, mode)
+      : DEFAULT_WELCOME[mode];
+    setMessages([{ id: 'welcome', role: 'assistant', content }]);
+  }, [mode, onboardingData]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -181,6 +238,7 @@ export default function AIAssistant() {
         body: JSON.stringify({
           messages: currentMessages.map(m => ({ role: m.role, content: m.content })),
           mode,
+          ...(onboardingData ? { onboardingProfile: onboardingData } : {}),
           ...(mode === 'corporate' && Object.keys(corporateProfile).length > 0
             ? { corporateProfile }
             : {}),
@@ -242,7 +300,7 @@ export default function AIAssistant() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, mode, corporateProfile, fetchProfile]);
+  }, [input, isLoading, messages, mode, corporateProfile, onboardingData, fetchProfile]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -364,16 +422,28 @@ export default function AIAssistant() {
             <div className="px-4 pb-2 shrink-0">
               <div className="flex flex-wrap gap-1.5">
                 {(mode === 'personal'
-                  ? [
-                      'Best mortgage in Finland',
-                      'Am I eligible for a loan?',
-                      'Lowest personal loan rate',
-                    ]
-                  : [
-                      'Startup loans in Estonia',
-                      'e-Residency guide',
-                      'EU funding for my startup',
-                    ]
+                  ? onboardingData?.country && onboardingData?.preferredLoanTypes?.[0]
+                    ? [
+                        `Best ${onboardingData.preferredLoanTypes[0]} rates in ${COUNTRIES.find(c => c.code === onboardingData.country)?.name ?? onboardingData.country}`,
+                        'Am I eligible based on my profile?',
+                        'Compare my top options',
+                      ]
+                    : [
+                        'Best mortgage in Finland',
+                        'Am I eligible for a loan?',
+                        'Lowest personal loan rate',
+                      ]
+                  : onboardingData?.country
+                    ? [
+                        `Business loans in ${COUNTRIES.find(c => c.code === onboardingData.country)?.name ?? onboardingData.country}`,
+                        'e-Residency guide',
+                        'EU funding options for me',
+                      ]
+                    : [
+                        'Startup loans in Estonia',
+                        'e-Residency guide',
+                        'EU funding for my startup',
+                      ]
                 ).map((suggestion) => (
                   <button
                     key={suggestion}

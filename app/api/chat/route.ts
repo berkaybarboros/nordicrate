@@ -1,4 +1,4 @@
-import { buildSystemPrompt, type AssistantMode } from '@/lib/ai-context';
+import { buildSystemPrompt, type AssistantMode, type OnboardingContext } from '@/lib/ai-context';
 import type { LiveRatesData } from '@/lib/types';
 import { matchPrograms, type CorporateProfile } from '@/lib/corporate-profile';
 
@@ -27,7 +27,8 @@ export async function POST(req: Request) {
       messages,
       mode = 'personal',
       corporateProfile,
-    }: { messages: ChatMessage[]; mode: AssistantMode; corporateProfile?: CorporateProfile } = await req.json();
+      onboardingProfile,
+    }: { messages: ChatMessage[]; mode: AssistantMode; corporateProfile?: CorporateProfile; onboardingProfile?: OnboardingContext } = await req.json();
 
     if (!messages || messages.length === 0) {
       return Response.json({ error: 'No messages provided' }, { status: 400 });
@@ -53,7 +54,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const systemPrompt = buildSystemPrompt(mode, liveRates, topProgramsText);
+    const systemPrompt = buildSystemPrompt(mode, liveRates, topProgramsText, onboardingProfile);
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',

@@ -4,6 +4,14 @@ import type { LiveRatesData } from '@/lib/types';
 
 export type AssistantMode = 'personal' | 'corporate';
 
+export interface OnboardingContext {
+  name?: string;
+  country?: string;
+  preferredLoanTypes?: string[];
+  monthlyIncome?: number;
+  preferredMode?: 'personal' | 'corporate';
+}
+
 function formatProduct(p: typeof PRODUCTS[0]) {
   const inst = INSTITUTIONS.find(i => i.id === p.institutionId);
   const country = COUNTRIES.find(c => c.code === inst?.country);
@@ -74,7 +82,36 @@ PLATFORM STATS: ${INSTITUTIONS.length} institutions | ${PRODUCTS.length} loan pr
 `.trim();
 }
 
-export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData, topProgramsText?: string): string {
+function buildOnboardingBlock(onboarding: OnboardingContext): string {
+  const country = onboarding.country
+    ? COUNTRIES.find(c => c.code === onboarding.country)
+    : undefined;
+  const loanType = onboarding.preferredLoanTypes?.[0];
+  const incomeStr = onboarding.monthlyIncome && onboarding.monthlyIncome > 0
+    ? `~€${onboarding.monthlyIncome.toLocaleString()}/month`
+    : undefined;
+
+  const lines = [
+    onboarding.name           && `  Name: ${onboarding.name}`,
+    country                   && `  Country of interest: ${country.flag} ${country.name} (${country.code})`,
+    loanType                  && `  Preferred loan type: ${loanType}`,
+    incomeStr                 && `  Monthly income: ${incomeStr}`,
+    onboarding.preferredMode  && `  Mode: ${onboarding.preferredMode}`,
+  ].filter(Boolean).join('\n');
+
+  if (!lines) return '';
+
+  return `
+USER ONBOARDING PROFILE (already collected — do NOT re-ask these):
+${lines}
+
+IMPORTANT: The user completed onboarding and shared the above preferences. Use this immediately:
+- Reference their country and loan type in your first response
+- Skip the "tell me your situation" opener — go straight to recommendations
+- If they ask "what are my options" or similar, show the best products for their country/loan type first`.trim();
+}
+
+export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData, topProgramsText?: string, onboarding?: OnboardingContext): string {
   const data = buildDataContext(liveRates);
 
   const sharedRules = `
@@ -89,13 +126,15 @@ RESPONSE RULES:
 - Respond in the same language the user writes in (Turkish, English, etc.)
 `.trim();
 
+  const onboardingBlock = onboarding ? buildOnboardingBlock(onboarding) : '';
+
   if (mode === 'personal') {
     return `You are NordicAI, the personal finance assistant for NordicRate — the #1 Nordic & Baltic loan comparison platform.
 
 YOUR ROLE (Personal Mode):
 Help individuals (expats, digital nomads, locals) find the best loan, understand their eligibility, and assess financial risk for personal loans, mortgages, and auto loans across 8 countries.
 
-ELIGIBILITY ASSESSMENT FRAMEWORK:
+${onboardingBlock ? onboardingBlock + '\n' : ''}ELIGIBILITY ASSESSMENT FRAMEWORK:
 When a user shares financial details, assess eligibility using these guidelines:
 - DTI (Debt-to-Income): Monthly loan payment should not exceed 35–40% of net monthly income
 - LTV (Loan-to-Value) for mortgages: Typically max 70–85% depending on country
@@ -115,7 +154,9 @@ ${data}
 ${sharedRules}
 
 CONVERSATION FLOW:
-If user hasn't provided details, ask for: 1) Country of interest, 2) Loan type & amount, 3) Monthly net income, 4) Employment type, 5) Residency status.
+${onboardingBlock
+  ? 'User already provided country, loan type and income via onboarding. Start with personalized recommendations — do NOT ask for info they already gave.'
+  : 'If user hasn\'t provided details, ask for: 1) Country of interest, 2) Loan type & amount, 3) Monthly net income, 4) Employment type, 5) Residency status.'}
 Then provide: eligibility assessment + top 3 matching products + risk score + next steps.`;
   }
 
@@ -125,7 +166,7 @@ Then provide: eligibility assessment + top 3 matching products + risk score + ne
 YOUR ROLE (Corporate Mode):
 Help businesses (startups, SMEs, scale-ups, digital nomad founders) find the best business financing, government programs, EU funds, and assess corporate loan eligibility across 8 countries.
 
-CORPORATE ELIGIBILITY FRAMEWORK:
+${onboardingBlock ? onboardingBlock + '\n' : ''}CORPORATE ELIGIBILITY FRAMEWORK:
 - Revenue-based: Most banks require 2+ years of positive revenue; startups need government/guarantee-backed loans
 - Startup programs: Finnvera (FI), Innovasjon Norge (NO), Almi (SE), Enterprise Estonia (EE) — no revenue history required
 - EU Funds: EIB, EIF, Horizon Europe available across all 8 countries
@@ -146,7 +187,9 @@ ${data}
 ${sharedRules}
 
 CONVERSATION FLOW:
-If user hasn't provided details, ask for: 1) Business stage (idea/startup/established), 2) Country preference or citizenship, 3) Revenue (if any), 4) Funding needed + purpose, 5) Team size.
+${onboardingBlock
+  ? 'User already provided country and mode via onboarding. Start with personalized business loan/program recommendations.'
+  : 'If user hasn\'t provided details, ask for: 1) Business stage (idea/startup/established), 2) Country preference or citizenship, 3) Revenue (if any), 4) Funding needed + purpose, 5) Team size.'}
 Then provide: eligibility assessment + top 3 programs/products + strategic recommendation.
 ${topProgramsText ? `
 PERSONALIZED PROGRAM MATCHES (ranked by relevance to this specific user — lead with these):
