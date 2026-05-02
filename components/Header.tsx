@@ -115,13 +115,18 @@ export default function Header() {
             </span>
 
             {user ? (
-              <div className="flex items-center gap-2 ml-1">
-                <span className="text-xs text-slate-400 truncate max-w-[120px]">
-                  {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
-                </span>
+              <div className="flex items-center gap-2.5 ml-1">
+                <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
+                  </div>
+                  <span className="text-xs text-slate-200 font-medium truncate max-w-[100px]">
+                    {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
+                  </span>
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="text-xs text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white rounded-lg px-3 py-1.5 transition-colors"
+                  className="text-xs text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 rounded-xl px-3 py-1.5 transition-all"
                 >
                   Sign out
                 </button>
@@ -130,15 +135,21 @@ export default function Header() {
               <div className="flex items-center gap-2 ml-1">
                 <Link
                   href="/login"
-                  className="text-xs text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-lg px-3 py-1.5 transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 hover:bg-slate-800 rounded-xl px-3 py-1.5 transition-all"
                 >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                   Sign in
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-sky-900/40"
+                  className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-sky-900/50 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white"
                 >
-                  Register
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Get started
                 </Link>
               </div>
             )}
@@ -201,12 +212,20 @@ export default function Header() {
             <div className="pt-2 px-4 space-y-2">
               {user ? (
                 <>
-                  <p className="text-xs text-slate-400 px-1">
-                    {user.user_metadata?.full_name ?? user.email}
-                  </p>
+                  <div className="flex items-center gap-2.5 px-1 py-1">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                      {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm text-white font-medium leading-tight">
+                        {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-slate-500 leading-tight">{user.email}</p>
+                    </div>
+                  </div>
                   <button
                     onClick={() => { handleLogout(); setMenuOpen(false); }}
-                    className="block w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
+                    className="block w-full border border-red-500/30 text-red-400 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-red-500/10"
                   >
                     Sign out
                   </button>
@@ -216,16 +235,22 @@ export default function Header() {
                   <Link
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="block w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
+                    className="flex items-center justify-center gap-2 w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
                     Sign in
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors"
+                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-all shadow-lg shadow-sky-900/40"
                   >
-                    Register
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Get started
                   </Link>
                 </>
               )}

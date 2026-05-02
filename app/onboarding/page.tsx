@@ -184,7 +184,13 @@ export default function OnboardingPage() {
                           : 'border-slate-200 hover:border-slate-300 text-slate-700'
                       }`}
                     >
-                      <span className="text-xl leading-none">{c.flag}</span>
+                      <img
+                        src={`https://flagcdn.com/24x18/${c.code.toLowerCase()}.png`}
+                        width={24}
+                        height={18}
+                        alt={c.name}
+                        className="rounded-sm object-cover shadow-sm flex-shrink-0"
+                      />
                       <span>{c.name}</span>
                     </button>
                   ))}
