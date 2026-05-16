@@ -7,6 +7,7 @@ import CountryCard from '@/components/CountryCard';
 import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
+import HeroSearch from '@/components/HeroSearch';
 import TrustBar from '@/components/TrustBar';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
@@ -70,18 +71,9 @@ export default function HomePage() {
                 <span className="text-sm text-slate-300"><strong className="text-white">4.8/5</strong> · Trusted by 50,000+ users</span>
               </div>
 
-              {/* Quick nav */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {[
-                  { href: '/loans', label: '👤 Personal', color: 'bg-sky-600 hover:bg-sky-500' },
-                  { href: '/mortgage', label: '🏠 Mortgage', color: 'bg-emerald-600 hover:bg-emerald-500' },
-                  { href: '/business', label: '🏢 Business', color: 'bg-purple-600 hover:bg-purple-500' },
-                  { href: '/programs', label: '🚀 Programs', color: 'bg-amber-500 hover:bg-amber-400' },
-                ].map(({ href, label, color }) => (
-                  <Link key={href} href={href} className={`${color} text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm`}>
-                    {label}
-                  </Link>
-                ))}
+              {/* Hero Search */}
+              <div className="mb-8">
+                <HeroSearch />
               </div>
 
               {/* Micro stats */}

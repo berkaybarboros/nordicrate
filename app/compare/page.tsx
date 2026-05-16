@@ -1,10 +1,10 @@
 "use client";
 
 import { useCompare, CompareItem } from "@/contexts/CompareContext";
-import { BarChart2, X, ExternalLink, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import { BarChart2, X, ExternalLink, ArrowLeft, CheckCircle, XCircle, TrendingDown, Award } from "lucide-react";
 import Link from "next/link";
 
-// Return the index of the "best" (min) value among numeric raw values
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 function bestIndex(items: CompareItem[], key: keyof CompareItem): number {
   const values = items.map((it) => (it[key] as number | undefined) ?? Infinity);
   const min = Math.min(...values);
@@ -15,6 +15,141 @@ function bestIndexMax(items: CompareItem[], key: keyof CompareItem): number {
   const values = items.map((it) => (it[key] as number | undefined) ?? -Infinity);
   const max = Math.max(...values);
   return values.indexOf(max);
+}
+
+// ─── Financial Analysis ────────────────────────────────────────────────────────
+function FinancialAnalysis({ items }: { items: CompareItem[] }) {
+  // Only meaningful for loans with rawRate + rawMonthly
+  const loanItems = items.filter(it => it.rawRate != null && it.rawMonthly != null);
+  if (loanItems.length < 2) return null;
+
+  // Assume 60-month term for analysis (standard personal loan benchmark)
+  // Use rawMonthly × 60 as total cost proxy
+  const TERM = 60;
+
+  const costs = loanItems.map(it => ({
+    name: it.name,
+    logo: it.logo,
+    rate: it.rawRate!,
+    monthly: it.rawMonthly!,
+    totalCost: Math.round(it.rawMonthly! * TERM),
+    totalInterest: it.rawTotal != null ? Math.round(it.rawTotal) : Math.round(it.rawMonthly! * TERM - (it.rawMonthly! * TERM / (1 + it.rawRate! / 100 / 12 * TERM))),
+    applyUrl: it.applyUrl,
+  }));
+
+  const cheapest   = costs.reduce((a, b) => a.totalCost < b.totalCost ? a : b);
+  const mostExpensive = costs.reduce((a, b) => a.totalCost > b.totalCost ? a : b);
+  const maxSaving  = mostExpensive.totalCost - cheapest.totalCost;
+  const maxMonthly = Math.max(...costs.map(c => c.monthly));
+  const colColors  = ["#1a3c6e", "#b45309", "#16a34a"];
+
+  return (
+    <div className="mt-6 space-y-4">
+
+      {/* Section header */}
+      <div className="flex items-center gap-2 px-1">
+        <TrendingDown size={18} className="text-sky-600" />
+        <h2 className="text-lg font-extrabold text-gray-900">Financial Analysis</h2>
+        <span className="text-xs text-gray-400 font-normal ml-1">Based on {TERM}-month benchmark</span>
+      </div>
+
+      {/* Total cost bar chart */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-4">Total Cost of Borrowing ({TERM} months)</p>
+        <div className="space-y-3">
+          {costs.map((c, i) => {
+            const pct = maxSaving > 0 ? (c.totalCost / mostExpensive.totalCost) * 100 : 100;
+            const isBest = c.name === cheapest.name;
+            return (
+              <div key={c.name}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{c.logo}</span>
+                    <span className="text-sm font-semibold text-gray-700">{c.name}</span>
+                    {isBest && (
+                      <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Award size={10} /> BEST
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-sm font-extrabold ${isBest ? 'text-emerald-600' : 'text-gray-900'}`}>
+                      €{c.totalCost.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-gray-400 ml-1">total</span>
+                  </div>
+                </div>
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${pct}%`, backgroundColor: isBest ? '#16a34a' : colColors[i] }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                  <span>€{Math.round(c.monthly).toLocaleString()}/mo</span>
+                  <span>{c.rate}% APR</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Monthly payment comparison */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-4">Monthly Payment Comparison</p>
+        <div className="flex items-end gap-3 h-24">
+          {costs.map((c, i) => {
+            const pct = (c.monthly / maxMonthly) * 100;
+            const isBest = c.monthly === Math.min(...costs.map(x => x.monthly));
+            return (
+              <div key={c.name} className="flex-1 flex flex-col items-center gap-1">
+                <span className={`text-xs font-bold ${isBest ? 'text-emerald-600' : 'text-gray-600'}`}>
+                  €{Math.round(c.monthly).toLocaleString()}
+                </span>
+                <div className="w-full rounded-t-lg transition-all duration-700"
+                  style={{ height: `${pct * 0.7}%`, backgroundColor: isBest ? '#16a34a' : colColors[i], minHeight: '8px' }}
+                />
+                <span className="text-xs text-gray-400 truncate w-full text-center">{c.name.split(' ')[0]}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Savings recommendation */}
+      {maxSaving > 50 && (
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+              <Award size={20} className="text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <p className="font-extrabold text-emerald-900 mb-1">
+                {cheapest.logo} {cheapest.name} saves you the most
+              </p>
+              <p className="text-sm text-emerald-700">
+                Choosing <strong>{cheapest.name}</strong> over <strong>{mostExpensive.name}</strong> saves{' '}
+                <strong className="text-emerald-900">€{maxSaving.toLocaleString()}</strong> over {TERM} months —{' '}
+                that&apos;s <strong>€{Math.round(maxSaving / TERM).toLocaleString()}/month</strong> back in your pocket.
+              </p>
+              <p className="text-xs text-emerald-600 mt-2">
+                Rate difference: {Math.abs(cheapest.rate - mostExpensive.rate).toFixed(2)} percentage points
+                {costs.length === 2 && (
+                  <> · Break-even at month {Math.ceil(maxSaving / Math.abs(costs[0].monthly - costs[1].monthly))}</>
+                )}
+              </p>
+              <a href={cheapest.applyUrl} target="_blank" rel="noopener noreferrer sponsored"
+                className="inline-flex items-center gap-1.5 mt-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+              >
+                Apply for {cheapest.name} <ExternalLink size={12} />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ComparePage() {
@@ -241,6 +376,9 @@ export default function ComparePage() {
             </div>
           ))}
         </div>
+
+        {/* Financial Analysis */}
+        <FinancialAnalysis items={items} />
 
         {/* Disclaimer */}
         <p className="text-xs text-gray-400 text-center mt-8 leading-relaxed max-w-2xl mx-auto">
