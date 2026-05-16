@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown, Heart } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
+import AIProductSection from "@/components/AIProductSection";
+import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 
@@ -86,48 +88,62 @@ export default function HealthContent() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-4">
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
-          <strong>About health insurance in Estonia:</strong> Health insurance is voluntary but
-          provides access to private healthcare, shorter waiting times, and broader coverage than the
-          state health system (EHIF). Particularly valuable for expats and families.
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <InsurancePremiumCalc kind="health" />
+            <AIProductSection
+              productType="health insurance"
+              country="Estonia"
+              accentGradient="from-[#1a3c6e] to-[#e11d48]"
+            />
+          </div>
 
-        <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-sm font-medium text-gray-600">
-            <span className="font-bold text-[#1a3c6e]">
-              {loading ? "..." : offers.length} plans
-            </span>{" "}
-            available
-          </p>
-          <div className="flex items-center gap-2">
-            <ArrowUpDown size={14} className="text-gray-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
-              className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
-            >
-              <option value="price">Lowest Price</option>
-              <option value="rating">Highest Rated</option>
-            </select>
+          {/* Main */}
+          <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
+              <strong>About health insurance in Estonia:</strong> Health insurance is voluntary but
+              provides access to private healthcare, shorter waiting times, and broader coverage than
+              the state health system (EHIF). Particularly valuable for expats and families.
+            </div>
+
+            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
+              <p className="text-sm font-medium text-gray-600">
+                <span className="font-bold text-[#1a3c6e]">
+                  {loading ? "..." : offers.length} plans
+                </span>{" "}
+                available
+              </p>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown size={14} className="text-gray-400" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
+                  className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
+                >
+                  <option value="price">Lowest Price</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+              </div>
+            </div>
+
+            {loading && (
+              <>
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+              </>
+            )}
+
+            {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
+
+            <p className="text-xs text-gray-400 text-center py-4">
+              Health insurance is voluntary in Estonia. Premiums vary by age, health status and selected
+              coverage level. All insurers licensed by Finantsinspektsioon. BalticRate is a comparison service.
+            </p>
           </div>
         </div>
-
-        {loading && (
-          <>
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-          </>
-        )}
-
-        {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
-
-        <p className="text-xs text-gray-400 text-center py-4">
-          Health insurance is voluntary in Estonia. Premiums vary by age, health status and selected
-          coverage level. All insurers licensed by Finantsinspektsioon. BalticRate is a comparison
-          service.
-        </p>
       </div>
     </div>
   );

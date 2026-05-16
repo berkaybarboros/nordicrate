@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
+import AIProductSection from "@/components/AIProductSection";
+import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 
@@ -81,42 +83,57 @@ export default function HomeInsuranceContent() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-4">
-        <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-sm font-medium text-gray-600">
-            <span className="font-bold text-[#1a3c6e]">
-              {loading ? "..." : offers.length} insurers
-            </span>{" "}
-            compared
-          </p>
-          <div className="flex items-center gap-2">
-            <ArrowUpDown size={14} className="text-gray-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
-              className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
-            >
-              <option value="price">Lowest Price</option>
-              <option value="rating">Highest Rated</option>
-            </select>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <InsurancePremiumCalc kind="home" />
+            <AIProductSection
+              productType="home insurance"
+              country="Estonia"
+              accentGradient="from-[#1a3c6e] to-[#16a34a]"
+            />
+          </div>
+
+          {/* Main */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
+              <p className="text-sm font-medium text-gray-600">
+                <span className="font-bold text-[#1a3c6e]">
+                  {loading ? "..." : offers.length} insurers
+                </span>{" "}
+                compared
+              </p>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown size={14} className="text-gray-400" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
+                  className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
+                >
+                  <option value="price">Lowest Price</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+              </div>
+            </div>
+
+            {loading && (
+              <>
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+              </>
+            )}
+
+            {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
+
+            <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
+              Home insurance premiums depend on the property size, location, construction type and
+              selected coverage level. All insurers are licensed by Finantsinspektsioon. BalticRate is a
+              comparison service — we do not provide insurance directly.
+            </p>
           </div>
         </div>
-
-        {loading && (
-          <>
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-          </>
-        )}
-
-        {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
-
-        <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-          Home insurance premiums depend on the property size, location, construction type and
-          selected coverage level. All insurers are licensed by Finantsinspektsioon. BalticRate is a
-          comparison service — we do not provide insurance directly.
-        </p>
       </div>
     </div>
   );

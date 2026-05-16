@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
+import AIProductSection from "@/components/AIProductSection";
+import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 
@@ -83,42 +85,57 @@ export default function CascoContent() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-4">
-        <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
-          <p className="text-sm font-medium text-gray-600">
-            <span className="font-bold text-[#1a3c6e]">
-              {loading ? "..." : offers.length} insurers
-            </span>{" "}
-            compared
-          </p>
-          <div className="flex items-center gap-2">
-            <ArrowUpDown size={14} className="text-gray-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
-              className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
-            >
-              <option value="price">Lowest Price</option>
-              <option value="rating">Highest Rated</option>
-            </select>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <InsurancePremiumCalc kind="casco" />
+            <AIProductSection
+              productType="CASCO insurance"
+              country="Estonia"
+              accentGradient="from-[#1a3c6e] to-[#0d9488]"
+            />
+          </div>
+
+          {/* Main */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
+              <p className="text-sm font-medium text-gray-600">
+                <span className="font-bold text-[#1a3c6e]">
+                  {loading ? "..." : offers.length} insurers
+                </span>{" "}
+                compared
+              </p>
+              <div className="flex items-center gap-2">
+                <ArrowUpDown size={14} className="text-gray-400" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
+                  className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
+                >
+                  <option value="price">Lowest Price</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+              </div>
+            </div>
+
+            {loading && (
+              <>
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+                <SkeletonInsuranceCard />
+              </>
+            )}
+
+            {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
+
+            <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
+              CASCO insurance is optional but provides comprehensive protection for your vehicle beyond
+              mandatory liability. Premiums shown are indicative — final price depends on vehicle value,
+              age and your driving history. All insurers licensed by Finantsinspektsioon.
+            </p>
           </div>
         </div>
-
-        {loading && (
-          <>
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-            <SkeletonInsuranceCard />
-          </>
-        )}
-
-        {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
-
-        <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-          CASCO insurance is optional but provides comprehensive protection for your vehicle beyond
-          mandatory liability. Premiums shown are indicative — final price depends on vehicle value,
-          age and your driving history. All insurers licensed by Finantsinspektsioon.
-        </p>
       </div>
     </div>
   );
