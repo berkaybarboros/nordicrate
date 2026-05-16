@@ -17,7 +17,7 @@ export const fi: Translations = {
     language: "Kieli",
     business: "Yritysluotot",
     countries: "Maat",
-    programs: "🚀 Ohjelmat",
+    programs: "🚀 Startup",
     getQuote: "Pyydä ilmainen tarjous →",
     updatedDaily: "● Päivitetään päivittäin",
   },

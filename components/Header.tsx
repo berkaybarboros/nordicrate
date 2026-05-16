@@ -39,7 +39,7 @@ export default function Header() {
     { href: '/mortgage', label: t.nav.mortgage },
     { href: '/business', label: t.nav.business },
     { href: '/countries', label: t.nav.countries },
-    { href: '/programs', label: t.nav.programs, highlight: true },
+    { href: '/startup', label: t.nav.programs, highlight: true },
   ];
 
   return (

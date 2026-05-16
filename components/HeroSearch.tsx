@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Sparkles } from 'lucide-react';
 import { COUNTRIES } from '@/lib/data';
+import FindBestRateModal from '@/components/FindBestRateModal';
 
 // ─── Category definitions ──────────────────────────────────────────────────────
 type Category = 'loans' | 'insurance' | 'deposits';
@@ -129,8 +131,12 @@ export default function HeroSearch() {
     </button>
   );
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
+    <>
+    <FindBestRateModal open={modalOpen} onClose={() => setModalOpen(false)} />
     <div className="bg-white/8 backdrop-blur-md border border-white/15 rounded-2xl p-5 shadow-2xl">
 
       {/* Category tabs */}
@@ -298,6 +304,19 @@ export default function HeroSearch() {
           <p className="text-center text-xs text-white/30">FSCS/deposit guarantee info shown on results</p>
         </div>
       )}
+
+      {/* ── AI Find Best Rate CTA ── */}
+      <div className="mt-4 pt-4 border-t border-white/10">
+        <button
+          onClick={() => setModalOpen(true)}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500/20 to-blue-500/20 hover:from-sky-500/30 hover:to-blue-500/30 border border-sky-400/30 hover:border-sky-400/60 text-white font-semibold rounded-xl py-2.5 text-sm transition-all"
+        >
+          <Sparkles size={15} className="text-sky-300" />
+          Not sure? Let AI find the best match →
+        </button>
+      </div>
+
     </div>
+    </>
   );
 }

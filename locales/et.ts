@@ -17,7 +17,7 @@ export const et: Translations = {
     language: "Keel",
     business: "Ärilaenud",
     countries: "Riigid",
-    programs: "🚀 Programmid",
+    programs: "🚀 Startup",
     getQuote: "Hangi tasuta hinnapakkumine →",
     updatedDaily: "● Uuendatakse iga päev",
   },

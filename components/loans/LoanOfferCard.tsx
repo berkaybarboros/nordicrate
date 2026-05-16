@@ -2,7 +2,7 @@
 
 import { CheckCircle, Clock, ExternalLink, BarChart2, X } from "lucide-react";
 import { LoanOffer } from "@/data/loans";
-import { calculateMonthlyPayment, formatCurrency, calculateAPR } from "@/lib/utils";
+import { calculateMonthlyPayment, formatCurrency, calculateAPR, buildUTMLink } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 
@@ -33,6 +33,8 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
 
   const isEligible = amount >= offer.minAmount && amount <= offer.maxAmount &&
     termMonths >= offer.minTermMonths && termMonths <= offer.maxTermMonths;
+
+  const applyUrl = buildUTMLink(offer.applyUrl, offer.bankId, offer.type);
 
   return (
     <div className={`bg-white rounded-2xl border p-5 md:p-6 transition-all hover:shadow-lg ${!isEligible ? "opacity-60" : "border-gray-100 hover:border-[#1a3c6e]/20"}`}>
@@ -84,7 +86,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
         <div className="md:w-36 flex-shrink-0 space-y-2">
           {isEligible ? (
             <a
-              href={offer.applyUrl}
+              href={applyUrl}
               target="_blank"
               rel="noopener noreferrer sponsored"
               className="w-full flex items-center justify-center gap-1.5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-bold py-2.5 rounded-xl transition text-sm"
@@ -108,7 +110,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
                     type: "loan",
                     name: offer.bankName,
                     logo: offer.bankLogo,
-                    applyUrl: offer.applyUrl,
+                    applyUrl: applyUrl,
                     rawRate: offer.representativeRate,
                     rawMonthly: monthly,
                     metrics: [

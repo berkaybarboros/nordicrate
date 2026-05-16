@@ -15,7 +15,7 @@ export const en = {
     language: "Language",
     business: "Business",
     countries: "Countries",
-    programs: "🚀 Programs",
+    programs: "🚀 Startup",
     getQuote: "Get Free Quote →",
     updatedDaily: "● Updated daily",
   },

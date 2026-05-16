@@ -4,6 +4,7 @@ import { CheckCircle, Tag, ExternalLink, BarChart2, X } from "lucide-react";
 import { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
+import { buildUTMLink } from "@/lib/utils";
 
 interface Props {
   offer: InsuranceOffer;
@@ -23,6 +24,11 @@ export default function InsuranceOfferCard({ offer }: Props) {
   const compareFull = !inCompare && items.length >= MAX;
 
   const monthly = Math.round(offer.representativePremium / 12);
+  const quoteUrl = buildUTMLink(
+    offer.applyUrl || offer.websiteUrl,
+    offer.companyId,
+    `insurance-${offer.type}`
+  );
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 hover:shadow-lg hover:border-[#1a3c6e]/20 transition-all">
@@ -77,7 +83,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
         {/* CTA */}
         <div className="md:w-36 flex-shrink-0 space-y-2">
           <a
-            href={offer.applyUrl}
+            href={quoteUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
             className="w-full flex items-center justify-center gap-1.5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-bold py-2.5 rounded-xl transition text-sm"
@@ -96,7 +102,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
                     type: "insurance",
                     name: offer.companyName,
                     logo: offer.companyLogo,
-                    applyUrl: offer.applyUrl,
+                    applyUrl: quoteUrl,
                     rawPremium: offer.representativePremium,
                     metrics: [
                       { label: "Annual Premium", value: `€${offer.representativePremium}` },
