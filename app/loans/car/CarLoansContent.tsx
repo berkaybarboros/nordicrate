@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ArrowUpDown } from "lucide-react";
 import LoanOfferCard from "@/components/loans/LoanOfferCard";
 import LoanCalculator from "@/components/loans/LoanCalculator";
+import SmartRateWidget from "@/components/SmartRateWidget";
+import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { carLoans } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 
@@ -11,6 +13,11 @@ export default function CarLoansContent() {
   const [amount, setAmount] = useState(15000);
   const [termMonths, setTermMonths] = useState(48);
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
+  const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+  const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
+    const e3m = rates.find(r => r.key === 'euribor3m');
+    if (e3m) setLiveEuribor(e3m.rate);
+  }, []);
 
   const sortedOffers = useMemo(() => {
     return [...carLoans].sort((a, b) => {
@@ -62,6 +69,13 @@ export default function CarLoansContent() {
               maxAmount={60000}
               minTerm={12}
               maxTerm={84}
+            />
+            <SmartRateWidget onRateChange={handleRateChange} />
+            <PersonalizedRecs
+              productType="car"
+              amount={amount}
+              termMonths={termMonths}
+              liveEuribor={liveEuribor}
             />
             <div className="bg-white rounded-xl border border-gray-100 p-4">
               <h4 className="font-bold text-[#1a3c6e] text-sm mb-3">Eligibility Requirements</h4>

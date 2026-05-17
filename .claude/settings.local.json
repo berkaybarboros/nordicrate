@@ -35,7 +35,10 @@
       "Bash(NEXT_TURBOPACK_EXPERIMENTAL_USE_SYSTEM_TLS_CERTS=1 npm run build)",
       "mcp__supabase__list_projects",
       "mcp__supabase__list_tables",
-      "mcp__supabase__restore_project"
+      "mcp__supabase__restore_project",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "PowerShell(cd \"C:\\\\Users\\\\berka\\\\OneDrive\\\\Masaüstü\\\\Claude Code Project\\\\HangiKredi CLON\"; $env:NEXT_TURBOPACK_EXPERIMENTAL_USE_SYSTEM_TLS_CERTS = \"1\"; npm run build 2>&1 | Select-String -Pattern \"error|Error|warning|Route|✓|Failed\" | Select-Object -First 60)"
     ]
   }
 }

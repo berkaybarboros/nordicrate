@@ -99,7 +99,23 @@ export async function POST(req: NextRequest) {
     const euribor3m = rateMap.get('euribor3m')?.rate ?? null;
     const euriborDelta = rateMap.get('euribor3m')?.delta ?? null;
 
-    // ── Step 3: Get static catalog + merge with collaborative scores ─────────
+    // ── Step 3: Get user_id for vector layer ────────────────────────────────
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? null;
+
+    // ── Step 3b: Vector similarity recommendations (4th layer) ──────────────
+    let vectorMap = new Map<string, number>();
+    if (userId) {
+      const { data: vectorRecs } = await supabase.rpc('get_vector_recommendations', {
+        p_user_id:      userId,
+        p_product_type: productType,
+      });
+      for (const r of (vectorRecs ?? [])) {
+        vectorMap.set(r.product_id, Number(r.vector_score));
+      }
+    }
+
+    // ── Step 4: Get static catalog + merge all signals ───────────────────────
     const catalog = getCatalog(productType);
     const collabMap = new Map<string, { score: number; reasons: string[] }>();
     for (const r of (collabRecs ?? [])) {
@@ -111,13 +127,22 @@ export async function POST(req: NextRequest) {
       ? new Map<string, number>()
       : applyRateBoost(catalog as { id: string; representativeRate?: number }[], euribor3m);
 
-    // Score each product
+    // Normalize vector scores to 0-15 range for fair weighting
+    const maxVectorScore = Math.max(...Array.from(vectorMap.values()), 1);
+
+    // Score each product — 3 signal layers merged
     const scored = catalog.map(p => {
       const id = (p as { id: string }).id;
       const collab = collabMap.get(id);
       const rateBoost = rateBoosts.get(id) ?? 0;
-      const totalScore = (collab?.score ?? 0) + rateBoost;
-      return { product: p, id, totalScore, collabScore: collab?.score ?? 0, reasons: collab?.reasons ?? [] };
+      const rawVectorScore = vectorMap.get(id) ?? 0;
+      const normalizedVector = (rawVectorScore / maxVectorScore) * 15;
+      const totalScore = (collab?.score ?? 0) + rateBoost + normalizedVector;
+      const reasons = [
+        ...(collab?.reasons ?? []),
+        ...(rawVectorScore > 0 ? ['Chosen by similar profiles'] : []),
+      ];
+      return { product: p, id, totalScore, collabScore: collab?.score ?? 0, vectorScore: normalizedVector, reasons };
     });
 
     // Sort: collaborative score + rate boost, fallback to representative rate
@@ -258,9 +283,10 @@ Write 1-2 sentences for each product explaining WHY it's recommended for this sp
         trend: euriborDelta && euriborDelta < 0 ? 'falling' : euriborDelta && euriborDelta > 0 ? 'rising' : 'stable',
       },
       dataSource: {
-        collaborative: (collabRecs?.length ?? 0) > 0,
-        liveRates:     rateMap.size > 0,
-        aiExplained:   Object.keys(whyMap).length > 0,
+        collaborative:    (collabRecs?.length ?? 0) > 0,
+        liveRates:        rateMap.size > 0,
+        aiExplained:      Object.keys(whyMap).length > 0,
+        vectorSimilarity: vectorMap.size > 0,
       },
     });
 

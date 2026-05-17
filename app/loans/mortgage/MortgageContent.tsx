@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Info, ArrowUpDown } from "lucide-react";
 import LoanOfferCard from "@/components/loans/LoanOfferCard";
 import LoanCalculator from "@/components/loans/LoanCalculator";
+import SmartRateWidget from "@/components/SmartRateWidget";
+import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { mortgageLoans } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 
@@ -11,6 +13,11 @@ export default function MortgageContent() {
   const [amount, setAmount] = useState(100000);
   const [termMonths, setTermMonths] = useState(240);
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
+  const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+  const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
+    const e3m = rates.find(r => r.key === 'euribor3m');
+    if (e3m) setLiveEuribor(e3m.rate);
+  }, []);
 
   const sortedOffers = useMemo(() => {
     return [...mortgageLoans].sort((a, b) => {
@@ -68,6 +75,13 @@ export default function MortgageContent() {
               maxAmount={600000}
               minTerm={60}
               maxTerm={360}
+            />
+            <SmartRateWidget onRateChange={handleRateChange} />
+            <PersonalizedRecs
+              productType="mortgage"
+              amount={amount}
+              termMonths={termMonths}
+              liveEuribor={liveEuribor}
             />
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
               <div className="flex items-start gap-2">

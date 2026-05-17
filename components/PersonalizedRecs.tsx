@@ -42,9 +42,10 @@ interface RecommendResult {
     trend: 'falling' | 'rising' | 'stable';
   };
   dataSource: {
-    collaborative: boolean;
-    liveRates: boolean;
-    aiExplained: boolean;
+    collaborative:    boolean;
+    liveRates:        boolean;
+    aiExplained:      boolean;
+    vectorSimilarity: boolean;
   };
 }
 
@@ -199,6 +200,11 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
         {dataSource.aiExplained && (
           <span className="flex items-center gap-1 text-[9px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-semibold">
             <Sparkles size={8} /> AI
+          </span>
+        )}
+        {dataSource.vectorSimilarity && (
+          <span className="flex items-center gap-1 text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-semibold">
+            ⚡ Similar profiles
           </span>
         )}
       </div>

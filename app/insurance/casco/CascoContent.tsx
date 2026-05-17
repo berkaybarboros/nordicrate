@@ -5,6 +5,8 @@ import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
 import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
+import SmartRateWidget from "@/components/SmartRateWidget";
+import PersonalizedRecs from "@/components/PersonalizedRecs";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 
@@ -40,6 +42,11 @@ export default function CascoContent() {
   const [sortBy, setSortBy] = useState<"price" | "rating">("price");
   const [offers, setOffers] = useState<InsuranceOffer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+  const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
+    const e3m = rates.find(r => r.key === 'euribor3m');
+    if (e3m) setLiveEuribor(e3m.rate);
+  }, []);
 
   const fetchOffers = useCallback(() => {
     setLoading(true);
@@ -90,6 +97,11 @@ export default function CascoContent() {
           {/* Sidebar */}
           <div className="space-y-4">
             <InsurancePremiumCalc kind="casco" />
+            <SmartRateWidget onRateChange={handleRateChange} />
+            <PersonalizedRecs
+              productType="casco"
+              liveEuribor={liveEuribor}
+            />
             <AIProductSection
               productType="CASCO insurance"
               country="Estonia"
