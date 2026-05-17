@@ -160,12 +160,13 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
         }
       });
 
-    // ─── Save lead to Supabase ───────────────────────────────────────────────────
+    // ─── Save lead + model_outputs to Supabase ──────────────────────────────────
     let leadId: string | null = null;
     try {
       const supabase = await createSupabaseServer();
       const { data: { user } } = await supabase.auth.getUser();
 
+      // 1. Insert lead
       const { data: lead } = await supabase
         .from('leads')
         .insert({
@@ -184,6 +185,26 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
         .single();
 
       leadId = lead?.id ?? null;
+
+      // 2. Insert model_outputs row (one per lead — recommendations as JSONB)
+      if (leadId && recommendations.length > 0) {
+        await supabase.from('model_outputs').insert({
+          session_id:     sessionId,
+          user_id:        user?.id ?? null,
+          lead_id:        leadId,
+          product_type:   productType,
+          model_version:  'groq-llama-3.3-70b',
+          recommendations: recommendations.map(r => ({
+            rank:        r.rank,
+            product_id:  r.productId,
+            name:        r.name,
+            why_this:    r.whyThis,
+          })),
+          clicked_rank:   null,
+          clicked_product: null,
+          converted:      false,
+        });
+      }
     } catch (dbErr) {
       console.error('[find-rate] Supabase insert failed:', dbErr);
       // Don't fail the request — DB write is non-blocking for UX

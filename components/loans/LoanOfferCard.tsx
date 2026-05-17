@@ -5,6 +5,7 @@ import { LoanOffer } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency, calculateAPR, buildUTMLink } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
+import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 
 interface Props {
   offer: LoanOffer;
@@ -89,6 +90,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
               href={applyUrl}
               target="_blank"
               rel="noopener noreferrer sponsored"
+              onClick={() => trackApplyClick(offer.id, offer.type)}
               className="w-full flex items-center justify-center gap-1.5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-bold py-2.5 rounded-xl transition text-sm"
             >
               {t.loans.applyNow}
@@ -102,10 +104,12 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
           {/* Compare toggle */}
           <button
             disabled={compareFull}
-            onClick={() =>
-              inCompare
-                ? remove(offer.id)
-                : add({
+            onClick={() => {
+              if (inCompare) {
+                remove(offer.id);
+                trackCompareRemove(offer.id, offer.type);
+              } else {
+                add({
                     id: offer.id,
                     type: "loan",
                     name: offer.bankName,
@@ -123,8 +127,10 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
                       { label: "Min Amount", value: formatCurrency(offer.minAmount) },
                       { label: "Max Amount", value: formatCurrency(offer.maxAmount) },
                     ],
-                  })
-            }
+                  });
+                trackCompareAdd(offer.id, offer.type);
+              }
+            }}
             className={`w-full flex items-center justify-center gap-1.5 font-semibold py-2 rounded-xl transition text-xs border ${
               inCompare
                 ? "bg-[#1a3c6e] text-white border-[#1a3c6e]"

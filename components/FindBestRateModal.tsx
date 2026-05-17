@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, ExternalLink, ChevronRight, CheckCircle, ArrowLeft } from 'lucide-react';
 import { COUNTRIES } from '@/lib/data';
+import { track, trackFindRateSubmit, trackRecommendationClick } from '@/lib/tracker';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type ProductType =
@@ -69,9 +70,11 @@ export default function FindBestRateModal({ open, onClose }: Props) {
   const [result, setResult]         = useState<FindRateResult | null>(null);
   const [error, setError]           = useState('');
 
-  // Reset on close
+  // Track open + reset on close
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      track('find_rate_open');
+    } else {
       setTimeout(() => {
         setStep(1);
         setProductType(null);
@@ -115,6 +118,16 @@ export default function FindBestRateModal({ open, onClose }: Props) {
       const data = await res.json() as FindRateResult & { error?: string };
       if (data.error) throw new Error(data.error);
       setResult(data);
+      // Track submit + recommendation views
+      trackFindRateSubmit(productType!, data.leadId);
+      data.recommendations.forEach(rec => {
+        track('recommendation_view', {
+          product_id: rec.productId,
+          product_type: productType!,
+          rank: rec.rank,
+          lead_id: data.leadId,
+        });
+      });
     } catch (err) {
       setError((err as Error).message || 'Something went wrong. Please try again.');
     } finally {
@@ -415,6 +428,15 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                         href={rec.applyUrl}
                         target="_blank"
                         rel="noopener noreferrer sponsored"
+                        onClick={() => {
+                          trackRecommendationClick(rec.rank, rec.productId, result.leadId);
+                          track('find_rate_apply', {
+                            product_id: rec.productId,
+                            product_type: productType!,
+                            rank: rec.rank,
+                            lead_id: result.leadId,
+                          });
+                        }}
                         className={`w-full flex items-center justify-center gap-1.5 font-bold py-2.5 rounded-xl text-sm transition-all ${
                           i === 0
                             ? 'bg-sky-500 hover:bg-sky-400 text-white'

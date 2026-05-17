@@ -5,6 +5,7 @@ import { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { buildUTMLink } from "@/lib/utils";
+import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 
 interface Props {
   offer: InsuranceOffer;
@@ -86,6 +87,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
             href={quoteUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
+            onClick={() => trackApplyClick(offer.id, `insurance-${offer.type}`)}
             className="w-full flex items-center justify-center gap-1.5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-bold py-2.5 rounded-xl transition text-sm"
           >
             {t.insurance.getQuote}
@@ -94,10 +96,12 @@ export default function InsuranceOfferCard({ offer }: Props) {
           {/* Compare toggle */}
           <button
             disabled={compareFull}
-            onClick={() =>
-              inCompare
-                ? remove(offer.id)
-                : add({
+            onClick={() => {
+              if (inCompare) {
+                remove(offer.id);
+                trackCompareRemove(offer.id, `insurance-${offer.type}`);
+              } else {
+                add({
                     id: offer.id,
                     type: "insurance",
                     name: offer.companyName,
@@ -111,8 +115,10 @@ export default function InsuranceOfferCard({ offer }: Props) {
                       { label: "Online Discount", value: offer.onlineDiscount ? `-${offer.onlineDiscount}%` : "—" },
                       { label: "Payment Options", value: offer.paymentOptions.join(", ") },
                     ],
-                  })
-            }
+                  });
+                trackCompareAdd(offer.id, `insurance-${offer.type}`);
+              }
+            }}
             className={`w-full flex items-center justify-center gap-1.5 font-semibold py-2 rounded-xl transition text-xs border ${
               inCompare
                 ? "bg-[#1a3c6e] text-white border-[#1a3c6e]"
