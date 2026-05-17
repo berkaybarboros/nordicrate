@@ -7,6 +7,8 @@ import { Info, ArrowUpDown, Bell } from "lucide-react";
 import LoanOfferCard from "@/components/loans/LoanOfferCard";
 import LoanCalculator from "@/components/loans/LoanCalculator";
 import RateAlertModal from "@/components/alerts/RateAlertModal";
+import SmartRateWidget from "@/components/SmartRateWidget";
+import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { formatCurrency, calculateMonthlyPayment } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { LoanOffer } from "@/data/loans";
@@ -54,6 +56,12 @@ function PersonalLoansInner() {
   const [offers, setOffers] = useState<LoanOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+
+  const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
+    const e3m = rates.find(r => r.key === 'euribor3m');
+    if (e3m) setLiveEuribor(e3m.rate);
+  }, []);
 
   const fetchOffers = useCallback(() => {
     setLoading(true);
@@ -141,6 +149,17 @@ function PersonalLoansInner() {
                 </div>
               </div>
             </div>
+            <SmartRateWidget
+              onRateChange={handleRateChange}
+            />
+
+            <PersonalizedRecs
+              productType="personal"
+              amount={amount}
+              termMonths={termMonths}
+              liveEuribor={liveEuribor}
+            />
+
             <div className="bg-white rounded-xl border border-gray-100 p-4">
               <h4 className="font-bold text-[#1a3c6e] text-sm mb-3">{t.loans.eligibility}</h4>
               <ul className="space-y-2 text-xs text-gray-600">
