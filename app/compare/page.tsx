@@ -3,6 +3,7 @@
 import { useCompare, CompareItem } from "@/contexts/CompareContext";
 import { BarChart2, X, ExternalLink, ArrowLeft, CheckCircle, XCircle, TrendingDown, Award } from "lucide-react";
 import Link from "next/link";
+import CompareChatPanel from "@/components/compare/CompareChatPanel";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function bestIndex(items: CompareItem[], key: keyof CompareItem): number {
@@ -380,10 +381,15 @@ export default function ComparePage() {
         {/* Financial Analysis */}
         <FinancialAnalysis items={items} />
 
+        {/* AI Compare Chat */}
+        <div className="mt-6">
+          <CompareChatPanel items={items} />
+        </div>
+
         {/* Disclaimer */}
         <p className="text-xs text-gray-400 text-center mt-8 leading-relaxed max-w-2xl mx-auto">
           Rates and premiums shown are representative examples. Final rates depend on your credit
-          profile and the provider&apos;s assessment. BalticRate is a comparison service — we do not
+          profile and the provider&apos;s assessment. NordicRate is a comparison service — we do not
           provide financial products directly.
         </p>
       </div>
