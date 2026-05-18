@@ -4,7 +4,9 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AIAssistant from '@/components/AIAssistant';
+import CompareBar from '@/components/compare/CompareBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { CompareProvider } from '@/contexts/CompareContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -87,10 +89,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 min-h-screen flex flex-col`}
       >
         <LanguageProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <AIAssistant />
+          <CompareProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <AIAssistant />
+            <CompareBar />
+          </CompareProvider>
         </LanguageProvider>
       </body>
     </html>
