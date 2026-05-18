@@ -1,9 +1,11 @@
 "use client";
 
 import { useCompare, CompareItem } from "@/contexts/CompareContext";
-import { BarChart2, X, ExternalLink, ArrowLeft, CheckCircle, XCircle, TrendingDown, Award } from "lucide-react";
+import { BarChart2, X, ExternalLink, ArrowLeft, CheckCircle, XCircle, TrendingDown, Award, Sparkles, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
 import CompareChatPanel from "@/components/compare/CompareChatPanel";
+import { calculateMonthlyPayment } from "@/lib/utils";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function bestIndex(items: CompareItem[], key: keyof CompareItem): number {
@@ -16,6 +18,159 @@ function bestIndexMax(items: CompareItem[], key: keyof CompareItem): number {
   const values = items.map((it) => (it[key] as number | undefined) ?? -Infinity);
   const max = Math.max(...values);
   return values.indexOf(max);
+}
+
+// ─── AI Verdict ───────────────────────────────────────────────────────────────
+function AIVerdict({ items }: { items: CompareItem[] }) {
+  const [verdicts, setVerdicts] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchVerdict() {
+      try {
+        const res = await fetch('/api/compare-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{
+              role: 'user',
+              content: `Give a one-sentence verdict for EACH product. Format exactly as:
+#1 [ProductName]: [verdict in max 15 words]
+#2 [ProductName]: [verdict in max 15 words]
+${items.length === 3 ? '#3 [ProductName]: [verdict in max 15 words]\n' : ''}Then add: "Winner: [ProductName] — [reason in 10 words]"
+Be direct and concrete. No fluff.`,
+            }],
+            compareItems: items,
+          }),
+        });
+        if (!res.ok || !res.body) return;
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulated = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+          for (const line of lines) {
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(data) as { choices: { delta: { content?: string } }[] };
+              const delta = parsed.choices?.[0]?.delta?.content ?? '';
+              accumulated += delta;
+              if (!cancelled) setVerdicts(accumulated);
+            } catch { /* skip */ }
+          }
+        }
+      } catch { /* silent fail */ } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchVerdict();
+    return () => { cancelled = true; };
+  }, [items]);
+
+  if (!verdicts && !loading) return null;
+
+  return (
+    <div className="mt-6 bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-7 h-7 bg-violet-100 rounded-lg flex items-center justify-center">
+          <Sparkles size={14} className="text-violet-600" />
+        </div>
+        <span className="font-extrabold text-sm text-slate-800">AI Verdict</span>
+        <span className="text-[10px] bg-violet-100 text-violet-600 px-2 py-0.5 rounded-full font-semibold">Instant analysis</span>
+      </div>
+      {loading && !verdicts ? (
+        <div className="space-y-2">
+          {[1, 2].map(i => <div key={i} className="h-4 bg-indigo-100/60 rounded animate-pulse" />)}
+        </div>
+      ) : (
+        <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans leading-relaxed">{verdicts}</pre>
+      )}
+    </div>
+  );
+}
+
+// ─── Scenario Slider ──────────────────────────────────────────────────────────
+function ScenarioSlider({ items }: { items: CompareItem[] }) {
+  const loanItems = items.filter(it => it.rawRate != null);
+  if (loanItems.length < 2) return null;
+
+  const [amount, setAmount] = useState(10000);
+  const [termMonths, setTermMonths] = useState(36);
+  const colColors = ["#1a3c6e", "#b45309", "#16a34a"];
+
+  const scenarios = loanItems.map((item, i) => {
+    const monthly = calculateMonthlyPayment(amount, item.rawRate!, termMonths);
+    const total = Math.round(monthly * termMonths);
+    return { name: item.name, logo: item.logo, rate: item.rawRate!, monthly: Math.round(monthly), total, color: colColors[i], applyUrl: item.applyUrl };
+  });
+  const cheapest = scenarios.reduce((a, b) => a.total < b.total ? a : b);
+
+  return (
+    <div className="mt-6 bg-white rounded-2xl border border-gray-100 p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <SlidersHorizontal size={16} className="text-sky-600" />
+        <span className="font-extrabold text-sm text-slate-800">Scenario Calculator</span>
+        <span className="text-xs text-gray-400">Adjust to see live cost changes</span>
+      </div>
+
+      {/* Sliders */}
+      <div className="grid sm:grid-cols-2 gap-5 mb-5">
+        <div>
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Loan Amount</span>
+            <span className="font-bold text-[#1a3c6e]">€{amount.toLocaleString()}</span>
+          </div>
+          <input type="range" min={1000} max={50000} step={500} value={amount}
+            onChange={e => setAmount(Number(e.target.value))}
+            className="w-full accent-[#1a3c6e]" />
+          <div className="flex justify-between text-[10px] text-gray-300 mt-0.5">
+            <span>€1,000</span><span>€50,000</span>
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Term</span>
+            <span className="font-bold text-[#1a3c6e]">{termMonths} months</span>
+          </div>
+          <input type="range" min={12} max={120} step={6} value={termMonths}
+            onChange={e => setTermMonths(Number(e.target.value))}
+            className="w-full accent-[#1a3c6e]" />
+          <div className="flex justify-between text-[10px] text-gray-300 mt-0.5">
+            <span>12 mo</span><span>120 mo</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Results */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${scenarios.length}, 1fr)` }}>
+        {scenarios.map((s) => {
+          const isBest = s.name === cheapest.name;
+          return (
+            <div key={s.name} className={`rounded-xl p-3 border text-center ${isBest ? 'border-emerald-200 bg-emerald-50' : 'border-gray-100 bg-gray-50'}`}>
+              <p className="text-lg mb-0.5">{s.logo}</p>
+              <p className="text-[11px] font-semibold text-gray-600 truncate">{s.name}</p>
+              <p className={`text-xl font-extrabold mt-1 ${isBest ? 'text-emerald-600' : 'text-gray-900'}`}>
+                €{s.monthly.toLocaleString()}<span className="text-xs font-normal text-gray-400">/mo</span>
+              </p>
+              <p className="text-xs text-gray-400">Total: €{s.total.toLocaleString()}</p>
+              {isBest && <span className="inline-block mt-1 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">CHEAPEST</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {scenarios.length >= 2 && (
+        <p className="text-xs text-center text-gray-400 mt-3">
+          Choosing <strong>{cheapest.name}</strong> saves €{(Math.max(...scenarios.map(s => s.total)) - cheapest.total).toLocaleString()} over {termMonths} months
+        </p>
+      )}
+    </div>
+  );
 }
 
 // ─── Financial Analysis ────────────────────────────────────────────────────────
@@ -377,6 +532,12 @@ export default function ComparePage() {
             </div>
           ))}
         </div>
+
+        {/* AI Verdict */}
+        <AIVerdict items={items} />
+
+        {/* Scenario Calculator (loans only) */}
+        <ScenarioSlider items={items} />
 
         {/* Financial Analysis */}
         <FinancialAnalysis items={items} />
