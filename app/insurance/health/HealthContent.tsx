@@ -9,6 +9,7 @@ import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
+import SocialProofBar from "@/components/SocialProofBar";
 
 function SkeletonInsuranceCard() {
   return (
@@ -114,6 +115,7 @@ export default function HealthContent() {
 
           {/* Main */}
           <div className="space-y-4">
+            <SocialProofBar productType="insurance" />
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
               <strong>About health insurance in Estonia:</strong> Health insurance is voluntary but
               provides access to private healthcare, shorter waiting times, and broader coverage than

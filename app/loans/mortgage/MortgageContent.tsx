@@ -8,6 +8,7 @@ import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { mortgageLoans } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
+import SocialProofBar from "@/components/SocialProofBar";
 
 export default function MortgageContent() {
   const [amount, setAmount] = useState(100000);
@@ -115,6 +116,7 @@ export default function MortgageContent() {
           </div>
 
           <div className="space-y-4">
+            <SocialProofBar productType="loan" />
             <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
               <p className="text-sm text-gray-600 font-medium">
                 <span className="font-bold text-[#1a3c6e]">{sortedOffers.length} offers</span>{" "}

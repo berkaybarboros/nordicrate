@@ -192,6 +192,19 @@ export default function AIAssistant() {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  // "Ask AI about this" — kart butonlarından gelen pre-fill eventi
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { message } = (e as CustomEvent<{ message: string }>).detail;
+      setInput(message);
+      setIsOpen(true);
+      setHasUnread(false);
+      setTimeout(() => inputRef.current?.focus(), 150);
+    };
+    window.addEventListener('ask-ai-product', handler);
+    return () => window.removeEventListener('ask-ai-product', handler);
+  }, []);
+
   const fetchProfile = useCallback(async (msgs: Array<{ role: string; content: string }>) => {
     if (msgs.length < 2) return;
     try {

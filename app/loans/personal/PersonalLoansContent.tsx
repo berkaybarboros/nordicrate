@@ -9,6 +9,7 @@ import LoanCalculator from "@/components/loans/LoanCalculator";
 import RateAlertModal from "@/components/alerts/RateAlertModal";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
+import SocialProofBar from "@/components/SocialProofBar";
 import { formatCurrency, calculateMonthlyPayment } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { LoanOffer } from "@/data/loans";
@@ -181,6 +182,7 @@ function PersonalLoansInner() {
 
           {/* Main: Offers */}
           <div className="space-y-4">
+            <SocialProofBar productType="loan" />
             <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
               <p className="text-sm text-gray-600 font-medium">
                 <span className="font-bold text-[#1a3c6e]">

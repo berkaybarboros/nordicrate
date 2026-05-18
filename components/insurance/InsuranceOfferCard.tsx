@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Tag, ExternalLink, BarChart2, X } from "lucide-react";
+import { CheckCircle, Tag, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
@@ -93,7 +93,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
             {t.insurance.getQuote}
             <ExternalLink size={13} />
           </a>
-          {/* Compare toggle */}
+          {/* Compare toggle — secondary style, clearly distinct from Get Quote */}
           <button
             disabled={compareFull}
             onClick={() => {
@@ -102,40 +102,43 @@ export default function InsuranceOfferCard({ offer }: Props) {
                 trackCompareRemove(offer.id, `insurance-${offer.type}`);
               } else {
                 add({
-                    id: offer.id,
-                    type: "insurance",
-                    name: offer.companyName,
-                    logo: offer.companyLogo,
-                    applyUrl: quoteUrl,
-                    rawPremium: offer.representativePremium,
-                    metrics: [
-                      { label: "Annual Premium", value: `€${offer.representativePremium}` },
-                      { label: "Monthly Premium", value: `€${monthly}` },
-                      { label: "Excess / Deductible", value: offer.excess === 0 ? "None" : `€${offer.excess}` },
-                      { label: "Online Discount", value: offer.onlineDiscount ? `-${offer.onlineDiscount}%` : "—" },
-                      { label: "Payment Options", value: offer.paymentOptions.join(", ") },
-                    ],
-                  });
+                  id: offer.id,
+                  type: "insurance",
+                  name: offer.companyName,
+                  logo: offer.companyLogo,
+                  applyUrl: quoteUrl,
+                  rawPremium: offer.representativePremium,
+                  metrics: [
+                    { label: "Annual Premium", value: `€${offer.representativePremium}` },
+                    { label: "Monthly Premium", value: `€${monthly}` },
+                    { label: "Excess / Deductible", value: offer.excess === 0 ? "None" : `€${offer.excess}` },
+                    { label: "Online Discount", value: offer.onlineDiscount ? `-${offer.onlineDiscount}%` : "—" },
+                    { label: "Payment Options", value: offer.paymentOptions.join(", ") },
+                  ],
+                });
                 trackCompareAdd(offer.id, `insurance-${offer.type}`);
               }
             }}
-            className={`w-full flex items-center justify-center gap-1.5 font-semibold py-2 rounded-xl transition text-xs border ${
+            className={`w-full flex items-center justify-center gap-1.5 font-medium py-2 rounded-xl transition text-xs border ${
               inCompare
-                ? "bg-[#1a3c6e] text-white border-[#1a3c6e]"
+                ? "bg-slate-700 text-white border-slate-700"
                 : compareFull
                 ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed"
-                : "bg-white text-[#1a3c6e] border-[#1a3c6e]/30 hover:bg-blue-50"
+                : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-slate-100 hover:text-slate-700 hover:border-slate-300"
             }`}
           >
-            {inCompare ? (
-              <>
-                <X size={11} /> Remove
-              </>
-            ) : (
-              <>
-                <BarChart2 size={11} /> {compareFull ? "Compare Full" : "+ Compare"}
-              </>
-            )}
+            {inCompare ? <><X size={11} /> In Compare</> : <><BarChart2 size={11} /> {compareFull ? "Compare Full" : "Add to Compare"}</>}
+          </button>
+          {/* Ask AI */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('ask-ai-product', {
+                detail: { message: `Tell me about ${offer.companyName} ${offer.type} insurance — €${offer.representativePremium}/year, excess €${offer.excess}. Is this good value?` }
+              }));
+            }}
+            className="w-full flex items-center justify-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-700 py-1.5 rounded-xl hover:bg-violet-50 transition"
+          >
+            <MessageCircle size={11} /> Ask AI about this
           </button>
           <p className="text-xs text-center text-gray-400">{t.insurance.opensInsurer}</p>
           <div className="flex flex-wrap gap-1 justify-center">

@@ -9,6 +9,7 @@ import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import type { InsuranceOffer } from "@/data/insurance";
 import { useTranslation } from "@/contexts/LanguageContext";
+import SocialProofBar from "@/components/SocialProofBar";
 
 function SkeletonInsuranceCard() {
   return (
@@ -109,6 +110,7 @@ export default function HomeInsuranceContent() {
 
           {/* Main */}
           <div className="space-y-4">
+            <SocialProofBar productType="insurance" />
             <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
               <p className="text-sm font-medium text-gray-600">
                 <span className="font-bold text-[#1a3c6e]">
