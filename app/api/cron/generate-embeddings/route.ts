@@ -5,11 +5,11 @@
  * Akış:
  *  1. embedding_jobs'tan pending olanları çek (max 50/run)
  *  2. Her user için generate_profile_text() SQL fonksiyonu → metin
- *  3. Gemini text-embedding-004 → vector(768)
+ *  3. Gemini gemini-embedding-2 (outputDimensionality=768) → vector(768)
  *  4. user_signals.profile_embedding ← UPDATE
  *  5. embedding_jobs.status ← 'done'
  *
- * Gemini text-embedding-004: 768 dim, 1500 req/day free
+ * gemini-embedding-2: Matryoshka embeddings, 768 dim truncated, 1500 req/day free
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,7 +18,7 @@ import { createSupabaseServer } from '@/lib/supabase-server';
 export const runtime = 'nodejs';
 
 const GEMINI_EMBED_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent';
 
 async function getGeminiEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
@@ -26,9 +26,10 @@ async function getGeminiEmbedding(text: string, apiKey: string): Promise<number[
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'models/text-embedding-004',
+        model: 'models/gemini-embedding-2',
         content: { parts: [{ text }] },
         taskType: 'RETRIEVAL_DOCUMENT',
+        outputDimensionality: 768,
       }),
       signal: AbortSignal.timeout(15000),
     });
