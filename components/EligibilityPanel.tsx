@@ -1,153 +1,271 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import type { UserProfile, EligibilityResult, EligibilityScore } from '@/lib/profile';
+/**
+ * EligibilityPanel
+ * AI konuşmasından çıkarılan UserProfile → calculateEligibility() sonuçlarını gösterir.
+ * AIAssistant 'ai-messages-updated' custom event'i fırlatınca /api/profile'ı çağırır.
+ * Personal + Corporate loan sidebar'ına eklenir.
+ */
 
-interface ScoreConfig {
-  label: string;
-  color: string;
-  bg: string;
-  border: string;
-  dot: string;
-  bar: string;
-}
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Sparkles, TrendingDown, CheckCircle, AlertCircle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { calculateEligibility } from "@/lib/profile";
+import type { UserProfile, EligibilityResult } from "@/lib/profile";
 
-const SCORE_CONFIG: Record<EligibilityScore, ScoreConfig> = {
-  excellent:         { label: 'Excellent',  color: 'text-green-700', bg: 'bg-green-50',  border: 'border-green-200',  dot: 'bg-green-500',  bar: 'bg-green-500' },
-  good:              { label: 'Good',       color: 'text-sky-700',   bg: 'bg-sky-50',    border: 'border-sky-200',    dot: 'bg-sky-500',    bar: 'bg-sky-500' },
-  fair:              { label: 'Fair',       color: 'text-amber-700', bg: 'bg-amber-50',  border: 'border-amber-200',  dot: 'bg-amber-500',  bar: 'bg-amber-500' },
-  poor:              { label: 'Poor',       color: 'text-red-700',   bg: 'bg-red-50',    border: 'border-red-200',    dot: 'bg-red-500',    bar: 'bg-red-500' },
-  insufficient_data: { label: 'Incomplete', color: 'text-slate-600', bg: 'bg-slate-50',  border: 'border-slate-200',  dot: 'bg-slate-400',  bar: 'bg-slate-400' },
+const SCORE_CONFIG = {
+  excellent: {
+    label: "Excellent",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    bar: "bg-emerald-500",
+    pct: 95,
+    icon: <CheckCircle size={14} className="text-emerald-500" />,
+  },
+  good: {
+    label: "Good",
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    bar: "bg-blue-500",
+    pct: 72,
+    icon: <CheckCircle size={14} className="text-blue-500" />,
+  },
+  fair: {
+    label: "Fair",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    bar: "bg-amber-400",
+    pct: 48,
+    icon: <AlertCircle size={14} className="text-amber-500" />,
+  },
+  poor: {
+    label: "Poor",
+    color: "text-red-700",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    bar: "bg-red-500",
+    pct: 22,
+    icon: <XCircle size={14} className="text-red-500" />,
+  },
+  insufficient_data: {
+    label: "Share more info",
+    color: "text-gray-500",
+    bg: "bg-gray-50",
+    border: "border-gray-200",
+    bar: "bg-gray-300",
+    pct: 0,
+    icon: <Sparkles size={14} className="text-gray-400" />,
+  },
 };
 
 interface Props {
-  profile: UserProfile;
-  result: EligibilityResult;
+  mode?: "personal" | "corporate";
+  className?: string;
+  /** Optional: pass profile + result directly (used by AIAssistant chat widget) */
+  profile?: UserProfile;
+  result?: EligibilityResult;
 }
 
-export default function EligibilityPanel({ profile, result }: Props) {
-  const [expanded, setExpanded] = useState(false);
-  const cfg = SCORE_CONFIG[result.score];
+export default function EligibilityPanel({ mode = "personal", className = "", profile: propProfile, result: propResult }: Props) {
+  const [profile, setProfile] = useState<UserProfile | null>(propProfile ?? null);
+  const [result, setResult] = useState<EligibilityResult | null>(propResult ?? null);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [hasMessages, setHasMessages] = useState(!!propProfile);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // If passed as props (AIAssistant mode), sync on changes
+  useEffect(() => {
+    if (propProfile !== undefined) setProfile(propProfile);
+    if (propResult !== undefined) setResult(propResult);
+  }, [propProfile, propResult]);
+
+  const fetchProfile = useCallback(
+    async (messages: { role: string; content: string }[]) => {
+      if (messages.length < 2) return;
+      setLoading(true);
+      try {
+        const res = await fetch("/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages, mode }),
+        });
+        if (!res.ok) return;
+        const extracted: UserProfile = await res.json();
+        if (Object.keys(extracted).length === 0) return;
+        setProfile(extracted);
+        setResult(calculateEligibility(extracted));
+      } catch {
+        // silent
+      } finally {
+        setLoading(false);
+      }
+    },
+    [mode]
+  );
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { messages } = (e as CustomEvent<{ messages: { role: string; content: string }[] }>).detail;
+      setHasMessages(messages.length > 1);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => fetchProfile(messages), 800);
+    };
+    window.addEventListener("ai-messages-updated", handler);
+    return () => {
+      window.removeEventListener("ai-messages-updated", handler);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [fetchProfile]);
+
+  if (!hasMessages && !profile) return null;
+
+  const cfg = result ? SCORE_CONFIG[result.score] : SCORE_CONFIG.insufficient_data;
 
   return (
-    <div className={`mx-3 mb-2 rounded-xl border ${cfg.border} overflow-hidden shrink-0`}>
-      {/* Collapsed header — always visible */}
+    <div className={`bg-white rounded-xl border ${cfg.border} overflow-hidden transition-all ${className}`}>
+      {/* Header */}
       <button
-        onClick={() => setExpanded(v => !v)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 gap-2 ${cfg.bg}`}
-        aria-expanded={expanded}
+        className={`w-full flex items-center justify-between px-4 py-3 ${cfg.bg} transition`}
+        onClick={() => setExpanded((v) => !v)}
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
-          <span className={`text-xs font-bold shrink-0 ${cfg.color}`}>
-            Eligibility: {cfg.label}
-          </span>
-          {result.dti !== undefined && (
-            <span className="text-xs text-slate-500 shrink-0">· DTI {result.dti}%</span>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-violet-100 rounded-lg flex items-center justify-center">
+            <Sparkles size={12} className="text-violet-600" />
+          </div>
+          <span className="text-sm font-bold text-gray-800">AI Eligibility Check</span>
+          {loading && (
+            <span className="text-[10px] bg-violet-100 text-violet-600 px-2 py-0.5 rounded-full animate-pulse">
+              Analysing…
+            </span>
           )}
-          {result.matchedProducts.length > 0 && (
-            <span className="text-xs text-slate-400 truncate">
-              · {result.matchedProducts.length} match{result.matchedProducts.length !== 1 ? 'es' : ''}
+          {!loading && result && (
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color} border ${cfg.border}`}>
+              {cfg.label}
             </span>
           )}
         </div>
-        <svg
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform shrink-0 ${expanded ? 'rotate-180' : ''}`}
-          fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        {expanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
       </button>
 
-      {/* Expanded content */}
+      {/* Body */}
       {expanded && (
-        <div className="bg-white px-3 pb-3 pt-2.5 space-y-3 border-t border-slate-100">
-          {/* Profile summary */}
-          {(profile.monthlyIncome || profile.loanAmount) && (
-            <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-              {profile.monthlyIncome && (
-                <span>Income: <strong className="text-slate-700">€{profile.monthlyIncome.toLocaleString()}/mo</strong></span>
-              )}
-              {profile.loanAmount && (
-                <span>Loan: <strong className="text-slate-700">€{profile.loanAmount.toLocaleString()}</strong></span>
-              )}
-              {profile.loanTermMonths && (
-                <span>Term: <strong className="text-slate-700">{profile.loanTermMonths}mo</strong></span>
-              )}
+        <div className="px-4 py-3 space-y-3">
+          {!result && !loading && (
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Tell the AI your <strong>income</strong>, <strong>loan amount</strong>, and{" "}
+              <strong>employment status</strong> to get an instant eligibility estimate.
+            </p>
+          )}
+
+          {loading && !result && (
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-100 rounded animate-pulse" />
+              <div className="h-3 w-3/4 bg-gray-100 rounded animate-pulse" />
             </div>
           )}
 
-          {/* DTI bar */}
-          {result.dti !== undefined && (
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-500">Debt-to-Income ratio</span>
-                <span className={`font-bold ${cfg.color}`}>{result.dti}%</span>
-              </div>
-              <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className={`absolute inset-y-0 left-0 rounded-full transition-all ${cfg.bar}`}
-                  style={{ width: `${Math.min(result.dti, 100)}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>0%</span>
-                <span className="text-green-600 font-medium">25% safe</span>
-                <span className="text-red-500 font-medium">45% risk</span>
-                <span>100%</span>
-              </div>
-            </div>
-          )}
-
-          {/* Max affordable loan */}
-          {result.maxLoanDTI !== undefined && (
-            <div className={`text-xs rounded-lg px-2.5 py-2 ${cfg.bg} border ${cfg.border}`}>
-              <span className="text-slate-500">Max affordable loan </span>
-              <span className={`font-bold ${cfg.color}`}>€{result.maxLoanDTI.toLocaleString()}</span>
-              <span className="text-slate-400"> at 35% DTI ceiling</span>
-            </div>
-          )}
-
-          {/* Matched products */}
-          {result.matchedProducts.length > 0 && (
-            <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
-                Top Matches
-              </p>
-              <div className="space-y-1">
-                {result.matchedProducts.map(p => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between bg-slate-50 rounded-lg px-2.5 py-1.5 border border-slate-100"
-                  >
-                    <span className="text-xs text-slate-700 truncate max-w-[180px]">{p.name}</span>
-                    <span className={`text-xs font-bold shrink-0 ml-2 ${cfg.color}`}>
-                      {p.rateMin}–{p.rateMax}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Reasons */}
-          {result.reasons.length > 0 && (
-            <div className="space-y-1">
-              {result.reasons.slice(0, 2).map((reason, i) => (
-                <div key={i} className="flex gap-2 text-xs text-slate-600">
-                  <span className="text-slate-300 shrink-0 mt-0.5">›</span>
-                  <span>{reason}</span>
+          {result && (
+            <>
+              {/* Score bar */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-500">Eligibility score</span>
+                  <span className={`text-xs font-bold flex items-center gap-1 ${cfg.color}`}>
+                    {cfg.icon} {cfg.label}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${cfg.bar}`}
+                    style={{ width: `${cfg.pct}%` }}
+                  />
+                </div>
+              </div>
 
-          {/* First recommendation */}
-          {result.recommendations.length > 0 && (
-            <div className={`flex gap-2 rounded-lg px-2.5 py-2 text-xs ${cfg.bg} border ${cfg.border}`}>
-              <span className="shrink-0">💡</span>
-              <span className={cfg.color}>{result.recommendations[0]}</span>
-            </div>
+              {/* DTI */}
+              {result.dti !== undefined && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <TrendingDown size={13} className="text-gray-400" />
+                    <span className="text-xs text-gray-500">Debt-to-Income (DTI)</span>
+                  </div>
+                  <span className={`text-sm font-extrabold ${
+                    result.dti < 25 ? "text-emerald-600" :
+                    result.dti < 35 ? "text-blue-600" :
+                    result.dti < 45 ? "text-amber-600" : "text-red-600"
+                  }`}>
+                    {result.dti}%
+                  </span>
+                </div>
+              )}
+
+              {/* Max loan */}
+              {result.maxLoanDTI != null && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                  <span className="text-xs text-gray-500">Max recommended loan</span>
+                  <span className="text-sm font-extrabold text-[#1a3c6e]">
+                    €{result.maxLoanDTI.toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {/* Profile extracted */}
+              {profile && (
+                <div className="text-xs text-gray-500 space-y-1 pt-1 border-t border-gray-50">
+                  {profile.monthlyIncome && (
+                    <div className="flex justify-between">
+                      <span>Monthly income</span>
+                      <span className="font-semibold text-gray-700">€{profile.monthlyIncome.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {profile.loanAmount && (
+                    <div className="flex justify-between">
+                      <span>Loan requested</span>
+                      <span className="font-semibold text-gray-700">€{profile.loanAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {profile.employmentType && (
+                    <div className="flex justify-between">
+                      <span>Employment</span>
+                      <span className="font-semibold text-gray-700 capitalize">
+                        {profile.employmentType.replace("_", " ")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Reasons */}
+              {result.reasons.length > 0 && (
+                <ul className="space-y-1">
+                  {result.reasons.slice(0, 3).map((r, i) => (
+                    <li key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
+                      {cfg.icon}
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Recommendations */}
+              {result.recommendations.length > 0 && (
+                <div className="bg-amber-50 border border-amber-100 rounded-lg p-2.5">
+                  <p className="text-xs font-semibold text-amber-800 mb-1">💡 Recommendations</p>
+                  <ul className="space-y-1">
+                    {result.recommendations.slice(0, 2).map((r, i) => (
+                      <li key={i} className="text-xs text-amber-700">• {r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <p className="text-[10px] text-gray-400 text-center pt-1">
+                Based on your conversation · Not a credit decision · For guidance only
+              </p>
+            </>
           )}
         </div>
       )}

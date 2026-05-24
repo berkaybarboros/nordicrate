@@ -8,7 +8,8 @@ export interface CompareItem {
   id: string;
   type: CompareItemType;
   name: string;       // bank / company name
-  logo: string;       // emoji
+  logo: string;       // emoji (fallback)
+  logoId?: string;    // bankId / companyId for BankLogo resolution
   applyUrl: string;
   metrics: {
     label: string;

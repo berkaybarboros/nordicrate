@@ -2,6 +2,7 @@
 
 import { CheckCircle, Tag, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { InsuranceOffer } from "@/data/insurance";
+import BankLogo from "@/components/ui/BankLogo";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { buildUTMLink } from "@/lib/utils";
@@ -36,9 +37,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
       <div className="flex flex-col md:flex-row md:items-start gap-4">
         {/* Company Info */}
         <div className="flex items-center gap-4 md:w-48 flex-shrink-0">
-          <div className="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-3xl border border-gray-100">
-            {offer.companyLogo}
-          </div>
+          <BankLogo bankId={offer.companyId} name={offer.companyName} size={56} />
           <div>
             <p className="font-bold text-gray-900 text-sm">{offer.companyName}</p>
             {offer.badge && (
@@ -106,6 +105,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
                   type: "insurance",
                   name: offer.companyName,
                   logo: offer.companyLogo,
+                  logoId: offer.companyId,
                   applyUrl: quoteUrl,
                   rawPremium: offer.representativePremium,
                   metrics: [

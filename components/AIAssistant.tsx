@@ -207,6 +207,10 @@ export default function AIAssistant() {
 
   const fetchProfile = useCallback(async (msgs: Array<{ role: string; content: string }>) => {
     if (msgs.length < 2) return;
+
+    // Broadcast messages to EligibilityPanel on loan pages (even before API call)
+    window.dispatchEvent(new CustomEvent('ai-messages-updated', { detail: { messages: msgs, mode } }));
+
     try {
       const res = await fetch('/api/profile', {
         method: 'POST',

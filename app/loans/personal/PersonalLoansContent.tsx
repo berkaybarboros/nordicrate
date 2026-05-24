@@ -10,6 +10,7 @@ import RateAlertModal from "@/components/alerts/RateAlertModal";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import SocialProofBar from "@/components/SocialProofBar";
+import EligibilityPanel from "@/components/EligibilityPanel";
 import { formatCurrency, calculateMonthlyPayment } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { LoanOffer } from "@/data/loans";
@@ -160,6 +161,7 @@ function PersonalLoansInner() {
               termMonths={termMonths}
               liveEuribor={liveEuribor}
             />
+            <EligibilityPanel mode="personal" />
 
             <div className="bg-white rounded-xl border border-gray-100 p-4">
               <h4 className="font-bold text-[#1a3c6e] text-sm mb-3">{t.loans.eligibility}</h4>

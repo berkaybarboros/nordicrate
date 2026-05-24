@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import CompareChatPanel from "@/components/compare/CompareChatPanel";
 import { calculateMonthlyPayment } from "@/lib/utils";
+import BankLogo from "@/components/ui/BankLogo";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function bestIndex(items: CompareItem[], key: keyof CompareItem): number {
@@ -106,7 +107,7 @@ function ScenarioSlider({ items }: { items: CompareItem[] }) {
   const scenarios = loanItems.map((item, i) => {
     const monthly = calculateMonthlyPayment(amount, item.rawRate!, termMonths);
     const total = Math.round(monthly * termMonths);
-    return { name: item.name, logo: item.logo, rate: item.rawRate!, monthly: Math.round(monthly), total, color: colColors[i], applyUrl: item.applyUrl };
+    return { name: item.name, logo: item.logo, logoId: item.logoId, rate: item.rawRate!, monthly: Math.round(monthly), total, color: colColors[i], applyUrl: item.applyUrl };
   });
   const cheapest = scenarios.reduce((a, b) => a.total < b.total ? a : b);
 
@@ -152,7 +153,11 @@ function ScenarioSlider({ items }: { items: CompareItem[] }) {
           const isBest = s.name === cheapest.name;
           return (
             <div key={s.name} className={`rounded-xl p-3 border text-center ${isBest ? 'border-emerald-200 bg-emerald-50' : 'border-gray-100 bg-gray-50'}`}>
-              <p className="text-lg mb-0.5">{s.logo}</p>
+              {s.logoId ? (
+                <div className="flex justify-center mb-1"><BankLogo bankId={s.logoId} name={s.name} size={32} /></div>
+              ) : (
+                <p className="text-lg mb-0.5">{s.logo}</p>
+              )}
               <p className="text-[11px] font-semibold text-gray-600 truncate">{s.name}</p>
               <p className={`text-xl font-extrabold mt-1 ${isBest ? 'text-emerald-600' : 'text-gray-900'}`}>
                 €{s.monthly.toLocaleString()}<span className="text-xs font-normal text-gray-400">/mo</span>
@@ -186,6 +191,7 @@ function FinancialAnalysis({ items }: { items: CompareItem[] }) {
   const costs = loanItems.map(it => ({
     name: it.name,
     logo: it.logo,
+    logoId: it.logoId,
     rate: it.rawRate!,
     monthly: it.rawMonthly!,
     totalCost: Math.round(it.rawMonthly! * TERM),
@@ -220,7 +226,7 @@ function FinancialAnalysis({ items }: { items: CompareItem[] }) {
               <div key={c.name}>
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{c.logo}</span>
+                    {c.logoId ? <BankLogo bankId={c.logoId} name={c.name} size={28} /> : <span className="text-lg">{c.logo}</span>}
                     <span className="text-sm font-semibold text-gray-700">{c.name}</span>
                     {isBest && (
                       <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -281,8 +287,9 @@ function FinancialAnalysis({ items }: { items: CompareItem[] }) {
               <Award size={20} className="text-emerald-600" />
             </div>
             <div className="flex-1">
-              <p className="font-extrabold text-emerald-900 mb-1">
-                {cheapest.logo} {cheapest.name} saves you the most
+              <p className="font-extrabold text-emerald-900 mb-1 flex items-center gap-2">
+                {cheapest.logoId ? <BankLogo bankId={cheapest.logoId} name={cheapest.name} size={24} /> : cheapest.logo}
+                {cheapest.name} saves you the most
               </p>
               <p className="text-sm text-emerald-700">
                 Choosing <strong>{cheapest.name}</strong> over <strong>{mostExpensive.name}</strong> saves{' '}
@@ -433,11 +440,17 @@ export default function ComparePage() {
               >
                 <X size={14} />
               </button>
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl mx-auto mb-2 border"
-                style={{ borderColor: colColors[idx] + "44", backgroundColor: colColors[idx] + "0A" }}
-              >
-                {item.logo}
+              <div className="flex justify-center mb-2">
+                {item.logoId ? (
+                  <BankLogo bankId={item.logoId} name={item.name} size={56} />
+                ) : (
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl border"
+                    style={{ borderColor: colColors[idx] + "44", backgroundColor: colColors[idx] + "0A" }}
+                  >
+                    {item.logo}
+                  </div>
+                )}
               </div>
               <p className="font-bold text-gray-900 text-sm">{item.name}</p>
               <span

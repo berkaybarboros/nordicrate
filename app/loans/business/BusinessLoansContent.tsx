@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Building2, ArrowRight, TrendingUp, CheckCircle2 } from 'lucide-react';
 import SmartRateWidget from '@/components/SmartRateWidget';
 import PersonalizedRecs from '@/components/PersonalizedRecs';
+import EligibilityPanel from '@/components/EligibilityPanel';
 import type { RateEntry } from '@/components/SmartRateWidget';
 
 const FEATURES = [
@@ -48,6 +49,7 @@ export default function BusinessLoansContent() {
               liveEuribor={liveEuribor}
               className=""
             />
+            <EligibilityPanel mode="corporate" />
           </div>
 
           {/* Main content */}

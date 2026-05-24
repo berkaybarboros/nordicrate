@@ -2,6 +2,7 @@
 
 import { CheckCircle, Clock, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { LoanOffer } from "@/data/loans";
+import BankLogo from "@/components/ui/BankLogo";
 import { calculateMonthlyPayment, formatCurrency, calculateAPR, buildUTMLink } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
@@ -42,9 +43,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
       <div className="flex flex-col md:flex-row md:items-center gap-4">
         {/* Bank Info */}
         <div className="flex items-center gap-4 md:w-44 flex-shrink-0">
-          <div className="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-3xl border border-gray-100">
-            {offer.bankLogo}
-          </div>
+          <BankLogo bankId={offer.bankId} name={offer.bankName} size={56} />
           <div>
             <p className="font-bold text-gray-900">{offer.bankName}</p>
             {offer.badge && (
@@ -114,6 +113,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
                   type: "loan",
                   name: offer.bankName,
                   logo: offer.bankLogo,
+                  logoId: offer.bankId,
                   applyUrl: applyUrl,
                   rawRate: offer.representativeRate,
                   rawMonthly: monthly,
