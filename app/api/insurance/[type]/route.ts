@@ -4,14 +4,18 @@ import {
   cascoInsurance,
   homeInsurance,
   healthInsurance,
+  travelInsurance,
+  lifeInsurance,
 } from "@/data/insurance";
 import type { InsuranceOffer } from "@/data/insurance";
 
 const insuranceDataMap: Record<string, InsuranceOffer[]> = {
-  motor: motorInsurance,
-  casco: cascoInsurance,
-  home: homeInsurance,
+  motor:  motorInsurance,
+  casco:  cascoInsurance,
+  home:   homeInsurance,
   health: healthInsurance,
+  travel: travelInsurance,
+  life:   lifeInsurance,
 };
 
 export async function GET(
@@ -24,7 +28,7 @@ export async function GET(
   const offers = insuranceDataMap[type];
   if (!offers) {
     return NextResponse.json(
-      { error: `Unknown insurance type: ${type}. Valid types: motor, casco, home, health` },
+      { error: `Unknown insurance type: ${type}. Valid types: motor, casco, home, health, travel, life` },
       { status: 404 }
     );
   }

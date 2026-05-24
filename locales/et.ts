@@ -88,6 +88,8 @@ export const et: Translations = {
     cascoTitle: "Kaskokindlustus Eestis",
     homeTitle: "Kodukindlustus Eestis",
     healthTitle: "Ravikindlustus Eestis",
+    travelTitle: "Reisikindlustus Eestis",
+    lifeTitle: "Elukindlustus Eestis",
     annualPremium: "Aastane kindlustusmakse",
     monthly: "Kuus",
     excess: "Omavastutus",

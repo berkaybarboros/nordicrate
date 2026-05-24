@@ -88,6 +88,8 @@ export const fi: Translations = {
     cascoTitle: "Kaskovakuutus Virossa",
     homeTitle: "Kotivakuutus Virossa",
     healthTitle: "Sairausvakuutus Virossa",
+    travelTitle: "Matkavakuutus Virossa",
+    lifeTitle: "Henkivakuutus Virossa",
     annualPremium: "Vuosimaksu",
     monthly: "Kuukaudessa",
     excess: "Omavastuuosuus",

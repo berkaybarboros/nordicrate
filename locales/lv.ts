@@ -88,6 +88,8 @@ export const lv: Translations = {
     cascoTitle: "KASKO Igaunijā",
     homeTitle: "Mājas apdrošināšana Igaunijā",
     healthTitle: "Veselības apdrošināšana Igaunijā",
+    travelTitle: "Ceļojumu apdrošināšana Igaunijā",
+    lifeTitle: "Dzīvības apdrošināšana Igaunijā",
     annualPremium: "Gada prēmija",
     monthly: "Mēnesī",
     excess: "Pašrisks",

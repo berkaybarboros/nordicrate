@@ -86,6 +86,8 @@ export const en = {
     cascoTitle: "CASCO Insurance in Estonia",
     homeTitle: "Home Insurance in Estonia",
     healthTitle: "Health Insurance in Estonia",
+    travelTitle: "Travel Insurance Estonia",
+    lifeTitle: "Life Insurance Estonia",
     annualPremium: "Annual Premium",
     monthly: "Monthly",
     excess: "Excess",

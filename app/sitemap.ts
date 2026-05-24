@@ -45,6 +45,68 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
+    // Insurance hub + all category pages
+    {
+      url: `${BASE_URL}/insurance`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/insurance/motor`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/insurance/casco`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/insurance/home`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/insurance/health`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/insurance/travel`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/insurance/life`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    // Loan sub-pages
+    {
+      url: `${BASE_URL}/loans/personal`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.88,
+    },
+    {
+      url: `${BASE_URL}/loans/business`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/compare`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.75,
+    },
   ];
 
   // Per-country loan pages (/loans?country=XX)
