@@ -99,8 +99,8 @@ export default function HealthContent() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-          {/* Sidebar */}
-          <div className="space-y-4">
+          {/* Sidebar — below on mobile */}
+          <div className="space-y-4 order-2 lg:order-1">
             <InsurancePremiumCalc kind="health" />
             <SmartRateWidget onRateChange={handleRateChange} />
             <PersonalizedRecs
@@ -114,8 +114,8 @@ export default function HealthContent() {
             />
           </div>
 
-          {/* Main */}
-          <div className="space-y-4">
+          {/* Main — first on mobile */}
+          <div className="space-y-4 order-1 lg:order-2">
             <SocialProofBar productType="insurance" />
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
               <strong>About health insurance in Estonia:</strong> Health insurance is voluntary but

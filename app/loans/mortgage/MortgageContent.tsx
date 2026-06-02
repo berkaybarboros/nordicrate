@@ -10,9 +10,28 @@ import { mortgageLoans } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 import SocialProofBar from "@/components/SocialProofBar";
 
+const MORTGAGE_STORAGE_KEY = "nordicrate-mortgage-calc";
+
+function getStored(key: string, field: string, fallback: number): number {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const saved = sessionStorage.getItem(key);
+    if (saved) return JSON.parse(saved)[field] ?? fallback;
+  } catch { /* ignore */ }
+  return fallback;
+}
+
 export default function MortgageContent() {
-  const [amount, setAmount] = useState(100000);
-  const [termMonths, setTermMonths] = useState(240);
+  const [amount, setAmountRaw] = useState(() => getStored(MORTGAGE_STORAGE_KEY, "amount", 100000));
+  const [termMonths, setTermMonthsRaw] = useState(() => getStored(MORTGAGE_STORAGE_KEY, "termMonths", 240));
+  const [downPayment, setDownPaymentRaw] = useState(() => getStored(MORTGAGE_STORAGE_KEY, "downPayment", 0));
+
+  const persist = (a: number, t: number, d: number) => {
+    try { sessionStorage.setItem(MORTGAGE_STORAGE_KEY, JSON.stringify({ amount: a, termMonths: t, downPayment: d })); } catch { /* ignore */ }
+  };
+  const setAmount = (v: number) => { setAmountRaw(v); persist(v, termMonths, downPayment); };
+  const setTermMonths = (v: number) => { setTermMonthsRaw(v); persist(amount, v, downPayment); };
+  const setDownPayment = (v: number) => { setDownPaymentRaw(v); persist(amount, termMonths, v); };
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
@@ -76,6 +95,9 @@ export default function MortgageContent() {
               maxAmount={600000}
               minTerm={60}
               maxTerm={360}
+              showDownPayment={true}
+              downPayment={downPayment}
+              setDownPayment={setDownPayment}
             />
             <SmartRateWidget onRateChange={handleRateChange} />
             <PersonalizedRecs

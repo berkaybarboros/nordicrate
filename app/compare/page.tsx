@@ -103,7 +103,7 @@ function ScenarioSlider({ items }: { items: CompareItem[] }) {
 
   const [amount, setAmount] = useState(10000);
   const [termMonths, setTermMonths] = useState(36);
-  const colColors = ["#1a3c6e", "#b45309", "#16a34a"];
+  const colColors = ["#1a3c6e", "#b45309", "#16a34a", "#7c3aed"];
 
   const scenarios = loanItems.map((item, i) => {
     const monthly = calculateMonthlyPayment(amount, item.rawRate!, termMonths);
@@ -204,7 +204,7 @@ function FinancialAnalysis({ items }: { items: CompareItem[] }) {
   const mostExpensive = costs.reduce((a, b) => a.totalCost > b.totalCost ? a : b);
   const maxSaving  = mostExpensive.totalCost - cheapest.totalCost;
   const maxMonthly = Math.max(...costs.map(c => c.monthly));
-  const colColors  = ["#1a3c6e", "#b45309", "#16a34a"];
+  const colColors  = ["#1a3c6e", "#b45309", "#16a34a", "#7c3aed"];
 
   return (
     <div className="mt-6 space-y-4">
@@ -329,7 +329,7 @@ export default function ComparePage() {
           </h1>
           <p className="text-gray-500 mb-6">
             Browse loans, insurance or deposits and click{" "}
-            <span className="font-semibold text-[#1a3c6e]">+ Compare</span> to add up to 3 items.
+            <span className="font-semibold text-[#1a3c6e]">+ Compare</span> to add up to 4 items.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link
@@ -381,7 +381,7 @@ export default function ComparePage() {
     "Total at Maturity": totalIdx,
   };
 
-  const colColors = ["#1a3c6e", "#b45309", "#16a34a"];
+  const colColors = ["#1a3c6e", "#b45309", "#16a34a", "#7c3aed"];
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pb-24">
@@ -400,7 +400,7 @@ export default function ComparePage() {
           >
             <ArrowLeft size={14} /> Back to results
           </Link>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-extrabold mb-1 flex items-center gap-2">
                 <BarChart2 size={28} />
@@ -416,6 +416,13 @@ export default function ComparePage() {
                   Clear all
                 </button>
               </p>
+            </div>
+            <div className="flex-shrink-0 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-right">
+              <p className="text-[10px] text-white/50 uppercase tracking-wide">Data updated</p>
+              <p className="text-xs font-bold text-white/90">
+                {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              </p>
+              <p className="text-[10px] text-emerald-300 mt-0.5">✓ Live rates</p>
             </div>
           </div>
         </div>

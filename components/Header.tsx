@@ -165,10 +165,30 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile right: user icon + hamburger grouped together */}
+          <div className="md:hidden flex items-center gap-1">
+            {user ? (
+              <button
+                onClick={() => setMenuOpen(true)}
+                className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold"
+                aria-label="Account"
+              >
+                {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
+                aria-label="Sign in"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            )}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
+            className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,6 +199,7 @@ export default function Header() {
               )}
             </svg>
           </button>
+          </div>{/* end mobile right group */}
         </div>
 
         {/* Mobile menu */}

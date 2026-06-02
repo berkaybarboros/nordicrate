@@ -12,11 +12,15 @@ interface Props {
   maxAmount?: number;
   minTerm?: number;
   maxTerm?: number;
+  showDownPayment?: boolean;
+  downPayment?: number;
+  setDownPayment?: (v: number) => void;
 }
 
 export default function LoanCalculator({
   amount, setAmount, termMonths, setTermMonths,
   minAmount = 500, maxAmount = 30000, minTerm = 6, maxTerm = 84,
+  showDownPayment = false, downPayment = 0, setDownPayment,
 }: Props) {
   const { t } = useTranslation();
   const amountPercent = ((amount - minAmount) / (maxAmount - minAmount)) * 100;
@@ -71,6 +75,35 @@ export default function LoanCalculator({
           <span>{maxTerm} mo</span>
         </div>
       </div>
+
+      {/* Down Payment */}
+      {showDownPayment && setDownPayment && (
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-semibold text-gray-700">Down Payment</label>
+            <span className="text-[#f97316] font-bold">{formatCurrency(downPayment)}</span>
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={Math.round(amount * 0.5)}
+            step={500}
+            value={Math.min(downPayment, Math.round(amount * 0.5))}
+            onChange={(e) => setDownPayment(Number(e.target.value))}
+            style={{ "--value": `${(Math.min(downPayment, Math.round(amount * 0.5)) / Math.round(amount * 0.5)) * 100}%` } as React.CSSProperties}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>€0</span>
+            <span>{formatCurrency(Math.round(amount * 0.5))}</span>
+          </div>
+          {downPayment > 0 && (
+            <p className="text-xs text-emerald-600 mt-1 font-medium">
+              Financing: {formatCurrency(Math.max(0, amount - downPayment))}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Quick select buttons */}
       <div>

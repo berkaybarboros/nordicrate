@@ -263,8 +263,8 @@ export default function LifeInsuranceContent() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-          {/* Sidebar */}
-          <div className="space-y-4">
+          {/* Sidebar — below on mobile */}
+          <div className="space-y-4 order-2 lg:order-1">
             {/* Cover summary */}
             <div className="bg-white rounded-xl border border-gray-100 p-4">
               <h4 className="font-bold text-[#1a3c6e] text-sm mb-3 flex items-center gap-1.5">
@@ -301,8 +301,8 @@ export default function LifeInsuranceContent() {
             />
           </div>
 
-          {/* Offers */}
-          <div className="space-y-4">
+          {/* Offers — first on mobile */}
+          <div className="space-y-4 order-1 lg:order-2">
             <SocialProofBar productType="insurance" />
             <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
               <p className="text-sm font-medium text-gray-600">

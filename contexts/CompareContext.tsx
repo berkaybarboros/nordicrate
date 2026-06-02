@@ -41,11 +41,11 @@ const CompareContext = createContext<CompareCtx>({
   remove: () => {},
   has: () => false,
   clear: () => {},
-  MAX: 3,
+  MAX: 4,
 });
 
 export function CompareProvider({ children }: { children: ReactNode }) {
-  const MAX = 3;
+  const MAX = 4;
 
   const [items, setItems] = useState<CompareItem[]>(() => {
     // Hydrate from sessionStorage on mount (client only)

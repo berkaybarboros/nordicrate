@@ -50,11 +50,57 @@ function SkeletonCard() {
   );
 }
 
+const CALC_STORAGE_KEY = "nordicrate-personal-calc";
+
 function PersonalLoansInner() {
   const params = useSearchParams();
   const { t } = useTranslation();
-  const [amount, setAmount] = useState(Number(params.get("amount")) || 5000);
-  const [termMonths, setTermMonths] = useState(Number(params.get("term")) || 36);
+
+  const [amount, setAmountRaw] = useState<number>(() => {
+    if (params.get("amount")) return Number(params.get("amount"));
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem(CALC_STORAGE_KEY);
+        if (saved) return JSON.parse(saved).amount ?? 5000;
+      } catch { /* ignore */ }
+    }
+    return 5000;
+  });
+
+  const [termMonths, setTermMonthsRaw] = useState<number>(() => {
+    if (params.get("term")) return Number(params.get("term"));
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem(CALC_STORAGE_KEY);
+        if (saved) return JSON.parse(saved).termMonths ?? 36;
+      } catch { /* ignore */ }
+    }
+    return 36;
+  });
+
+  const [downPayment, setDownPaymentRaw] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem(CALC_STORAGE_KEY);
+        if (saved) return JSON.parse(saved).downPayment ?? 0;
+      } catch { /* ignore */ }
+    }
+    return 0;
+  });
+
+  const setAmount = (v: number) => {
+    setAmountRaw(v);
+    try { sessionStorage.setItem(CALC_STORAGE_KEY, JSON.stringify({ amount: v, termMonths, downPayment })); } catch { /* ignore */ }
+  };
+  const setTermMonths = (v: number) => {
+    setTermMonthsRaw(v);
+    try { sessionStorage.setItem(CALC_STORAGE_KEY, JSON.stringify({ amount, termMonths: v, downPayment })); } catch { /* ignore */ }
+  };
+  const setDownPayment = (v: number) => {
+    setDownPaymentRaw(v);
+    try { sessionStorage.setItem(CALC_STORAGE_KEY, JSON.stringify({ amount, termMonths, downPayment: v })); } catch { /* ignore */ }
+  };
+
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [offers, setOffers] = useState<LoanOffer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,13 +178,16 @@ function PersonalLoansInner() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-          {/* Sidebar */}
-          <div className="space-y-4">
+          {/* Sidebar — shows below offers on mobile */}
+          <div className="space-y-4 order-2 lg:order-1">
             <LoanCalculator
               amount={amount}
               setAmount={setAmount}
               termMonths={termMonths}
               setTermMonths={setTermMonths}
+              showDownPayment={true}
+              downPayment={downPayment}
+              setDownPayment={setDownPayment}
             />
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
               <div className="flex items-start gap-2">
@@ -183,8 +232,8 @@ function PersonalLoansInner() {
             </div>
           </div>
 
-          {/* Main: Offers */}
-          <div className="space-y-4">
+          {/* Main: Offers — shows first on mobile */}
+          <div className="space-y-4 order-1 lg:order-2">
             <SocialProofBar productType="loan" />
             <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
               <p className="text-sm text-gray-600 font-medium">

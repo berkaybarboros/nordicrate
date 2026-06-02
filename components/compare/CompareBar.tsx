@@ -3,6 +3,7 @@
 import { X, BarChart2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useCompare } from "@/contexts/CompareContext";
+import BankLogo from "@/components/ui/BankLogo";
 
 export default function CompareBar() {
   const { items, remove, clear, MAX } = useCompare();
@@ -33,7 +34,10 @@ export default function CompareBar() {
                 key={item.id}
                 className="flex items-center gap-1.5 bg-white/10 rounded-xl px-2.5 py-1.5 flex-shrink-0 group"
               >
-                <span className="text-lg leading-none">{item.logo}</span>
+                {item.logoId
+                  ? <BankLogo bankId={item.logoId} name={item.name} size={24} className="flex-shrink-0" />
+                  : <span className="text-lg leading-none">{item.logo}</span>
+                }
                 <span className="text-xs font-semibold max-w-[80px] truncate">{item.name}</span>
                 <span className="text-xs text-white/50 hidden sm:block">
                   · {typeLabel[item.type]}

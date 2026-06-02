@@ -42,8 +42,8 @@ export default function BusinessLoansContent() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-          {/* Sidebar */}
-          <div className="space-y-4">
+          {/* Sidebar — below on mobile */}
+          <div className="space-y-4 order-2 lg:order-1">
             <SmartRateWidget onRateChange={handleRateChange} />
             <PersonalizedRecs
               productType="personal"
@@ -53,8 +53,8 @@ export default function BusinessLoansContent() {
             <EligibilityPanel mode="corporate" />
           </div>
 
-          {/* Main content */}
-          <div className="space-y-6">
+          {/* Main content — first on mobile */}
+          <div className="space-y-6 order-1 lg:order-2">
             <AIPageBanner productType="business-loan" />
             {/* Coming soon card */}
             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
