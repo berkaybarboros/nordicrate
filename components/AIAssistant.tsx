@@ -117,6 +117,8 @@ function MarkdownText({ text }: { text: string }) {
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTeaser, setShowTeaser] = useState(false);
+  const [teaserDismissed, setTeaserDismissed] = useState(false);
   const [mode, setMode] = useState<AssistantMode>('personal');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -168,6 +170,13 @@ export default function AIAssistant() {
       setHasUnread(true);
     }
   }, [messages, isOpen]);
+
+  // Show teaser bubble after 4s on first load (only once per session)
+  useEffect(() => {
+    if (isOpen || teaserDismissed) return;
+    const timer = setTimeout(() => setShowTeaser(true), 4000);
+    return () => clearTimeout(timer);
+  }, [isOpen, teaserDismissed]);
 
   useEffect(() => {
     if (Object.keys(userProfile).length === 0) {
@@ -337,29 +346,78 @@ export default function AIAssistant() {
 
   return (
     <>
-      {/* Floating bubble */}
-      <button
-        onClick={isOpen ? () => setIsOpen(false) : handleOpen}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-sky-600 hover:bg-sky-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-        aria-label="Open AI Assistant"
-      >
-        {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-          </svg>
+      {/* Teaser bubble — auto-appears after 4s */}
+      {showTeaser && !isOpen && !teaserDismissed && (
+        <div className="fixed bottom-28 right-6 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="bg-white border border-violet-200 rounded-2xl shadow-2xl px-4 py-3 max-w-[240px] relative">
+            <button
+              onClick={() => { setShowTeaser(false); setTeaserDismissed(true); }}
+              className="absolute -top-2 -right-2 w-5 h-5 bg-gray-400 hover:bg-gray-500 text-white rounded-full text-xs flex items-center justify-center transition"
+            >
+              ×
+            </button>
+            <div className="flex items-start gap-2">
+              <span className="text-lg shrink-0">🤖</span>
+              <div>
+                <p className="text-xs font-bold text-gray-800">NordicAI</p>
+                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                  👋 Need help comparing loans or checking your eligibility?
+                </p>
+                <button
+                  onClick={() => { setShowTeaser(false); setTeaserDismissed(true); handleOpen(); }}
+                  className="mt-2 text-xs font-bold text-violet-600 hover:text-violet-700 flex items-center gap-1"
+                >
+                  Chat now →
+                </button>
+              </div>
+            </div>
+            {/* Tail */}
+            <div className="absolute -bottom-2 right-6 w-3 h-3 bg-white border-r border-b border-violet-200 rotate-45" />
+          </div>
+        </div>
+      )}
+
+      {/* Floating button — pill on desktop, circle on mobile */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+        {/* Pulse ring — visible when chat is closed and no conversation yet */}
+        {!isOpen && messages.length <= 1 && (
+          <span className="absolute inset-0 rounded-full bg-violet-500 opacity-20 animate-ping pointer-events-none" />
         )}
-        {hasUnread && !isOpen && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
-        )}
-      </button>
+        <button
+          onClick={isOpen ? () => setIsOpen(false) : handleOpen}
+          aria-label="Open AI Assistant"
+          className={`relative flex items-center gap-2.5 text-white font-bold shadow-2xl transition-all active:scale-95 select-none
+            ${isOpen
+              ? 'bg-slate-700 hover:bg-slate-600 rounded-full w-12 h-12 justify-center'
+              : 'bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-500 hover:to-sky-400 rounded-full md:rounded-2xl h-14 px-5 hover:shadow-violet-500/40 hover:shadow-lg'
+            }`}
+        >
+          {isOpen ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <>
+              {/* Sparkle icon */}
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+              {/* Label — hidden on mobile */}
+              <span className="hidden md:inline text-sm">Ask NordicAI</span>
+              {/* Unread or "AI" badge */}
+              {hasUnread ? (
+                <span className="w-2 h-2 bg-red-400 rounded-full shrink-0" />
+              ) : (
+                <span className="hidden md:inline text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold shrink-0">AI</span>
+              )}
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Chat window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+        <div className="fixed bottom-[88px] right-6 z-50 w-[400px] max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
           style={{ height: '520px' }}
         >
           {/* Header */}

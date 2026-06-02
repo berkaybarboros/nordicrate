@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 import CompareChatPanel from "@/components/compare/CompareChatPanel";
 import { calculateMonthlyPayment } from "@/lib/utils";
 import BankLogo from "@/components/ui/BankLogo";
+import AIPageBanner from "@/components/AIPageBanner";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function bestIndex(items: CompareItem[], key: keyof CompareItem): number {
@@ -421,6 +422,13 @@ export default function ComparePage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
+        {/* AI Banner — top of compare */}
+        <AIPageBanner
+          productType="compare"
+          context={`Comparing: ${items.map(i => i.name).join(' vs ')}`}
+          className="mb-5"
+        />
+
         {/* Product header row */}
         <div
           className="grid gap-3 mb-1"

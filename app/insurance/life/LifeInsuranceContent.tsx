@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown, CheckCircle, Heart, ShieldCheck, Info } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
+import AIPageBanner from "@/components/AIPageBanner";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import SocialProofBar from "@/components/SocialProofBar";
@@ -322,6 +323,11 @@ export default function LifeInsuranceContent() {
                 </select>
               </div>
             </div>
+
+            <AIPageBanner
+              productType="life-insurance"
+              context={!loading && offers.length > 0 ? `${offers.length} life insurers · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+            />
 
             {loading && (
               <>

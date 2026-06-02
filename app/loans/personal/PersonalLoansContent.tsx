@@ -11,6 +11,7 @@ import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import SocialProofBar from "@/components/SocialProofBar";
 import EligibilityPanel from "@/components/EligibilityPanel";
+import AIPageBanner from "@/components/AIPageBanner";
 import { formatCurrency, calculateMonthlyPayment } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import type { LoanOffer } from "@/data/loans";
@@ -205,6 +206,12 @@ function PersonalLoansInner() {
                 </select>
               </div>
             </div>
+
+            {/* AI Banner — top of results */}
+            <AIPageBanner
+              productType="personal-loan"
+              context={!loading && bestRate > 0 ? `Best available rate: ${bestRate}% APR · Amount: €${amount} · Term: ${termMonths} months` : undefined}
+            />
 
             {loading && (
               <>

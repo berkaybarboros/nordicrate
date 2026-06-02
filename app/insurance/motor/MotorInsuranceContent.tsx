@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown, AlertCircle, CheckCircle } from "lucide-react";
+import AIPageBanner from "@/components/AIPageBanner";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
 import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
@@ -263,6 +264,11 @@ export default function MotorInsuranceContent() {
                 </select>
               </div>
             </div>
+
+            <AIPageBanner
+              productType="motor-insurance"
+              context={!loading && offers.length > 0 ? `Cheapest found: €${Math.min(...offers.map(o => o.representativePremium))}/year — ${offers.length} insurers compared` : undefined}
+            />
 
             {loading && (
               <>

@@ -6,6 +6,7 @@ import { Building2, ArrowRight, TrendingUp, CheckCircle2 } from 'lucide-react';
 import SmartRateWidget from '@/components/SmartRateWidget';
 import PersonalizedRecs from '@/components/PersonalizedRecs';
 import EligibilityPanel from '@/components/EligibilityPanel';
+import AIPageBanner from '@/components/AIPageBanner';
 import type { RateEntry } from '@/components/SmartRateWidget';
 
 const FEATURES = [
@@ -54,6 +55,7 @@ export default function BusinessLoansContent() {
 
           {/* Main content */}
           <div className="space-y-6">
+            <AIPageBanner productType="business-loan" />
             {/* Coming soon card */}
             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
               <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-4">

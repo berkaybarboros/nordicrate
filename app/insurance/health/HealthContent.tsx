@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown, Heart } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
+import AIPageBanner from "@/components/AIPageBanner";
 import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
@@ -141,6 +142,11 @@ export default function HealthContent() {
                 </select>
               </div>
             </div>
+
+            <AIPageBanner
+              productType="health-insurance"
+              context={!loading && offers.length > 0 ? `${offers.length} health insurance plans · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+            />
 
             {loading && (
               <>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
+import AIPageBanner from "@/components/AIPageBanner";
 import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
@@ -130,6 +131,11 @@ export default function HomeInsuranceContent() {
                 </select>
               </div>
             </div>
+
+            <AIPageBanner
+              productType="home-insurance"
+              context={!loading && offers.length > 0 ? `${offers.length} home insurance plans · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+            />
 
             {loading && (
               <>
