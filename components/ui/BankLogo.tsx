@@ -4,43 +4,67 @@ import { useState } from "react";
 
 // Maps bankId/companyId → their primary domain for Clearbit logo fetch
 const DOMAIN_MAP: Record<string, string> = {
-  // Banks
+  // ── Estonia ──────────────────────────────────────────────────────────────
   lhv: "lhv.ee",
+  "lhv-pank": "lhv.ee",
+  "lhv-insurance": "lhv.ee",
   swedbank: "swedbank.ee",
+  "swedbank-ee": "swedbank.ee",
+  "swedbank-insurance": "swedbank.ee",
+  "swedbank-life": "swedbank.ee",
   seb: "seb.ee",
+  "seb-ee": "seb.ee",
+  "seb-life": "seb.ee",
   luminor: "luminor.ee",
   bigbank: "bigbank.ee",
   coop: "cooppank.ee",
   "coop-pank": "cooppank.ee",
-  // Insurance companies
+  inbank: "inbank.ee",
+  ferratum: "ferratum.com",
+  credit24: "credit24.ee",
+  // ── Latvia ───────────────────────────────────────────────────────────────
+  citadele: "citadele.lv",
+  "bigbank-lv": "bigbank.lv",
+  "inbank-lv": "inbank.lv",
+  "swedbank-lv": "swedbank.lv",
+  "seb-lv": "seb.lv",
+  "luminor-lv": "luminor.lv",
+  bta: "bta.lv",
+  "bta-insurance": "bta.lv",
+  "bta-life": "bta.lv",
+  // ── Lithuania ────────────────────────────────────────────────────────────
+  siauliu: "sb.lt",
+  "siauliu-bankas": "sb.lt",
+  "inbank-lt": "inbank.lt",
+  "seb-lt": "seb.lt",
+  "luminor-lt": "luminor.lt",
+  // ── Nordic ───────────────────────────────────────────────────────────────
+  "bank-norwegian": "banknorwegian.com",
+  "banknorwegian": "banknorwegian.com",
+  resurs: "resursbank.se",
+  dnb: "dnb.no",
+  nordea: "nordea.com",
+  op: "op.fi",
+  // ── Insurance ────────────────────────────────────────────────────────────
   if: "if.ee",
   "if-insurance": "if.ee",
+  "if-life": "if.ee",
   ergo: "ergo.ee",
   "ergo-life": "ergo.ee",
   gjensidige: "gjensidige.ee",
-  "gjensidige-ee": "gjensidige.ee",
-  "swedbank-insurance": "swedbank.ee",
-  "lhv-insurance": "lhv.ee",
-  "seb-life": "seb.ee",
-  "swedbank-life": "swedbank.ee",
-  "if-life": "if.ee",
-  // Aliases
-  "lhv-pank": "lhv.ee",
-  "swedbank-ee": "swedbank.ee",
-  "seb-ee": "seb.ee",
+  compensa: "compensa.ee",
+  "compensa-life": "compensa.ee",
+  salva: "salva.ee",
 };
 
 // Emoji fallbacks in case logo fails completely
 const EMOJI_FALLBACK: Record<string, string> = {
-  lhv: "🏦",
-  swedbank: "🟡",
-  seb: "🟢",
-  luminor: "🔷",
-  bigbank: "🔶",
-  coop: "🟤",
-  if: "🔵",
-  ergo: "🟠",
-  gjensidige: "🔴",
+  lhv: "🏦", swedbank: "🟡", seb: "🟢", luminor: "🔷",
+  bigbank: "🔶", coop: "🟤", inbank: "📱", ferratum: "⚡",
+  credit24: "💳", citadele: "🏛️", siauliu: "🇱🇹",
+  if: "🔵", ergo: "🟠", gjensidige: "🔴", bta: "🔷",
+  compensa: "🟡", salva: "🟠",
+  "bank-norwegian": "🇳🇴", resurs: "🇸🇪",
 };
 
 interface BankLogoProps {
