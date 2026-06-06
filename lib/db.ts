@@ -31,6 +31,24 @@ export async function getProducts(): Promise<LoanProduct[]> {
   }
 }
 
+// ── Rate Alerts ───────────────────────────────────────────────
+export async function createRateAlert(
+  email: string,
+  product: string,
+  targetRate?: number | null,
+): Promise<{ id?: string; error?: string }> {
+  const { data, error } = await supabase
+    .from('rate_alerts')
+    .upsert(
+      { email, product, target_rate: targetRate ?? null, created_at: new Date().toISOString() },
+      { onConflict: 'email,product' },
+    )
+    .select('id')
+    .single();
+  if (error) return { error: error.message };
+  return { id: (data as { id: string } | null)?.id };
+}
+
 // ── Leads ─────────────────────────────────────────────────────
 export interface LeadInput {
   email?: string;

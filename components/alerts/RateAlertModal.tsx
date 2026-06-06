@@ -202,7 +202,7 @@ export default function RateAlertModal({ open, onClose, defaultProduct, defaultR
 
               {/* Privacy note */}
               <p className="text-xs text-gray-400 leading-relaxed">
-                By subscribing you agree to receive email alerts from BalticRate. We never share
+                By subscribing you agree to receive email alerts from NordicRate. We never share
                 your email with third parties.
               </p>
 

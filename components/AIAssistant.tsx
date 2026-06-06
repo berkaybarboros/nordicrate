@@ -10,8 +10,10 @@ import { matchPrograms } from '@/lib/corporate-profile';
 import EligibilityPanel from '@/components/EligibilityPanel';
 import ProgramMatchPanel from '@/components/ProgramMatchPanel';
 import { supabase } from '@/lib/supabase';
-import { getUserProfile } from '@/lib/db';
+import { getUserProfile, createLead } from '@/lib/db';
+import { track } from '@/lib/tracker';
 import { COUNTRIES } from '@/lib/data';
+import { Bell } from 'lucide-react';
 
 const DEFAULT_WELCOME: Record<AssistantMode, string> = {
   personal: `👋 Hi! I'm **NordicAI**, your personal finance assistant.
@@ -132,6 +134,14 @@ export default function AIAssistant() {
   const [corporateProfile, setCorporateProfile] = useState<CorporateProfile>({});
   const [programMatches, setProgramMatches] = useState<ProgramMatch[]>([]);
   const [onboardingData, setOnboardingData] = useState<OnboardingContext | null>(null);
+  // Lead capture
+  const [leadCaptured, setLeadCaptured] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('nr-lead-captured') === 'true';
+  });
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadSaving, setLeadSaving] = useState(false);
+  const [leadSaved, setLeadSaved] = useState(false);
 
   // Load Supabase profile once on mount
   useEffect(() => {
@@ -151,13 +161,39 @@ export default function AIAssistant() {
     });
   }, []);
 
-  // Initialize welcome message (re-runs when mode or onboardingData changes)
+  // Initialize messages for current mode — restore from localStorage or show welcome
   useEffect(() => {
-    const content = onboardingData
-      ? buildPersonalizedWelcome(onboardingData, mode)
-      : DEFAULT_WELCOME[mode];
-    setMessages([{ id: 'welcome', role: 'assistant', content }]);
-  }, [mode, onboardingData]);
+    try {
+      const saved = localStorage.getItem(`nr-chat-${mode}`);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+          return;
+        }
+      }
+    } catch { /* ignore */ }
+    setMessages([{ id: 'welcome', role: 'assistant', content: DEFAULT_WELCOME[mode] }]);
+  }, [mode]); // Only re-run on mode switch — intentionally omits onboardingData
+
+  // When onboardingData arrives, upgrade the welcome message (only if no real conversation yet)
+  useEffect(() => {
+    if (!onboardingData) return;
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        return [{ id: 'welcome', role: 'assistant', content: buildPersonalizedWelcome(onboardingData, mode) }];
+      }
+      return prev;
+    });
+  }, [onboardingData, mode]);
+
+  // Persist conversation to localStorage on every message update
+  useEffect(() => {
+    if (messages.length <= 1) return; // Don't save solo welcome message
+    try {
+      localStorage.setItem(`nr-chat-${mode}`, JSON.stringify(messages));
+    } catch { /* ignore quota errors */ }
+  }, [messages, mode]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -342,7 +378,54 @@ export default function AIAssistant() {
     setEligibilityResult(null);
     setCorporateProfile({});
     setProgramMatches([]);
+    // History is preserved per-mode in localStorage — init effect will restore it
   };
+
+  const handleClearConversation = useCallback(() => {
+    localStorage.removeItem(`nr-chat-${mode}`);
+    const content = onboardingData
+      ? buildPersonalizedWelcome(onboardingData, mode)
+      : DEFAULT_WELCOME[mode];
+    setMessages([{ id: 'welcome', role: 'assistant', content }]);
+    setUserProfile({});
+    setEligibilityResult(null);
+    setCorporateProfile({});
+    setProgramMatches([]);
+  }, [mode, onboardingData]);
+
+  const handleLeadSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadEmail.includes('@') || leadSaving) return;
+    setLeadSaving(true);
+    try {
+      await createLead({
+        email:          leadEmail,
+        mode,
+        country:        mode === 'personal' ? userProfile.country : corporateProfile.country,
+        loanType:       userProfile.loanType,
+        loanAmount:     userProfile.loanAmount,
+        monthlyIncome:  userProfile.monthlyIncome,
+        employmentType: userProfile.employmentType,
+        businessStage:  corporateProfile.businessStage,
+        fundingNeeded:  corporateProfile.fundingNeeded,
+        sector:         corporateProfile.sector,
+        source:         'ai_chat',
+      });
+      await fetch('/api/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email:   leadEmail,
+          product: mode === 'personal' ? (userProfile.loanType ?? 'personal-loan') : 'business-loan',
+        }),
+      });
+      setLeadSaved(true);
+      setLeadCaptured(true);
+      localStorage.setItem('nr-lead-captured', 'true');
+      track('find_rate_submit', { mode, source: 'ai_chat' });
+    } catch { /* silent */ }
+    finally { setLeadSaving(false); }
+  }, [leadEmail, leadSaving, mode, userProfile, corporateProfile]);
 
   return (
     <>
@@ -431,9 +514,20 @@ export default function AIAssistant() {
                 <p className="text-slate-400 text-xs mt-0.5">Credit & Loan Assistant</p>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-xs text-slate-400">Online</span>
+            <div className="flex items-center gap-2">
+              {messages.length > 1 && (
+                <button
+                  onClick={handleClearConversation}
+                  className="text-[10px] text-slate-500 hover:text-slate-300 transition px-2 py-1 rounded-lg hover:bg-white/10"
+                  title="Clear conversation"
+                >
+                  Clear
+                </button>
+              )}
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-xs text-slate-400">Online</span>
+              </div>
             </div>
           </div>
 
@@ -543,6 +637,41 @@ export default function AIAssistant() {
           {/* Program Match Panel — corporate mode */}
           {programMatches.length > 0 && mode === 'corporate' && (
             <ProgramMatchPanel matches={programMatches} />
+          )}
+
+          {/* Lead capture nudge — appears after 2+ user messages */}
+          {messages.filter(m => m.role === 'user').length >= 2 && !leadCaptured && (
+            <div className="mx-3 mb-2 shrink-0 bg-gradient-to-r from-violet-50 to-sky-50 border border-violet-200 rounded-xl p-3">
+              {leadSaved ? (
+                <p className="text-xs font-semibold text-emerald-700 text-center py-0.5">
+                  ✓ Saved! We&apos;ll alert you when rates improve.
+                </p>
+              ) : (
+                <>
+                  <p className="text-[11px] font-bold text-violet-800 mb-2 flex items-center gap-1.5">
+                    <Bell size={11} className="text-violet-600" />
+                    Save your results &amp; get rate alerts
+                  </p>
+                  <form onSubmit={handleLeadSubmit} className="flex gap-2">
+                    <input
+                      type="email"
+                      value={leadEmail}
+                      onChange={e => setLeadEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      required
+                      className="flex-1 text-xs border border-violet-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-violet-400 min-w-0"
+                    />
+                    <button
+                      type="submit"
+                      disabled={leadSaving}
+                      className="text-xs bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-60 shrink-0"
+                    >
+                      {leadSaving ? '…' : 'Save →'}
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
           )}
 
           {/* Input */}
