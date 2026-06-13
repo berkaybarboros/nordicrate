@@ -34,15 +34,18 @@ export async function getProducts(): Promise<LoanProduct[]> {
 // ── Rate Alerts ───────────────────────────────────────────────
 export async function createRateAlert(
   email: string,
-  product: string,
+  product: string,          // maps to rate_key column
   targetRate?: number | null,
 ): Promise<{ id?: string; error?: string }> {
   const { data, error } = await supabase
     .from('rate_alerts')
-    .upsert(
-      { email, product, target_rate: targetRate ?? null, created_at: new Date().toISOString() },
-      { onConflict: 'email,product' },
-    )
+    .insert({
+      email,
+      rate_key:  product,
+      threshold: targetRate ?? 0,   // 0 = notify on any change
+      direction: 'below',
+      // user_id intentionally omitted — anon RLS policy allows null
+    })
     .select('id')
     .single();
   if (error) return { error: error.message };
