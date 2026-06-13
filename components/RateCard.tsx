@@ -1,4 +1,7 @@
+"use client";
+
 import type { LoanProduct, Institution, CountryInfo } from '@/lib/types';
+import { trackApplyClick } from '@/lib/tracker';
 import {
   formatAmount,
   formatRate,
@@ -165,6 +168,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
             href={applyUrl}
             target={applyUrl !== '#' ? '_blank' : undefined}
             rel={applyUrl !== '#' ? 'noopener noreferrer' : undefined}
+            onClick={() => trackApplyClick(product.id, product.type)}
             className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-3 rounded-xl text-center transition-colors shadow-md shadow-sky-100 mb-2"
           >
             Apply Now →

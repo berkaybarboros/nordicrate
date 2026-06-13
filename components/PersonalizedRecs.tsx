@@ -16,6 +16,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Sparkles, TrendingDown, TrendingUp, ExternalLink, RefreshCw, Users } from 'lucide-react';
 import { buildUTMLink } from '@/lib/utils';
+import { trackRecommendationClick } from '@/lib/tracker';
 
 interface Recommendation {
   rank: number;
@@ -281,6 +282,7 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
                   href={utmUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
+                  onClick={() => trackRecommendationClick(rec.rank, rec.productId, null)}
                   className={`flex-shrink-0 flex items-center gap-1 font-bold text-xs py-2 px-3 rounded-xl transition-all ${
                     i === 0
                       ? 'bg-sky-500 hover:bg-sky-400 text-white'

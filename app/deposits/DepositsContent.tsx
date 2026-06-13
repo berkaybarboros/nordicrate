@@ -5,6 +5,7 @@ import { PiggyBank, Lock, TrendingUp, ExternalLink, BarChart2, X } from "lucide-
 import { formatCurrency } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
+import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 
 interface DepositOffer {
   id: string;
@@ -262,6 +263,7 @@ export default function DepositsContent() {
                       href={offer.applyUrl}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
+                      onClick={() => trackApplyClick(offer.id, 'deposit')}
                       className="w-full flex items-center justify-center gap-1.5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-bold py-2.5 rounded-xl transition text-sm"
                     >
                       {t.deposits.openDeposit}
@@ -274,26 +276,30 @@ export default function DepositsContent() {
                       return (
                         <button
                           disabled={compareFull}
-                          onClick={() =>
-                            inCompare
-                              ? remove(offer.id)
-                              : add({
-                                  id: offer.id,
-                                  type: "deposit",
-                                  name: offer.bankName,
-                                  logo: offer.bankLogo,
-                                  applyUrl: offer.applyUrl,
-                                  rawRate: offer.rate,
-                                  rawInterest: offer.interest,
-                                  rawTotal: offer.totalAtMaturity,
-                                  metrics: [
-                                    { label: "Rate p.a.", value: `${offer.rate}%` },
-                                    { label: "You Earn", value: formatCurrency(offer.interest) },
-                                    { label: "Total at Maturity", value: formatCurrency(offer.totalAtMaturity) },
-                                    { label: "Min. Amount", value: formatCurrency(offer.minAmount) },
-                                  ],
-                                })
-                          }
+                          onClick={() => {
+                            if (inCompare) {
+                              remove(offer.id);
+                              trackCompareRemove(offer.id, 'deposit');
+                            } else {
+                              add({
+                                id: offer.id,
+                                type: "deposit",
+                                name: offer.bankName,
+                                logo: offer.bankLogo,
+                                applyUrl: offer.applyUrl,
+                                rawRate: offer.rate,
+                                rawInterest: offer.interest,
+                                rawTotal: offer.totalAtMaturity,
+                                metrics: [
+                                  { label: "Rate p.a.", value: `${offer.rate}%` },
+                                  { label: "You Earn", value: formatCurrency(offer.interest) },
+                                  { label: "Total at Maturity", value: formatCurrency(offer.totalAtMaturity) },
+                                  { label: "Min. Amount", value: formatCurrency(offer.minAmount) },
+                                ],
+                              });
+                              trackCompareAdd(offer.id, 'deposit');
+                            }
+                          }}
                           className={`w-full flex items-center justify-center gap-1.5 font-semibold py-2 rounded-xl transition text-xs border ${
                             inCompare
                               ? "bg-[#1a3c6e] text-white border-[#1a3c6e]"
