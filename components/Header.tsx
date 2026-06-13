@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { Bell } from 'lucide-react';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { LOCALE_NAMES, type Locale } from '@/locales';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import RateAlertModal from './alerts/RateAlertModal';
 
 const LOCALES: Locale[] = ['en', 'fi', 'et'];
 
@@ -17,6 +19,7 @@ export default function Header() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { locale, t, setLocale } = useTranslation();
 
@@ -120,6 +123,17 @@ export default function Header() {
               )}
             </div>
 
+            {/* Rate Alert bell */}
+            <button
+              onClick={() => setAlertOpen(true)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-100 border border-amber-500/30 hover:border-amber-400/60 hover:bg-amber-500/10 rounded-xl px-3 py-1.5 transition-all group"
+              title="Get notified when rates drop"
+            >
+              <Bell size={13} className="group-hover:animate-bounce" />
+              Rate Alert
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            </button>
+
             <span className="text-xs bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded px-2 py-1 font-medium">
               {t.nav.updatedDaily}
             </span>
@@ -222,6 +236,16 @@ export default function Header() {
               </Link>
             ))}
 
+            {/* Mobile Rate Alert */}
+            <button
+              onClick={() => { setAlertOpen(true); setMenuOpen(false); }}
+              className="mx-4 flex items-center justify-center gap-2 w-full border border-amber-500/40 text-amber-300 text-sm font-semibold py-2.5 rounded-xl transition-colors hover:bg-amber-500/10"
+            >
+              <Bell size={15} />
+              Get Rate Drop Alert
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            </button>
+
             {/* Mobile language switcher */}
             <div className="flex gap-2 px-4 pt-2">
               {LOCALES.map((loc) => (
@@ -298,6 +322,8 @@ export default function Header() {
       {langOpen && (
         <div className="fixed inset-0 z-40" onClick={() => setLangOpen(false)} />
       )}
+
+      <RateAlertModal open={alertOpen} onClose={() => setAlertOpen(false)} />
     </header>
   );
 }

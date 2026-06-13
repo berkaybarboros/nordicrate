@@ -13,8 +13,9 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { TrendingUp, TrendingDown, Minus, RefreshCw, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, RefreshCw, Zap, Bell } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import RateAlertModal from './alerts/RateAlertModal';
 
 export interface RateEntry {
   key: string;
@@ -33,17 +34,19 @@ const RATE_META: Record<string, { label: string; currency: string; group: 'eurib
 };
 
 interface Props {
-  compact?: boolean;       // sadece EURIBOR 3M + trend ok
-  onRateChange?: (rates: RateEntry[]) => void; // dış component'a bildir
+  compact?: boolean;
+  onRateChange?: (rates: RateEntry[]) => void;
   className?: string;
+  showAlertCta?: boolean;
 }
 
-export default function SmartRateWidget({ compact = false, onRateChange, className = '' }: Props) {
+export default function SmartRateWidget({ compact = false, onRateChange, className = '', showAlertCta = true }: Props) {
   const [rates, setRates] = useState<Map<string, RateEntry>>(new Map());
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [justChanged, setJustChanged] = useState(false);
   const [realtimeActive, setRealtimeActive] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   // İlk yükleme: son rates'leri çek
   const fetchInitialRates = useCallback(async () => {
@@ -212,8 +215,21 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
           <p className="text-[10px] text-white/20 text-center pt-1">
             Indicative rates · ECB & Norges Bank · Updated hourly
           </p>
+
+          {showAlertCta && (
+            <button
+              onClick={() => setAlertOpen(true)}
+              className="mt-3 w-full flex items-center justify-center gap-2 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 hover:border-amber-400/60 text-amber-300 hover:text-amber-200 text-xs font-semibold py-2 rounded-xl transition-all group"
+            >
+              <Bell size={12} className="group-hover:animate-bounce" />
+              Get Rate Drop Alert
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            </button>
+          )}
         </div>
       )}
+
+      <RateAlertModal open={alertOpen} onClose={() => setAlertOpen(false)} />
     </div>
   );
 }

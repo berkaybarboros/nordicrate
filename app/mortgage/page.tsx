@@ -16,6 +16,7 @@ export default function MortgagePage() {
       icon="🏠"
       allProducts={products}
       availableLoanTypes={['mortgage']}
+      alertProduct="mortgage"
     />
   );
 }

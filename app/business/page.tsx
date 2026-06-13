@@ -17,6 +17,7 @@ export default function BusinessPage() {
       allProducts={products}
       availableLoanTypes={['business']}
       defaultFilters={{ customerType: 'corporate' }}
+      alertProduct="personal-loan"
     />
   );
 }

@@ -28,6 +28,7 @@ export default async function LoansPage({ searchParams }: PageProps) {
       allProducts={products}
       availableLoanTypes={['personal', 'auto', 'student']}
       defaultFilters={defaultFilters}
+      alertProduct="personal-loan"
     />
   );
 }

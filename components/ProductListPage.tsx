@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { Bell } from 'lucide-react';
 import type { LoanProduct, LoanType } from '@/lib/types';
 import { INSTITUTIONS, COUNTRIES } from '@/lib/data';
 import { getInstitution, getCountry } from '@/lib/utils';
 import RateCard from './RateCard';
 import FilterSidebar, { type FilterState } from './FilterSidebar';
 import DataFreshnessBadge from './DataFreshnessBadge';
+import RateAlertModal from './alerts/RateAlertModal';
 
 interface ProductListPageProps {
   title: string;
@@ -15,6 +17,7 @@ interface ProductListPageProps {
   allProducts: LoanProduct[];
   availableLoanTypes?: LoanType[];
   defaultFilters?: Partial<FilterState>;
+  alertProduct?: string;
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -35,9 +38,11 @@ export default function ProductListPage({
   allProducts,
   availableLoanTypes,
   defaultFilters,
+  alertProduct = 'personal-loan',
 }: ProductListPageProps) {
   const [filters, setFilters] = useState<FilterState>({ ...DEFAULT_FILTERS, ...defaultFilters });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const filtered = useMemo(() => {
     let result = [...allProducts];
@@ -136,20 +141,36 @@ export default function ProductListPage({
         {/* Results */}
         <div className="flex-1 min-w-0">
           {/* Results bar */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
             <p className="text-sm text-slate-600">
               <span className="font-semibold text-slate-900">{filtered.length}</span> products found
-              {hasActiveFilters && ' (filtered)'}
+              {hasActiveFilters && <span className="text-slate-400"> (filtered)</span>}
             </p>
-            {hasActiveFilters && (
+            <div className="flex items-center gap-2">
+              {hasActiveFilters && (
+                <button
+                  onClick={() => setFilters({ ...DEFAULT_FILTERS, ...defaultFilters })}
+                  className="text-xs text-slate-500 hover:text-slate-700 font-medium underline underline-offset-2"
+                >
+                  Clear filters
+                </button>
+              )}
               <button
-                onClick={() => setFilters({ ...DEFAULT_FILTERS, ...defaultFilters })}
-                className="text-xs text-sky-600 hover:text-sky-800 font-medium"
+                onClick={() => setAlertOpen(true)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 hover:border-amber-300 rounded-lg px-3 py-1.5 transition-all group"
               >
-                Clear filters
+                <Bell size={12} className="group-hover:animate-bounce" />
+                Rate Alert
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               </button>
-            )}
+            </div>
           </div>
+
+          <RateAlertModal
+            open={alertOpen}
+            onClose={() => setAlertOpen(false)}
+            defaultProduct={alertProduct}
+          />
 
           {filtered.length === 0 ? (
             <div className="text-center py-20">
