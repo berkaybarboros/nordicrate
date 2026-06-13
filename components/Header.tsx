@@ -38,11 +38,13 @@ export default function Header() {
   }
 
   const navLinks = [
-    { href: '/loans', label: t.nav.personalLoans },
-    { href: '/mortgage', label: t.nav.mortgage },
-    { href: '/business', label: t.nav.business },
+    { href: '/loans',     label: t.nav.loans },
+    { href: '/mortgage',  label: t.nav.mortgage },
+    { href: '/business',  label: t.nav.business },
+    { href: '/insurance', label: t.nav.insurance },
+    { href: '/deposits',  label: t.nav.deposits },
     { href: '/countries', label: t.nav.countries },
-    { href: '/startup', label: t.nav.programs, highlight: true },
+    { href: '/startup',   label: t.nav.programs, highlight: true },
   ];
 
   return (
@@ -65,7 +67,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
                     ? 'bg-sky-600 text-white'
                     : link.highlight

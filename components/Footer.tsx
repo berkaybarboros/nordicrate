@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { Bell, CheckCircle } from 'lucide-react';
 import CountryFlag from './CountryFlag';
 
 const COUNTRY_CODES = [
@@ -14,9 +18,75 @@ const COUNTRY_CODES = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+function RateAlertStrip() {
+  const [email, setEmail] = useState('');
+  const [done, setDone] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.includes('@') || loading) return;
+    setLoading(true);
+    try {
+      await fetch('/api/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, product: 'personal-loan', targetRate: null }),
+      });
+      setDone(true);
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }
+
+  return (
+    <div className="border-b border-slate-800 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-400/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Bell size={20} className="text-amber-400" />
+            </div>
+            <div>
+              <p className="text-white font-bold text-sm">Get Rate Drop Alerts</p>
+              <p className="text-slate-400 text-xs mt-0.5">Be first to know when loan rates fall across Nordic &amp; Baltic markets</p>
+            </div>
+          </div>
+
+          {done ? (
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+              <CheckCircle size={18} />
+              You&apos;re on the list!
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full sm:w-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="flex-1 sm:w-56 bg-slate-800 border border-slate-700 focus:border-amber-400/60 focus:outline-none rounded-xl px-4 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-900 font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+              >
+                <Bell size={13} />
+                {loading ? 'Saving…' : 'Notify Me'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-400 mt-auto">
+      <RateAlertStrip />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
