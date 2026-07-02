@@ -8,13 +8,34 @@
  */
 
 import { NextRequest } from 'next/server';
+import { enforceRateLimit, sanitizeChatMessages, clampString } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
+const MAX_COMPARE_ITEMS = 4;   // CompareContext MAX=4 ile hizalı
+const MAX_METRICS = 12;
+const MAX_FIELD_LEN = 200;
+
+/** Client'tan gelen compareItems'i cap'ler — prompt injection yüzeyini daraltır. */
+function sanitizeCompareItems(input: unknown): CompareItem[] | null {
+  if (!Array.isArray(input) || input.length === 0) return null;
+  const items: CompareItem[] = [];
+  for (const raw of input.slice(0, MAX_COMPARE_ITEMS)) {
+    if (typeof raw !== 'object' || raw === null) return null;
+    const item = raw as CompareItem;
+    if (typeof item.name !== 'string' || !Array.isArray(item.metrics)) return null;
+    items.push({
+      ...item,
+      name: item.name.slice(0, MAX_FIELD_LEN),
+      logo: typeof item.logo === 'string' ? item.logo.slice(0, MAX_FIELD_LEN) : '',
+      metrics: item.metrics.slice(0, MAX_METRICS).map((m) => ({
+        label: String(m?.label ?? '').slice(0, MAX_FIELD_LEN),
+        value: typeof m?.value === 'number' ? m.value : String(m?.value ?? '').slice(0, MAX_FIELD_LEN),
+      })),
+    });
+  }
+  return items;
 }
 
 interface CompareMetric {
@@ -73,15 +94,21 @@ Never mention that you are an AI or have limitations.`;
 
 export async function POST(req: NextRequest) {
   try {
+    // 15 istek/dk/IP
+    const limited = enforceRateLimit(req, 'compare-chat', 15);
+    if (limited) return limited;
+
     const body = await req.json() as {
-      messages: ChatMessage[];
-      compareItems: CompareItem[];
-      userCtx?: string;
+      messages: unknown;
+      compareItems: unknown;
+      userCtx?: unknown;
     };
 
-    const { messages, compareItems, userCtx } = body;
+    const messages = sanitizeChatMessages(body.messages);
+    const compareItems = sanitizeCompareItems(body.compareItems);
+    const userCtx = clampString(body.userCtx, 500) ?? undefined;
 
-    if (!messages?.length || !compareItems?.length) {
+    if (!messages || !compareItems) {
       return Response.json({ error: 'messages and compareItems required' }, { status: 400 });
     }
 

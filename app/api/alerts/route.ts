@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRateAlert } from "@/lib/db";
+import { enforceRateLimit, isValidEmail } from "@/lib/security";
 
 interface AlertPayload {
   email: string;
@@ -9,12 +10,16 @@ interface AlertPayload {
 
 export async function POST(req: NextRequest) {
   try {
+    // 5 istek/dk/IP — spam insert koruması
+    const limited = enforceRateLimit(req, 'alerts', 5);
+    if (limited) return limited;
+
     const body = (await req.json()) as AlertPayload;
 
-    if (!body.email || typeof body.email !== "string" || !body.email.includes("@")) {
+    if (!isValidEmail(body.email)) {
       return NextResponse.json({ message: "Invalid email address." }, { status: 400 });
     }
-    if (!body.product || typeof body.product !== "string") {
+    if (!body.product || typeof body.product !== "string" || body.product.length > 100) {
       return NextResponse.json({ message: "Product type is required." }, { status: 400 });
     }
     if (body.targetRate !== null && body.targetRate !== undefined) {

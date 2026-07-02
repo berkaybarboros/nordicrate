@@ -1,5 +1,6 @@
 import type { UserProfile } from '@/lib/profile';
 import type { CorporateProfile } from '@/lib/corporate-profile';
+import { enforceRateLimit, sanitizeChatMessages } from '@/lib/security';
 
 export const runtime = 'nodejs';
 
@@ -38,13 +39,18 @@ Return {} if no relevant business info found.`;
 
 export async function POST(req: Request) {
   try {
-    const { messages, mode = 'personal' } = await req.json();
-    if (!messages || messages.length === 0) return Response.json({});
+    // 15 istek/dk/IP — profil çıkarımı chat'ten daha seyrek çağrılır
+    const limited = enforceRateLimit(req, 'profile', 15);
+    if (limited) return limited;
+
+    const { messages: rawMessages, mode = 'personal' } = await req.json();
+    const messages = sanitizeChatMessages(rawMessages);
+    if (!messages) return Response.json({});
 
     const extractPrompt = mode === 'corporate' ? CORPORATE_EXTRACT_PROMPT : PERSONAL_EXTRACT_PROMPT;
     const recent = messages.slice(-8);
     const conversation = recent
-      .map((m: { role: string; content: string }) => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
+      .map((m) => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
       .join('\n');
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {

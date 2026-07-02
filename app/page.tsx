@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { PROGRAMS } from '@/lib/programs-data';
-import { getCountryStats, getInstitution, getCountry, formatAmount, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
+import { getCountryStats, getInstitution, getCountry, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
 import RateCard from '@/components/RateCard';
 import CountryCard from '@/components/CountryCard';
 import CountryFlag from '@/components/CountryFlag';
@@ -133,11 +133,21 @@ export default function HomePage() {
             <p className="text-slate-500 text-sm mt-1">Live lowest APR from our database — updated daily</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Tailwind v4 dinamik class üretmez — accent renkleri statik map'ten gelir */}
             {[
-              { product: bestPersonal, label: 'Best Personal Loan', href: '/loans', accent: 'sky', icon: '👤' },
-              { product: bestMortgage, label: 'Best Mortgage Rate', href: '/mortgage', accent: 'emerald', icon: '🏠' },
-              { product: bestBusiness, label: 'Best Business Loan', href: '/business', accent: 'purple', icon: '🏢' },
-            ].map(({ product, label, href, accent, icon }) => {
+              {
+                product: bestPersonal, label: 'Best Personal Loan', href: '/loans', icon: '👤',
+                border: 'border-sky-100 hover:border-sky-300', text: 'text-sky-600',
+              },
+              {
+                product: bestMortgage, label: 'Best Mortgage Rate', href: '/mortgage', icon: '🏠',
+                border: 'border-emerald-100 hover:border-emerald-300', text: 'text-emerald-600',
+              },
+              {
+                product: bestBusiness, label: 'Best Business Loan', href: '/business', icon: '🏢',
+                border: 'border-purple-100 hover:border-purple-300', text: 'text-purple-600',
+              },
+            ].map(({ product, label, href, icon, border, text }) => {
               if (!product) return null;
               const inst = getInstitution(product.institutionId);
               const country = inst ? getCountry(inst.country) : null;
@@ -145,22 +155,22 @@ export default function HomePage() {
                 <Link
                   key={label}
                   href={href}
-                  className={`bg-white rounded-2xl border-2 border-${accent}-100 hover:border-${accent}-300 p-5 hover:shadow-lg transition-all group`}
+                  className={`bg-white rounded-2xl border-2 ${border} p-5 hover:shadow-lg transition-all group`}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-${accent}-600`}>
+                    <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${text}`}>
                       <span>{icon}</span>
                       <span>{label}</span>
                     </div>
                     {country && <CountryFlag code={country.code} size={32} rounded="sm" />}
                   </div>
-                  <p className={`text-4xl font-extrabold text-${accent}-600 mb-1`}>
+                  <p className={`text-4xl font-extrabold ${text} mb-1`}>
                     {formatRate(product.rateMin)}
                   </p>
                   <p className="text-xs text-slate-500 mb-3">APR from</p>
                   <p className="text-sm font-bold text-slate-800">{inst?.shortName}</p>
                   <p className="text-xs text-slate-500 mb-4">{product.name}</p>
-                  <p className={`text-xs font-semibold text-${accent}-600 group-hover:underline`}>
+                  <p className={`text-xs font-semibold ${text} group-hover:underline`}>
                     Compare all rates →
                   </p>
                 </Link>

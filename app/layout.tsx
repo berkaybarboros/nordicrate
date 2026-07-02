@@ -78,6 +78,35 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// JSON-LD — Organization + WebSite structured data (SEO / rich results)
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${BASE_URL}/#organization`,
+      name: 'NordicRate',
+      url: BASE_URL,
+      logo: `${BASE_URL}/og-image.png`,
+      description:
+        'Loan, mortgage and business credit comparison platform for the Nordic and Baltic region.',
+      areaServed: ['DK', 'FI', 'IS', 'NO', 'SE', 'EE', 'LV', 'LT'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${BASE_URL}/#website`,
+      url: BASE_URL,
+      name: 'NordicRate',
+      publisher: { '@id': `${BASE_URL}/#organization` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/loans?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -85,6 +114,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 min-h-screen flex flex-col`}
       >

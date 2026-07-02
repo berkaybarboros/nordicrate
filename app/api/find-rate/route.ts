@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { enforceRateLimit, isValidEmail, isValidSessionId, clampNumber } from '@/lib/security';
 
 export const runtime = 'nodejs';
 import { buildUTMLink } from '@/lib/utils';
@@ -28,6 +29,10 @@ function getProducts(productType: string) {
 // ─── POST /api/find-rate ────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
+    // 10 istek/dk/IP — Groq + DB insert maliyeti
+    const limited = enforceRateLimit(req, 'find-rate', 10);
+    if (limited) return limited;
+
     const body = await req.json() as {
       productType: string;
       country?: string;
@@ -38,11 +43,21 @@ export async function POST(req: NextRequest) {
       sessionId: string;
     };
 
-    const { productType, country, amount, termMonths, monthlyIncome, email, sessionId } = body;
+    const { productType, country, email, sessionId } = body;
 
-    if (!productType || !sessionId) {
+    if (!productType || !isValidSessionId(sessionId)) {
       return NextResponse.json({ error: 'productType and sessionId required' }, { status: 400 });
     }
+    if (email !== undefined && email !== null && email !== '' && !isValidEmail(email)) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
+    }
+    if (country !== undefined && (typeof country !== 'string' || country.length > 4)) {
+      return NextResponse.json({ error: 'Invalid country' }, { status: 400 });
+    }
+
+    const amount        = clampNumber(body.amount, 0, 10_000_000);
+    const termMonths    = clampNumber(body.termMonths, 1, 480);
+    const monthlyIncome = clampNumber(body.monthlyIncome, 0, 1_000_000);
 
     const products = getProducts(productType);
     if (products.length === 0) {
@@ -51,7 +66,6 @@ export async function POST(req: NextRequest) {
 
     // ─── Build product catalog text for AI ──────────────────────────────────────
     const isInsurance = ['motor', 'casco', 'home', 'health'].includes(productType);
-    const isLoan      = ['personal', 'mortgage', 'car', 'business'].includes(productType);
 
     const catalogText = products.map((p, i) => {
       if (isInsurance) {

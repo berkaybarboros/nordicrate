@@ -84,6 +84,11 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3001
 NEXT_PUBLIC_BASE_URL=https://nordicrate.berkaybarboros.com
 GROQ_API_KEY=gsk_...
 ANTHROPIC_API_KEY=sk-ant-...  # Yedek — şu an kullanılmıyor
+NEXT_PUBLIC_SUPABASE_URL=https://sdbwlyncpjssxxcuxbhp.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...  # /admin dashboard (RLS bypass) — SADECE server-side
+CRON_SECRET=...                # /api/cron/* endpoint'leri
+ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 ```
 
 ## Kurallar — Her Zaman
@@ -115,10 +120,18 @@ ANTHROPIC_API_KEY=sk-ant-...  # Yedek — şu an kullanılmıyor
 - Hata bulunca: neden oldu → nasıl düzelir → başka nereyi etkiler
 - Türkçe konuş (teknik terimler İngilizce kalabilir)
 
+## Güvenlik Katmanı (V3)
+- `lib/security.ts` — sliding-window rate limiter (in-memory, PM2 cluster'da worker başına ayrı sayaç) + input validators
+- Rate limitler (IP başına/dk): chat 20, compare-chat 15, profile 15, recommend 15, find-rate 10, alerts 5, admin-login 5
+- Security headers → `next.config.ts` `headers()`: CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy
+- `/admin` — ADMIN_TOKEN korumalı lead funnel dashboard; cookie'de token'ın SHA-256 hash'i, timing-safe compare
+- `lib/supabase-admin.ts` — service-role client; ASLA client component'a import etme
+- Chat live rates module-level cache (1 saat TTL) — "her mesajda HTTP round-trip" issue kapandı
+
 ## Aktif Bağlam
-**Son güncelleme**: 2026-04-12
-**Mevcut durum**: nordicrate.berkaybarboros.com canlıda, HTTPS çalışıyor
-**Bu sprint odağı**: AI Katman 2 — kullanıcı profil çıkarımı + DTI hesabı + EligibilityPanel UI
+**Son güncelleme**: 2026-07-02
+**Mevcut durum**: nordicrate.berkaybarboros.com canlıda, HTTPS çalışıyor. V3 sprint başladı.
+**Bu sprint odağı**: V3 — backend security ✅ + admin funnel (B3) ✅; sıradaki: real data pipeline (D1 Playwright scraper), affiliate (Awin/LHV)
 **Tamamlananlar**:
 - ✅ ECB EURIBOR canlı veri (RT series key düzeltildi)
 - ✅ sitemap.ts + robots.ts

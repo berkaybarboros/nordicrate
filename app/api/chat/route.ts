@@ -1,6 +1,7 @@
 import { buildSystemPrompt, type AssistantMode, type OnboardingContext } from '@/lib/ai-context';
 import type { LiveRatesData } from '@/lib/types';
 import { matchPrograms, type CorporateProfile } from '@/lib/corporate-profile';
+import { enforceRateLimit, sanitizeChatMessages } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -10,28 +11,43 @@ export interface ChatMessage {
   content: string;
 }
 
+// Live rates module-level cache — her mesajda HTTP round-trip yapmamak için.
+// PM2 cluster'da worker başına ayrı cache; 1 saat TTL.
+const RATES_TTL_MS = 60 * 60 * 1000;
+let ratesCache: { data: LiveRatesData; fetchedAt: number } | null = null;
+
 async function fetchLiveRates(): Promise<LiveRatesData | undefined> {
+  if (ratesCache && Date.now() - ratesCache.fetchedAt < RATES_TTL_MS) {
+    return ratesCache.data;
+  }
   try {
     const base = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3001';
     const res = await fetch(`${base}/api/rates`, { next: { revalidate: 3600 } });
-    if (!res.ok) return undefined;
-    return await res.json();
+    if (!res.ok) return ratesCache?.data;
+    const data = (await res.json()) as LiveRatesData;
+    ratesCache = { data, fetchedAt: Date.now() };
+    return data;
   } catch {
-    return undefined;
+    return ratesCache?.data;
   }
 }
 
 export async function POST(req: Request) {
   try {
+    // 20 istek/dk/IP — Groq maliyet + DoS koruması
+    const limited = enforceRateLimit(req, 'chat', 20);
+    if (limited) return limited;
+
     const {
-      messages,
+      messages: rawMessages,
       mode = 'personal',
       corporateProfile,
       onboardingProfile,
-    }: { messages: ChatMessage[]; mode: AssistantMode; corporateProfile?: CorporateProfile; onboardingProfile?: OnboardingContext } = await req.json();
+    }: { messages: unknown; mode: AssistantMode; corporateProfile?: CorporateProfile; onboardingProfile?: OnboardingContext } = await req.json();
 
-    if (!messages || messages.length === 0) {
-      return Response.json({ error: 'No messages provided' }, { status: 400 });
+    const messages = sanitizeChatMessages(rawMessages);
+    if (!messages) {
+      return Response.json({ error: 'Invalid messages' }, { status: 400 });
     }
 
     const liveRates = await fetchLiveRates();

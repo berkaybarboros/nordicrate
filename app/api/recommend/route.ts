@@ -14,6 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { enforceRateLimit, isValidSessionId, clampNumber } from '@/lib/security';
 
 // Product catalogs (static data — gerçek banka verileri)
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
@@ -57,6 +58,10 @@ function applyRateBoost(
 // ─── POST handler ────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
+    // 15 istek/dk/IP
+    const limited = enforceRateLimit(req, 'recommend', 15);
+    if (limited) return limited;
+
     const body = await req.json() as {
       sessionId: string;
       productType: string;
@@ -66,10 +71,15 @@ export async function POST(req: NextRequest) {
       stream?: boolean;
     };
 
-    const { sessionId, productType, country, amount, termMonths, stream = true } = body;
+    const { sessionId, productType, country } = body;
+    const amount = clampNumber(body.amount, 0, 10_000_000);
+    const termMonths = clampNumber(body.termMonths, 1, 480);
 
-    if (!sessionId || !productType) {
+    if (!isValidSessionId(sessionId) || !productType || typeof productType !== 'string') {
       return NextResponse.json({ error: 'sessionId and productType required' }, { status: 400 });
+    }
+    if (country !== undefined && (typeof country !== 'string' || country.length > 4)) {
+      return NextResponse.json({ error: 'Invalid country' }, { status: 400 });
     }
 
     const supabase = await createSupabaseServer();
@@ -104,7 +114,7 @@ export async function POST(req: NextRequest) {
     const userId = user?.id ?? null;
 
     // ── Step 3b: Vector similarity recommendations (4th layer) ──────────────
-    let vectorMap = new Map<string, number>();
+    const vectorMap = new Map<string, number>();
     if (userId) {
       const { data: vectorRecs } = await supabase.rpc('get_vector_recommendations', {
         p_user_id:      userId,
@@ -198,7 +208,7 @@ Write 1-2 sentences for each product explaining WHY it's recommended for this sp
 {"recommendations": [{"rank": 1, "why": "..."}, {"rank": 2, "why": "..."}, {"rank": 3, "why": "..."}], "marketSummary": "1 sentence about current market conditions"}`;
 
     // ── Step 5: Non-streaming Groq call for explanations ────────────────────
-    let whyMap: Record<number, string> = {};
+    const whyMap: Record<number, string> = {};
     let marketSummary = '';
 
     try {
