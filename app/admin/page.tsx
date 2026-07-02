@@ -40,14 +40,41 @@ interface LeadRow {
   mode?: string | null;
 }
 
-async function loadData() {
+interface ScrapedRateRow {
+  bank_id: string;
+  product_type: string;
+  rate_min: number | null;
+  aprc: number | null;
+  raw_snippet: string | null;
+  scraped_at: string;
+}
+
+const EMPTY_DATA = {
+  usingServiceRole: false,
+  leads: [] as LeadRow[],
+  leadsError: 'Data load timed out — Supabase unreachable?' as string | null,
+  events: [] as EventRow[],
+  eventsError: null as string | null,
+  alertCount: 0,
+  scrapedRates: [] as ScrapedRateRow[],
+};
+
+async function loadData(): Promise<typeof EMPTY_DATA> {
+  // Supabase erişilemezse sayfa sonsuza kadar beklemesin — 8sn'de boş veriyle render et
+  return Promise.race([
+    loadDataInner(),
+    new Promise<typeof EMPTY_DATA>((resolve) => setTimeout(() => resolve(EMPTY_DATA), 8000)),
+  ]);
+}
+
+async function loadDataInner() {
   const admin = createSupabaseAdmin();
   const client = admin ?? (await createSupabaseServer());
   const usingServiceRole = admin !== null;
 
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes] = await Promise.all([
+  const [leadsRes, eventsRes, alertsRes, scrapedRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -60,6 +87,11 @@ async function loadData() {
       .order('created_at', { ascending: false })
       .limit(2000),
     client.from('rate_alerts').select('id', { count: 'exact', head: true }),
+    // D1 pilot — tablo henüz yoksa sessizce boş döner
+    client
+      .from('latest_scraped_rates')
+      .select('bank_id, product_type, rate_min, aprc, raw_snippet, scraped_at')
+      .order('bank_id'),
   ]);
 
   return {
@@ -69,6 +101,7 @@ async function loadData() {
     events: (eventsRes.data ?? []) as EventRow[],
     eventsError: eventsRes.error?.message ?? null,
     alertCount: alertsRes.count ?? 0,
+    scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
   };
 }
 
@@ -89,7 +122,7 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates } = await loadData();
 
   const eventCounts = new Map(countBy(events, (e) => e.event_type));
   const pageViews = eventCounts.get('page_view') ?? 0;
@@ -217,6 +250,51 @@ export default async function AdminDashboard() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* D1 pilot — scraped rates */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-extrabold text-slate-900">Scraped Rates (D1 Pilot — LHV)</h2>
+          <span className="text-xs text-slate-400">daily via VPS cron</span>
+        </div>
+        {scrapedRates.length === 0 ? (
+          <p className="text-sm text-slate-400">
+            No scraped data yet. Run <code className="bg-slate-50 px-1 rounded">deploy/scraper/schema.sql</code> in Supabase,
+            then set up the cron per <code className="bg-slate-50 px-1 rounded">deploy/scraper/README.md</code>.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                  <th className="py-2 pr-4">Bank</th>
+                  <th className="py-2 pr-4">Product</th>
+                  <th className="py-2 pr-4">Rate from</th>
+                  <th className="py-2 pr-4">APRC</th>
+                  <th className="py-2 pr-4">Scraped</th>
+                  <th className="py-2">Snippet (verify)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scrapedRates.map((r) => (
+                  <tr key={`${r.bank_id}-${r.product_type}`} className="border-b border-slate-50 last:border-0">
+                    <td className="py-2 pr-4 font-bold text-slate-800 uppercase">{r.bank_id}</td>
+                    <td className="py-2 pr-4 text-slate-600">{r.product_type}</td>
+                    <td className="py-2 pr-4 font-bold text-sky-700">{r.rate_min != null ? `${r.rate_min}%` : '—'}</td>
+                    <td className="py-2 pr-4 text-slate-600">{r.aprc != null ? `${r.aprc}%` : '—'}</td>
+                    <td className="py-2 pr-4 text-slate-500 whitespace-nowrap">
+                      {new Date(r.scraped_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="py-2 text-xs text-slate-400 max-w-md truncate" title={r.raw_snippet ?? ''}>
+                      {r.raw_snippet ?? '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Recent leads table */}

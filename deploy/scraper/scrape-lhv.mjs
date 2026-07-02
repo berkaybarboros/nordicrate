@@ -1,0 +1,110 @@
+/**
+ * D1 Pilot — LHV rate scraper
+ *
+ * Neden LHV: robots.txt loan sayfalarına tüm UA'lara izin veriyor (kontrol edildi
+ * 2026-07-02), faiz oranı halka açık faktüel veri, ve D3'te LHV partnerliği zaten
+ * hedefte. Politeness: günde 1 çalıştırma, sayfalar arası 3sn bekleme, sonuçlar
+ * cache'lenir — siteye yük binmez.
+ *
+ * Çalıştırma (VPS):
+ *   cd /var/www/nordicrate/deploy/scraper
+ *   node --env-file=/var/www/nordicrate/.env.local scrape-lhv.mjs
+ *
+ * Gereken env: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ * Kurulum: bkz. README.md
+ */
+
+import { chromium } from 'playwright';
+import { createClient } from '@supabase/supabase-js';
+
+const BANK_ID = 'lhv';
+
+// ⚠️ İlk çalıştırmadan önce URL'leri tarayıcıda doğrula — LHV site yapısı değişebilir.
+const TARGETS = [
+  { productType: 'personal', url: 'https://www.lhv.ee/en/small-loan' },
+  { productType: 'mortgage', url: 'https://www.lhv.ee/en/home-loan' },
+];
+
+// Sayfa metninden oran çıkarma — EN + ET desenleri, en spesifikten genele
+const RATE_PATTERNS = [
+  /interest(?:\s+rate)?[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+  /intress[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+  /(?:from|alates)\s+(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+];
+
+const APRC_PATTERNS = [
+  /(?:APRC|annual percentage rate(?: of charge)?)[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+  /krediidi kulukuse m[aä]{1,2}r[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+];
+
+function extract(text, patterns) {
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (!m) continue;
+    const value = parseFloat(m[1].replace(',', '.'));
+    // Sanity: kredi faizi 0.5–35% aralığı dışındaysa parse hatası say
+    if (!Number.isFinite(value) || value < 0.5 || value > 35) continue;
+    const idx = m.index ?? 0;
+    const snippet = text.slice(Math.max(0, idx - 60), idx + m[0].length + 60).replace(/\s+/g, ' ').trim();
+    return { value, snippet };
+  }
+  return null;
+}
+
+async function main() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    console.error('[scraper] Missing NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
+    process.exit(1);
+  }
+  const supabase = createClient(url, key, { auth: { persistSession: false } });
+
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ locale: 'en-GB' });
+  let failures = 0;
+
+  for (const target of TARGETS) {
+    try {
+      console.log(`[scraper] ${BANK_ID}/${target.productType} → ${target.url}`);
+      await page.goto(target.url, { waitUntil: 'networkidle', timeout: 45_000 });
+      const text = await page.evaluate(() => document.body.innerText);
+
+      const rate = extract(text, RATE_PATTERNS);
+      const aprc = extract(text, APRC_PATTERNS);
+      const parseOk = rate !== null;
+
+      const { error } = await supabase.from('scraped_rates').insert({
+        bank_id:      BANK_ID,
+        product_type: target.productType,
+        rate_min:     rate?.value ?? null,
+        aprc:         aprc?.value ?? null,
+        source_url:   target.url,
+        raw_snippet:  rate?.snippet ?? text.slice(0, 300),
+        parse_ok:     parseOk,
+      });
+
+      if (error) throw new Error(`Supabase insert: ${error.message}`);
+
+      if (parseOk) {
+        console.log(`[scraper] OK — rate ${rate.value}%${aprc ? `, APRC ${aprc.value}%` : ''}`);
+        console.log(`[scraper]      "${rate.snippet}"`);
+      } else {
+        failures++;
+        console.warn(`[scraper] PARSE FAILED — sayfa açıldı ama oran deseni bulunamadı (selector drift?). parse_ok=false yazıldı.`);
+      }
+    } catch (err) {
+      failures++;
+      console.error(`[scraper] ERROR ${target.productType}:`, err instanceof Error ? err.message : err);
+    }
+
+    // Politeness: sayfalar arası bekleme
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+
+  await browser.close();
+  console.log(`[scraper] Done — ${TARGETS.length - failures}/${TARGETS.length} targets OK`);
+  process.exit(failures === TARGETS.length ? 1 : 0); // hepsi patladıysa cron mail atsın
+}
+
+main();

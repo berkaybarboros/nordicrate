@@ -1,0 +1,14 @@
+{
+  "name": "nordicrate-scraper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "D1 pilot — LHV daily rate scraper (VPS cron, Next app'ten bagimsiz)",
+  "scripts": {
+    "scrape": "node --env-file=/var/www/nordicrate/.env.local scrape-lhv.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
+    "playwright": "^1.50.0"
+  }
+}
