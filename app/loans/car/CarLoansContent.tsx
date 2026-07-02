@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { ArrowUpDown } from "lucide-react";
 import LoanOfferCard from "@/components/loans/LoanOfferCard";
 import LoanCalculator from "@/components/loans/LoanCalculator";
@@ -10,11 +10,34 @@ import { carLoans } from "@/data/loans";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 import SocialProofBar from "@/components/SocialProofBar";
 
+const SS_AMOUNT = 'car-loan-amount';
+const SS_TERM   = 'car-loan-term';
+const SS_DP     = 'car-loan-dp';
+
 export default function CarLoansContent() {
   const [amount, setAmount] = useState(15000);
   const [termMonths, setTermMonths] = useState(48);
+  const [downPayment, setDownPayment] = useState(0);
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+
+  // Restore from sessionStorage on mount
+  useEffect(() => {
+    const a = Number(sessionStorage.getItem(SS_AMOUNT));
+    const t = Number(sessionStorage.getItem(SS_TERM));
+    const d = Number(sessionStorage.getItem(SS_DP));
+    if (a) setAmount(a);
+    if (t) setTermMonths(t);
+    if (d) setDownPayment(d);
+  }, []);
+
+  // Persist to sessionStorage on change
+  useEffect(() => { sessionStorage.setItem(SS_AMOUNT, String(amount)); }, [amount]);
+  useEffect(() => { sessionStorage.setItem(SS_TERM, String(termMonths)); }, [termMonths]);
+  useEffect(() => { sessionStorage.setItem(SS_DP, String(downPayment)); }, [downPayment]);
+
+  const netAmount = Math.max(0, amount - downPayment);
+
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
     const e3m = rates.find(r => r.key === 'euribor3m');
     if (e3m) setLiveEuribor(e3m.rate);
@@ -23,14 +46,14 @@ export default function CarLoansContent() {
   const sortedOffers = useMemo(() => {
     return [...carLoans].sort((a, b) => {
       if (sortBy === "rate") return a.representativeRate - b.representativeRate;
-      const aM = calculateMonthlyPayment(amount, a.representativeRate, termMonths);
-      const bM = calculateMonthlyPayment(amount, b.representativeRate, termMonths);
+      const aM = calculateMonthlyPayment(netAmount, a.representativeRate, termMonths);
+      const bM = calculateMonthlyPayment(netAmount, b.representativeRate, termMonths);
       return sortBy === "monthly" ? aM - bM : aM * termMonths - bM * termMonths;
     });
-  }, [sortBy, amount, termMonths]);
+  }, [sortBy, netAmount, termMonths]);
 
   const bestRate = Math.min(...carLoans.map((l) => l.representativeRate));
-  const bestMonthly = calculateMonthlyPayment(amount, bestRate, termMonths);
+  const bestMonthly = calculateMonthlyPayment(netAmount, bestRate, termMonths);
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">
@@ -70,11 +93,14 @@ export default function CarLoansContent() {
               maxAmount={60000}
               minTerm={12}
               maxTerm={84}
+              showDownPayment={true}
+              downPayment={downPayment}
+              setDownPayment={setDownPayment}
             />
             <SmartRateWidget onRateChange={handleRateChange} />
             <PersonalizedRecs
               productType="car"
-              amount={amount}
+              amount={netAmount}
               termMonths={termMonths}
               liveEuribor={liveEuribor}
             />
@@ -122,7 +148,7 @@ export default function CarLoansContent() {
               <LoanOfferCard
                 key={offer.id}
                 offer={offer}
-                amount={amount}
+                amount={netAmount}
                 termMonths={termMonths}
               />
             ))}
