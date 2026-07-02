@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f7f9fb;
+  --foreground: #0b1220;
+}
+
+/*
+ * NordicRate design tokens — "Nordic Clarity"
+ * sky-* skalası markanın ana mavisine remap edildi (Avrupa fintech tonu).
+ * Böylece tüm mevcut sky-* class'ları tek yerden yeni paleti alır.
+ */
+@theme {
+  --color-sky-50:  #eff4ff;
+  --color-sky-100: #dbe6fe;
+  --color-sky-200: #bfd3fe;
+  --color-sky-300: #93b4fd;
+  --color-sky-400: #6090fa;
+  --color-sky-500: #3b76f6;
+  --color-sky-600: #2563eb;
+  --color-sky-700: #1d58d8;
+  --color-sky-800: #1e4bae;
+  --color-sky-900: #1e3f89;
+  --color-sky-950: #172a54;
 }
 
 @theme inline {
@@ -16,8 +35,36 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   box-sizing: border-box;
+}
+
+::selection {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Klavye kullanıcıları için tutarlı focus ring */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Başlıklarda hafif sıkı letter-spacing — Nordic tipografi hissi */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { PROGRAMS } from '@/lib/programs-data';
 import { getCountryStats, getInstitution, getCountry, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
@@ -34,41 +35,50 @@ export default function HomePage() {
     <div>
 
       {/* ========== HERO — 2-column layout ========== */}
-      <section className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+      <section className="relative bg-slate-950 text-white overflow-hidden">
+        {/* Subtle brand glow */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden>
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-sky-600/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-60 -left-40 w-[500px] h-[500px] bg-sky-800/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
             {/* Left column — text */}
             <div>
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-                <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse" />
-                #1 Nordic &amp; Baltic Credit Comparison Platform
+              {/* Live data badge — gerçek iddia */}
+              <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                Live EURIBOR &amp; central bank data
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-5">
-                Compare Loans.
+              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-[1.08] mb-5">
+                One search.
                 <br />
-                <span className="text-sky-400">Save Money.</span>
+                Every Nordic &amp; Baltic
                 <br />
-                Apply Today.
+                <span className="text-sky-400">loan rate.</span>
               </h1>
 
               <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
-                Compare offers from <strong className="text-white">{totalInstitutions}+ banks</strong> across{' '}
-                <strong className="text-white">8 Nordic &amp; Baltic countries</strong> — free, instant, and without affecting your credit score.
+                Compare {totalProducts}+ products from {totalInstitutions}+ banks and insurers across{' '}
+                {totalCountries} countries — free, independent, and with no impact on your credit score.
               </p>
 
-              {/* Star rating */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="flex">
-                  {[1,2,3,4,5].map(i => (
-                    <svg key={i} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              {/* Honest trust chips */}
+              <div className="flex flex-wrap gap-2 mb-8">
+                {['100% free', 'No credit check', 'Independent comparison', 'GDPR compliant'].map((chip) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-300 bg-white/5 border border-white/10 rounded-full px-3 py-1.5"
+                  >
+                    <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                  ))}
-                </div>
-                <span className="text-sm text-slate-300"><strong className="text-white">4.8/5</strong> · Trusted by 50,000+ users</span>
+                    {chip}
+                  </span>
+                ))}
               </div>
 
               {/* Hero Search */}
@@ -77,18 +87,15 @@ export default function HomePage() {
               </div>
 
               {/* Micro stats */}
-              <div className="flex flex-wrap gap-6 text-sm">
+              <div className="flex flex-wrap gap-8 text-sm">
                 {[
-                  { value: `${totalCountries}`, label: 'Countries', icon: '🌍' },
-                  { value: `${totalInstitutions}+`, label: 'Banks', icon: '🏦' },
-                  { value: `${totalProducts}+`, label: 'Products', icon: '📊' },
-                ].map(({ value, label, icon }) => (
-                  <div key={label} className="flex items-center gap-2">
-                    <span>{icon}</span>
-                    <div>
-                      <p className="font-extrabold text-white leading-none">{value}</p>
-                      <p className="text-xs text-slate-400">{label}</p>
-                    </div>
+                  { value: `${totalCountries}`, label: 'Countries' },
+                  { value: `${totalInstitutions}+`, label: 'Institutions' },
+                  { value: `${totalProducts}+`, label: 'Products' },
+                ].map(({ value, label }) => (
+                  <div key={label}>
+                    <p className="text-2xl font-extrabold text-white leading-none">{value}</p>
+                    <p className="text-xs text-slate-400 mt-1">{label}</p>
                   </div>
                 ))}
               </div>
@@ -101,7 +108,7 @@ export default function HomePage() {
           </div>
 
           {/* Country flags row */}
-          <div className="mt-12 pt-8 border-t border-slate-800">
+          <div className="mt-12 pt-8 border-t border-white/10">
             <p className="text-xs text-slate-500 text-center mb-4 uppercase tracking-widest font-semibold">Compare rates in</p>
             <div className="flex flex-wrap justify-center gap-2">
               {COUNTRIES.map((c) => (
@@ -189,15 +196,17 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { step: 1, icon: '🧮', title: 'Calculate', desc: 'Enter your loan amount and term in our free calculator to see estimated monthly payments instantly.' },
-              { step: 2, icon: '📊', title: 'Compare', desc: 'Browse and filter 100+ loan products from 50+ banks, sorted by lowest APR, highest limit, or most recent.' },
-              { step: 3, icon: '✅', title: 'Apply', desc: 'Click directly through to your chosen bank. No middleman, no hidden fees — we are 100% free to use.' },
-            ].map(({ step, icon, title, desc }) => (
+              { step: 1, Icon: Calculator, title: 'Calculate', desc: 'Enter your loan amount and term in our free calculator to see estimated monthly payments instantly.' },
+              { step: 2, Icon: BarChart3, title: 'Compare', desc: 'Browse and filter 100+ loan products from 50+ banks, sorted by lowest APR, highest limit, or most recent.' },
+              { step: 3, Icon: CheckCircle2, title: 'Apply', desc: 'Click directly through to your chosen bank. No middleman, no hidden fees — we are 100% free to use.' },
+            ].map(({ step, Icon, title, desc }) => (
               <div key={step} className="bg-white rounded-2xl border border-slate-200 p-6 text-center relative overflow-hidden">
-                <div className="absolute top-3 right-3 w-7 h-7 bg-sky-600 text-white rounded-full text-sm font-extrabold flex items-center justify-center shadow-md">
+                <div className="absolute top-3 right-3 w-7 h-7 bg-slate-100 text-slate-500 rounded-full text-sm font-bold flex items-center justify-center">
                   {step}
                 </div>
-                <div className="text-4xl mb-3">{icon}</div>
+                <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Icon size={24} strokeWidth={1.8} />
+                </div>
                 <h3 className="font-extrabold text-slate-900 mb-2">{title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
               </div>
@@ -303,8 +312,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">For Nomads &amp; Founders</span>
-              <h2 className="text-2xl font-extrabold mt-1">🚀 Entrepreneur &amp; Digital Nomad Hub</h2>
+              <span className="text-xs font-bold uppercase tracking-widest text-sky-400">For Nomads &amp; Founders</span>
+              <h2 className="text-2xl font-extrabold mt-1">Entrepreneur &amp; Digital Nomad Hub</h2>
               <p className="text-slate-400 text-sm mt-1">Government loans, digital nomad visas, e-Residency, and EU funding programs</p>
             </div>
             <Link href="/programs" className="text-sky-400 hover:text-sky-300 font-semibold text-sm hidden sm:block">

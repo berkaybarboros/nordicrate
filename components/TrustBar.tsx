@@ -1,8 +1,11 @@
+import { BadgeCheck, Landmark, Activity, SearchCheck } from 'lucide-react';
+import { INSTITUTIONS } from '@/lib/data';
+
 const TRUST_ITEMS = [
-  { icon: '✓', label: 'Always Free', sub: 'No fees, ever', color: 'bg-emerald-100 text-emerald-600' },
-  { icon: '🏦', label: '50+ Banks', sub: 'All in one place', color: 'bg-sky-100 text-sky-600' },
-  { icon: '🔒', label: 'SSL Secured', sub: 'Bank-level encryption', color: 'bg-purple-100 text-purple-600' },
-  { icon: '✓', label: 'No Credit Impact', sub: 'Soft check only', color: 'bg-amber-100 text-amber-600' },
+  { Icon: BadgeCheck, label: 'Always free', sub: 'No fees for borrowers', color: 'bg-emerald-50 text-emerald-600' },
+  { Icon: Landmark, label: `${INSTITUTIONS.length}+ institutions`, sub: 'Banks, insurers, fintechs', color: 'bg-sky-50 text-sky-600' },
+  { Icon: Activity, label: 'Live market data', sub: 'ECB & Norges Bank feeds', color: 'bg-violet-50 text-violet-600' },
+  { Icon: SearchCheck, label: 'No credit impact', sub: 'Comparison only — no checks', color: 'bg-amber-50 text-amber-600' },
 ];
 
 const PARTNER_NAMES = [
@@ -17,10 +20,10 @@ export default function TrustBar() {
       <div className="max-w-7xl mx-auto">
         {/* Trust items */}
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-6">
-          {TRUST_ITEMS.map(({ icon, label, sub, color }) => (
+          {TRUST_ITEMS.map(({ Icon, label, sub, color }) => (
             <div key={label} className="flex items-center gap-2.5">
-              <span className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-sm font-bold shrink-0`}>
-                {icon}
+              <span className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center shrink-0`}>
+                <Icon size={17} strokeWidth={2} />
               </span>
               <div>
                 <p className="text-sm font-semibold text-slate-800 leading-none">{label}</p>
@@ -33,7 +36,7 @@ export default function TrustBar() {
         {/* Divider */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1 h-px bg-slate-100" />
-          <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Banks & institutions we compare</span>
+          <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Banks &amp; institutions we compare</span>
           <div className="flex-1 h-px bg-slate-100" />
         </div>
 
@@ -47,7 +50,7 @@ export default function TrustBar() {
               {name}
             </span>
           ))}
-          <span className="text-xs text-slate-400 font-medium self-center">& 40+ more</span>
+          <span className="text-xs text-slate-400 font-medium self-center">&amp; 40+ more</span>
         </div>
       </div>
     </section>

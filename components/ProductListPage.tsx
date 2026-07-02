@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Bell } from 'lucide-react';
 import type { LoanProduct, LoanType } from '@/lib/types';
-import { INSTITUTIONS, COUNTRIES } from '@/lib/data';
+import { INSTITUTIONS } from '@/lib/data';
 import { getInstitution, getCountry } from '@/lib/utils';
 import RateCard from './RateCard';
 import FilterSidebar, { type FilterState } from './FilterSidebar';
@@ -13,7 +13,8 @@ import RateAlertModal from './alerts/RateAlertModal';
 interface ProductListPageProps {
   title: string;
   subtitle: string;
-  icon: string;
+  /** Eski emoji ikon — Nordic Clarity redesign'da render edilmiyor, caller uyumluluğu için tutuluyor */
+  icon?: string;
   allProducts: LoanProduct[];
   availableLoanTypes?: LoanType[];
   defaultFilters?: Partial<FilterState>;
@@ -34,7 +35,6 @@ const DEFAULT_FILTERS: FilterState = {
 export default function ProductListPage({
   title,
   subtitle,
-  icon,
   allProducts,
   availableLoanTypes,
   defaultFilters,
@@ -103,8 +103,8 @@ export default function ProductListPage({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page header */}
       <div className="mb-8">
+        {/* icon prop görsel sadelik için artık render edilmiyor (Nordic Clarity) */}
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-3xl">{icon}</span>
           <h1 className="text-3xl font-extrabold text-slate-900">{title}</h1>
         </div>
         <div className="flex items-center gap-3 flex-wrap">

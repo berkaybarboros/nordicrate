@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Menu, X, LogIn, UserRound, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { LOCALE_NAMES, type Locale } from '@/locales';
 import { supabase } from '@/lib/supabase';
@@ -48,31 +48,31 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:bg-sky-400 transition-colors">
+            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:bg-sky-500 transition-colors">
               N
             </div>
-            <span className="text-xl font-bold tracking-tight">
-              Nordic<span className="text-sky-400">Rate</span>
+            <span className="text-xl font-bold tracking-tight text-slate-900">
+              Nordic<span className="text-sky-600">Rate</span>
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? 'bg-sky-600 text-white'
+                    ? 'bg-sky-50 text-sky-700'
                     : link.highlight
-                    ? 'text-amber-300 hover:text-white hover:bg-slate-800 border border-amber-600/40'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'text-sky-700 hover:bg-sky-50'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 {link.label}
@@ -80,37 +80,32 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right: language + badge + CTA */}
+          {/* Right: language + alert + auth */}
           <div className="hidden md:flex items-center gap-2">
             {/* Language switcher */}
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1 text-xs text-slate-300 border border-slate-700 hover:border-slate-500 rounded-lg px-2 py-1.5 transition-colors"
+                className="flex items-center gap-1.5 text-xs font-medium text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 rounded-lg px-2.5 py-1.5 transition-colors"
               >
                 <img
                   src={`https://flagcdn.com/20x15/${LOCALE_FLAG_CODES[locale]}.png`}
                   width={20} height={15} alt={locale}
                   className="rounded-sm object-cover"
                 />
-                <svg
-                  className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown size={12} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {langOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 min-w-[130px]">
+                <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden z-50 min-w-[130px]">
                   {LOCALES.map((loc) => (
                     <button
                       key={loc}
                       onClick={() => { setLocale(loc); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors text-left ${
                         locale === loc
-                          ? 'bg-sky-600 text-white'
-                          : 'text-slate-300 hover:bg-slate-700'
+                          ? 'bg-sky-50 text-sky-700 font-semibold'
+                          : 'text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       <img
@@ -128,31 +123,26 @@ export default function Header() {
             {/* Rate Alert bell */}
             <button
               onClick={() => setAlertOpen(true)}
-              className="flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-100 border border-amber-500/30 hover:border-amber-400/60 hover:bg-amber-500/10 rounded-xl px-3 py-1.5 transition-all group"
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-sky-700 border border-slate-200 hover:border-sky-200 hover:bg-sky-50 rounded-lg px-3 py-1.5 transition-all"
               title="Get notified when rates drop"
             >
-              <Bell size={13} className="group-hover:animate-bounce" />
+              <Bell size={13} />
               Rate Alert
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             </button>
 
-            <span className="text-xs bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded px-2 py-1 font-medium">
-              {t.nav.updatedDaily}
-            </span>
-
             {user ? (
-              <div className="flex items-center gap-2.5 ml-1">
-                <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              <div className="flex items-center gap-2 ml-1">
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                  <div className="w-6 h-6 rounded-full bg-sky-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
                   </div>
-                  <span className="text-xs text-slate-200 font-medium truncate max-w-[100px]">
+                  <span className="text-xs text-slate-700 font-medium truncate max-w-[100px]">
                     {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
                   </span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-xs text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 rounded-xl px-3 py-1.5 transition-all"
+                  className="text-xs text-slate-500 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-lg px-3 py-1.5 transition-all"
                 >
                   Sign out
                 </button>
@@ -161,32 +151,27 @@ export default function Header() {
               <div className="flex items-center gap-2 ml-1">
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 hover:bg-slate-800 rounded-xl px-3 py-1.5 transition-all"
+                  className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg px-3 py-1.5 transition-all"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <LogIn size={13} />
                   Sign in
                 </Link>
                 <Link
                   href="/register"
-                  className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-sky-900/50 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white"
+                  className="text-xs font-bold px-4 py-2 rounded-lg transition-colors bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
                   Get started
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile right: user icon + hamburger grouped together */}
+          {/* Mobile right: user icon + hamburger */}
           <div className="md:hidden flex items-center gap-1">
             {user ? (
               <button
                 onClick={() => setMenuOpen(true)}
-                className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold"
+                className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white text-xs font-bold"
                 aria-label="Account"
               >
                 {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
@@ -194,33 +179,25 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 aria-label="Sign in"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <UserRound size={20} />
               </Link>
             )}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
-            aria-label="Toggle menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-          </div>{/* end mobile right group */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden pb-4 border-t border-slate-800 mt-1 pt-3 space-y-1">
+          <div className="md:hidden pb-4 border-t border-slate-100 mt-1 pt-3 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -228,10 +205,10 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? 'bg-sky-600 text-white'
+                    ? 'bg-sky-50 text-sky-700'
                     : link.highlight
-                    ? 'text-amber-300 hover:text-white hover:bg-slate-800'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'text-sky-700 hover:bg-sky-50'
+                    : 'text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 {link.label}
@@ -241,11 +218,10 @@ export default function Header() {
             {/* Mobile Rate Alert */}
             <button
               onClick={() => { setAlertOpen(true); setMenuOpen(false); }}
-              className="mx-4 flex items-center justify-center gap-2 w-full border border-amber-500/40 text-amber-300 text-sm font-semibold py-2.5 rounded-xl transition-colors hover:bg-amber-500/10"
+              className="mx-4 flex items-center justify-center gap-2 w-[calc(100%-2rem)] border border-slate-200 text-slate-700 text-sm font-semibold py-2.5 rounded-xl transition-colors hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200"
             >
               <Bell size={15} />
               Get Rate Drop Alert
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             </button>
 
             {/* Mobile language switcher */}
@@ -256,8 +232,8 @@ export default function Header() {
                   onClick={() => setLocale(loc)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                     locale === loc
-                      ? 'bg-sky-600 border-sky-500 text-white'
-                      : 'border-slate-700 text-slate-400 hover:border-slate-500'
+                      ? 'bg-sky-50 border-sky-200 text-sky-700'
+                      : 'border-slate-200 text-slate-500 hover:border-slate-300'
                   }`}
                 >
                   <img
@@ -274,11 +250,11 @@ export default function Header() {
               {user ? (
                 <>
                   <div className="flex items-center gap-2.5 px-1 py-1">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                       {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm text-white font-medium leading-tight">
+                      <p className="text-sm text-slate-900 font-medium leading-tight">
                         {user.user_metadata?.full_name ?? user.email?.split('@')[0]}
                       </p>
                       <p className="text-xs text-slate-500 leading-tight">{user.email}</p>
@@ -286,7 +262,7 @@ export default function Header() {
                   </div>
                   <button
                     onClick={() => { handleLogout(); setMenuOpen(false); }}
-                    className="block w-full border border-red-500/30 text-red-400 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-red-500/10"
+                    className="block w-full border border-red-200 text-red-600 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-red-50"
                   >
                     Sign out
                   </button>
@@ -296,21 +272,16 @@ export default function Header() {
                   <Link
                     href="/login"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full border border-slate-700 text-slate-300 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-800"
+                    className="flex items-center justify-center gap-2 w-full border border-slate-200 text-slate-700 text-sm font-medium py-2.5 rounded-xl text-center transition-colors hover:bg-slate-50"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <LogIn size={15} />
                     Sign in
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-all shadow-lg shadow-sky-900/40"
+                    className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
                     Get started
                   </Link>
                 </>
