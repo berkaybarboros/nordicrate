@@ -38,10 +38,15 @@ const APRC_PATTERNS = [
   /krediidi kulukuse m[aä]{1,2}r[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
 ];
 
+// Faiz yerine ücret yakalamayı önler ("Contract fee 2% of loan sum" gibi)
+const FEE_WORDS = /fee|contract|service|tasu|lepingutasu|haldustasu|penalty|viivis/i;
+
 function extract(text, patterns) {
   for (const re of patterns) {
     const m = text.match(re);
     if (!m) continue;
+    // Keyword ile değer arasındaki metinde ücret kelimesi varsa bu bir fee'dir, faiz değil
+    if (FEE_WORDS.test(m[0])) continue;
     const value = parseFloat(m[1].replace(',', '.'));
     // Sanity: kredi faizi 0.5–35% aralığı dışındaysa parse hatası say
     if (!Number.isFinite(value) || value < 0.5 || value > 35) continue;
