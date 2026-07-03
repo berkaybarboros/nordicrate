@@ -15,7 +15,6 @@
  */
 
 import { chromium } from 'playwright';
-import { createClient } from '@supabase/supabase-js';
 
 const BANK_ID = 'lhv';
 
@@ -57,16 +56,31 @@ function extract(text, patterns) {
   return null;
 }
 
+// supabase-js yerine doğrudan PostgREST — Node 20'de ws bağımlılığı yok, Realtime gereksiz
+async function insertRow(url, key, row) {
+  const res = await fetch(`${url}/rest/v1/scraped_rates`, {
+    method: 'POST',
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(row),
+  });
+  if (!res.ok) {
+    throw new Error(`Supabase insert: HTTP ${res.status} — ${await res.text()}`);
+  }
+}
+
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   // Key yoksa dry-run: scrape + parse çalışır, DB yazımı atlanır.
-  // Böylece service key beklerken parsing pipeline'ı test edilebilir.
   const dryRun = !url || !key;
   if (dryRun) {
     console.warn('[scraper] DRY RUN — SUPABASE_SERVICE_ROLE_KEY yok, sonuçlar DB\'ye yazılmayacak');
   }
-  const supabase = dryRun ? null : createClient(url, key, { auth: { persistSession: false } });
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ locale: 'en-GB' });
@@ -87,8 +101,8 @@ async function main() {
       const aprc = extract(text, APRC_PATTERNS);
       const parseOk = rate !== null;
 
-      if (supabase) {
-        const { error } = await supabase.from('scraped_rates').insert({
+      if (!dryRun) {
+        await insertRow(url, key, {
           bank_id:      BANK_ID,
           product_type: target.productType,
           rate_min:     rate?.value ?? null,
@@ -97,7 +111,6 @@ async function main() {
           raw_snippet:  rate?.snippet ?? text.slice(0, 300),
           parse_ok:     parseOk,
         });
-        if (error) throw new Error(`Supabase insert: ${error.message}`);
       }
 
       if (parseOk) {
