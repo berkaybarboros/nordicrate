@@ -54,11 +54,13 @@ function extract(text, patterns) {
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    console.error('[scraper] Missing NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
-    process.exit(1);
+  // Key yoksa dry-run: scrape + parse çalışır, DB yazımı atlanır.
+  // Böylece service key beklerken parsing pipeline'ı test edilebilir.
+  const dryRun = !url || !key;
+  if (dryRun) {
+    console.warn('[scraper] DRY RUN — SUPABASE_SERVICE_ROLE_KEY yok, sonuçlar DB\'ye yazılmayacak');
   }
-  const supabase = createClient(url, key, { auth: { persistSession: false } });
+  const supabase = dryRun ? null : createClient(url, key, { auth: { persistSession: false } });
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ locale: 'en-GB' });
@@ -74,17 +76,18 @@ async function main() {
       const aprc = extract(text, APRC_PATTERNS);
       const parseOk = rate !== null;
 
-      const { error } = await supabase.from('scraped_rates').insert({
-        bank_id:      BANK_ID,
-        product_type: target.productType,
-        rate_min:     rate?.value ?? null,
-        aprc:         aprc?.value ?? null,
-        source_url:   target.url,
-        raw_snippet:  rate?.snippet ?? text.slice(0, 300),
-        parse_ok:     parseOk,
-      });
-
-      if (error) throw new Error(`Supabase insert: ${error.message}`);
+      if (supabase) {
+        const { error } = await supabase.from('scraped_rates').insert({
+          bank_id:      BANK_ID,
+          product_type: target.productType,
+          rate_min:     rate?.value ?? null,
+          aprc:         aprc?.value ?? null,
+          source_url:   target.url,
+          raw_snippet:  rate?.snippet ?? text.slice(0, 300),
+          parse_ok:     parseOk,
+        });
+        if (error) throw new Error(`Supabase insert: ${error.message}`);
+      }
 
       if (parseOk) {
         console.log(`[scraper] OK — rate ${rate.value}%${aprc ? `, APRC ${aprc.value}%` : ''}`);
