@@ -19,10 +19,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const BANK_ID = 'lhv';
 
-// ⚠️ İlk çalıştırmadan önce URL'leri tarayıcıda doğrula — LHV site yapısı değişebilir.
+// URL'ler LHV EN nav'ından doğrulandı (2026-07-02)
 const TARGETS = [
-  { productType: 'personal', url: 'https://www.lhv.ee/en/small-loan' },
+  { productType: 'personal', url: 'https://www.lhv.ee/en/consumer-loan' },
   { productType: 'mortgage', url: 'https://www.lhv.ee/en/home-loan' },
+  { productType: 'auto',     url: 'https://www.lhv.ee/en/car-loan' },
 ];
 
 // Sayfa metninden oran çıkarma — EN + ET desenleri, en spesifikten genele
@@ -69,7 +70,12 @@ async function main() {
   for (const target of TARGETS) {
     try {
       console.log(`[scraper] ${BANK_ID}/${target.productType} → ${target.url}`);
-      await page.goto(target.url, { waitUntil: 'networkidle', timeout: 45_000 });
+      // networkidle bazı LHV sayfalarında hiç gelmiyor (sürekli analytics trafiği)
+      const resp = await page.goto(target.url, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      if (resp && resp.status() >= 400) {
+        throw new Error(`HTTP ${resp.status()} — URL değişmiş olabilir`);
+      }
+      await page.waitForTimeout(3000); // lazy içerik için
       const text = await page.evaluate(() => document.body.innerText);
 
       const rate = extract(text, RATE_PATTERNS);
