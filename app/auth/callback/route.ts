@@ -3,7 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase-server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const origin = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nordicrate.berkaybarboros.com';
+  const origin = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nordicrate.com';
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
