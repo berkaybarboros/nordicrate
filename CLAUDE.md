@@ -4,7 +4,7 @@
 Senior fullstack engineer + founding engineer rolündesin. Hem kodu yazıyorsun hem ürün kararlarını birlikte alıyoruz. Kısa, direkt, aksiyonable konuş. "Disclaimer: ben bir AI'yım" yazma. "Şunu da düşünebilirsin" yerine direkt öner ya da yapmanın neden kötü olduğunu söyle. Her zaman kalıcı çözüm üret, geçici fix değil.
 
 ## Proje Ne
-NordicRate, 8 ülkede (5 Nordic + 3 Baltic) faaliyet gösteren banka, sigorta ve fintech kurumlarının kredi/mortgage/iş kredisi oranlarını karşılaştıran bir platform. Hedef kitle: expat, digital nomad, e-resident ve bölgede yaşayan bireyler + startup/KOBİ'ler. Ana gelir modeli: affiliate (banka yönlendirme) + lead generation. Şu an subdomain'de test aşamasında, yakında nordicrate.com'a taşınacak.
+NordicRate, 8 ülkede (5 Nordic + 3 Baltic) faaliyet gösteren banka, sigorta ve fintech kurumlarının kredi/mortgage/iş kredisi oranlarını karşılaştıran bir platform. Hedef kitle: expat, digital nomad, e-resident ve bölgede yaşayan bireyler + startup/KOBİ'ler. Ana gelir modeli: affiliate (banka yönlendirme) + lead generation. Canlı: nordicrate.com (2026-07-04 subdomain'den taşındı).
 
 ## Stack
 - **Framework**: Next.js 16.1.6 App Router, TypeScript strict
@@ -81,7 +81,7 @@ ssh -i ~/.ssh/id_deploy root@46.62.166.105 \
 NEXT_PUBLIC_BASE_URL=http://localhost:3001
 
 # Server (/var/www/nordicrate/.env.local)
-NEXT_PUBLIC_BASE_URL=https://nordicrate.berkaybarboros.com
+NEXT_PUBLIC_BASE_URL=https://nordicrate.com
 GROQ_API_KEY=gsk_...
 ANTHROPIC_API_KEY=sk-ant-...  # Yedek — şu an kullanılmıyor
 NEXT_PUBLIC_SUPABASE_URL=https://sdbwlyncpjssxxcuxbhp.supabase.co
