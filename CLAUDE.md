@@ -131,7 +131,7 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 
 ## Aktif Bağlam
 **Son güncelleme**: 2026-07-02
-**Mevcut durum**: nordicrate.berkaybarboros.com canlıda, HTTPS çalışıyor. V3 sprint başladı.
+**Mevcut durum**: nordicrate.com canlıda (2026-07-04 taşındı; eski subdomain 301), HTTPS çalışıyor. V3 sprint başladı.
 **Bu sprint odağı**: V3 — backend security ✅ + admin funnel (B3) ✅; sıradaki: real data pipeline (D1 Playwright scraper), affiliate (Awin/LHV)
 **Tamamlananlar**:
 - ✅ ECB EURIBOR canlı veri (RT series key düzeltildi)
