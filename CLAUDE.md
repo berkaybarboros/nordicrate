@@ -122,7 +122,8 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 
 ## Güvenlik Katmanı (V3)
 - `lib/security.ts` — sliding-window rate limiter (in-memory, PM2 cluster'da worker başına ayrı sayaç) + input validators
-- Rate limitler (IP başına/dk): chat 20, compare-chat 15, profile 15, recommend 15, find-rate 10, alerts 5, admin-login 5
+- Rate limitler (IP başına/dk): chat 20, compare-chat 15, profile 15, recommend 15, find-rate 10, alerts 5, admin-login 5; katalog GET'leri (loans/insurance/deposits/rates) 60
+- Cron secret'ları timing-safe compare ile (`safeCompareSecret`); `/.well-known/security.txt` mevcut
 - Security headers → `next.config.ts` `headers()`: CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy
 - `/admin` — ADMIN_TOKEN korumalı lead funnel dashboard; cookie'de token'ın SHA-256 hash'i, timing-safe compare
 - `lib/supabase-admin.ts` — service-role client; ASLA client component'a import etme
@@ -144,8 +145,11 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 - ✅ `app/api/profile/route.ts` — konuşmadan profil çıkarımı
 
 **Devam Eden**:
-- 🔄 Katman 2: EligibilityPanel UI component'ı (henüz yazılmadı)
-- 🔄 AIAssistant.tsx'e profil tracking + panel entegrasyonu
+- 🔄 Domain go-live (nordicrate.com satın alma kullanıcıda; sonrası: DNS/NPM/env geçişi)
+- 🔄 Awin + LHV başvuruları (metinler hazır: docs/affiliate/basvuru-paketi.md — domain sonrası gönder)
+- 🔄 SEO kalan: /blog + country landing pages (ItemList+FAQ JSON-LD tamamlandı)
+
+**Not**: EligibilityPanel + ProgramMatchPanel TAMAMLANDI ve AIAssistant'a entegre (eski "yazılmadı" notu bayattı).
 
 **Sıradaki Katmanlar**:
 - Katman 3: Kurumsal mod derinleştirme (program matching logic)
