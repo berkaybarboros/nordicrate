@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, ExternalLink, ChevronRight, CheckCircle, ArrowLeft } from 'lucide-react';
 import { COUNTRIES } from '@/lib/data';
+import { buildGoLink } from '@/lib/affiliate';
 import { track, trackFindRateSubmit, trackRecommendationClick } from '@/lib/tracker';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -425,7 +426,7 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                       </div>
 
                       <a
-                        href={rec.applyUrl}
+                        href={buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: productType ?? undefined })}
                         target="_blank"
                         rel="noopener noreferrer sponsored"
                         onClick={() => {

@@ -5,7 +5,7 @@ import { InsuranceOffer } from "@/data/insurance";
 import BankLogo from "@/components/ui/BankLogo";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
-import { buildUTMLink } from "@/lib/utils";
+import { buildGoLink } from "@/lib/affiliate";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 
 interface Props {
@@ -26,11 +26,11 @@ export default function InsuranceOfferCard({ offer }: Props) {
   const compareFull = !inCompare && items.length >= MAX;
 
   const monthly = Math.round(offer.representativePremium / 12);
-  const quoteUrl = buildUTMLink(
-    offer.applyUrl || offer.websiteUrl,
-    offer.companyId,
-    `insurance-${offer.type}`
-  );
+  const quoteUrl = buildGoLink(offer.applyUrl || offer.websiteUrl, {
+    inst: offer.companyId,
+    pid: offer.id,
+    pt: `insurance-${offer.type}`,
+  });
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 hover:shadow-lg hover:border-[#1a3c6e]/20 transition-all">

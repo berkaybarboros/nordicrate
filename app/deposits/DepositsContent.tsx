@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { PiggyBank, Lock, TrendingUp, ExternalLink, BarChart2, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { buildGoLink } from "@/lib/affiliate";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
@@ -260,7 +261,7 @@ export default function DepositsContent() {
                   {/* CTA — <a> with real link */}
                   <div className="md:w-36 flex-shrink-0 space-y-1">
                     <a
-                      href={offer.applyUrl}
+                      href={buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: 'deposit' })}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
                       onClick={() => trackApplyClick(offer.id, 'deposit')}

@@ -3,7 +3,8 @@
 import { CheckCircle, Clock, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { LoanOffer } from "@/data/loans";
 import BankLogo from "@/components/ui/BankLogo";
-import { calculateMonthlyPayment, formatCurrency, calculateAPR, buildUTMLink } from "@/lib/utils";
+import { calculateMonthlyPayment, formatCurrency, calculateAPR } from "@/lib/utils";
+import { buildGoLink } from "@/lib/affiliate";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
@@ -36,7 +37,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
   const isEligible = amount >= offer.minAmount && amount <= offer.maxAmount &&
     termMonths >= offer.minTermMonths && termMonths <= offer.maxTermMonths;
 
-  const applyUrl = buildUTMLink(offer.applyUrl, offer.bankId, offer.type);
+  const applyUrl = buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: offer.type });
 
   return (
     <div className={`bg-white rounded-2xl border p-5 md:p-6 transition-all hover:shadow-lg ${!isEligible ? "opacity-60" : "border-gray-100 hover:border-[#1a3c6e]/20"}`}>

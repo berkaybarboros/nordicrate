@@ -13,8 +13,8 @@ import {
   INSTITUTION_TYPE_LABELS,
   LOAN_TYPE_ICONS,
   calculateMonthlyPayment,
-  buildUTMLink,
 } from '@/lib/utils';
+import { buildGoLink } from '@/lib/affiliate';
 import { Smartphone, Globe2, AlertTriangle } from 'lucide-react';
 import CountryFlag from './CountryFlag';
 
@@ -31,8 +31,12 @@ export default function RateCard({ product, institution, country }: RateCardProp
   const repMonthly = calculateMonthlyPayment(repPrincipal, product.rateMin, repMonths);
   const repTotal = repMonthly * repMonths;
 
-  // UTM-tagged link to the institution's official website
-  const applyUrl = buildUTMLink(institution.website, institution.id, product.type);
+  // Affiliate gateway link — server-side tracked, UTM/Awin deeplink /go içinde eklenir
+  const applyUrl = buildGoLink(institution.website, {
+    inst: institution.id,
+    pid: product.id,
+    pt: product.type,
+  });
 
   return (
     <div
@@ -145,7 +149,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
           <a
             href={applyUrl}
             target={applyUrl !== '#' ? '_blank' : undefined}
-            rel={applyUrl !== '#' ? 'noopener noreferrer' : undefined}
+            rel={applyUrl !== '#' ? 'sponsored noopener noreferrer' : undefined}
             onClick={() => trackApplyClick(product.id, product.type)}
             className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-3 rounded-xl text-center transition-colors shadow-md shadow-sky-100 mb-2"
           >

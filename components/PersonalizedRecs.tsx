@@ -15,7 +15,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Sparkles, TrendingDown, TrendingUp, ExternalLink, RefreshCw, Users } from 'lucide-react';
-import { buildUTMLink } from '@/lib/utils';
+import { buildGoLink } from '@/lib/affiliate';
 import { trackRecommendationClick } from '@/lib/tracker';
 
 interface Recommendation {
@@ -220,7 +220,7 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
       {/* Recommendation cards */}
       <div className="space-y-3">
         {recommendations.map((rec, i) => {
-          const utmUrl = buildUTMLink(rec.applyUrl, rec.productId, `${productType}-personalized-rank${rec.rank}`);
+          const utmUrl = buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: `${productType}-personalized-rank${rec.rank}` });
           return (
             <div
               key={rec.productId}
