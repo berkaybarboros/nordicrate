@@ -8,6 +8,19 @@
  */
 
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
+
+/**
+ * Timing-safe secret karşılaştırması — cron secret'ları ve token'lar için.
+ * Düz !== karşılaştırması teoride timing attack'e açıktır.
+ */
+export function safeCompareSecret(provided: string | null, expected: string | undefined): boolean {
+  if (!provided || !expected) return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
 
 // ─── Rate limiter ────────────────────────────────────────────────────────────
 

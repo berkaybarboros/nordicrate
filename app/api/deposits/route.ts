@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deposits } from "@/data/insurance";
+import { enforceRateLimit } from "@/lib/security";
 
 export async function GET(request: NextRequest) {
+  // Statik katalog — cömert limit, sadece scraping/enum abuse'a karşı
+  const limited = enforceRateLimit(request, 'catalog-deposits', 60);
+  if (limited) return limited;
+
   const searchParams = request.nextUrl.searchParams;
 
   const amount = Number(searchParams.get("amount")) || 10000;

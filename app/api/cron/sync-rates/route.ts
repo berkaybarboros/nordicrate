@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { safeCompareSecret } from '@/lib/security';
 import { createSupabaseServer } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
@@ -67,7 +68,7 @@ async function fetchNorgesRate(): Promise<{ rate: number; period: string } | nul
 export async function POST(req: NextRequest) {
   // Secret kontrolü
   const secret = req.headers.get('x-cron-secret');
-  if (secret !== process.env.CRON_SECRET) {
+  if (!safeCompareSecret(secret, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -119,7 +120,7 @@ export async function POST(req: NextRequest) {
 // VPS health check
 export async function GET(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret');
-  if (secret !== process.env.CRON_SECRET) {
+  if (!safeCompareSecret(secret, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   return NextResponse.json({ ok: true, job: 'sync-rates' });

@@ -2,6 +2,8 @@ import { PRODUCTS } from '@/lib/data';
 import ProductListPage from '@/components/ProductListPage';
 import type { FilterState } from '@/components/FilterSidebar';
 import type { CountryCode } from '@/lib/types';
+import { buildProductsItemList } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
   title: 'Personal Loans – NordicRate | Compare Nordic & Baltic Rates',
@@ -21,6 +23,8 @@ export default async function LoansPage({ searchParams }: PageProps) {
   if (params.type)    defaultFilters.loanTypes  = [params.type as FilterState['loanTypes'][number]];
 
   return (
+    <>
+    <JsonLd data={buildProductsItemList(products, 'Personal & Consumer Loans — Nordic & Baltic', '/loans')} />
     <ProductListPage
       title="Personal & Consumer Loans"
       subtitle={`Compare ${products.length} personal loan and auto finance products from Nordic & Baltic banks and insurance companies.`}
@@ -30,5 +34,6 @@ export default async function LoansPage({ searchParams }: PageProps) {
       defaultFilters={defaultFilters}
       alertProduct="personal-loan"
     />
+    </>
   );
 }

@@ -1,5 +1,7 @@
 import { PRODUCTS } from '@/lib/data';
 import ProductListPage from '@/components/ProductListPage';
+import { buildProductsItemList } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
   title: 'Business Loans – NordicRate | Corporate Credit in Nordic & Baltic',
@@ -10,6 +12,8 @@ export default function BusinessPage() {
   const products = PRODUCTS.filter((p) => p.type === 'business');
 
   return (
+    <>
+    <JsonLd data={buildProductsItemList(products, 'Business & Corporate Loans — Nordic & Baltic', '/business')} />
     <ProductListPage
       title="Business & Corporate Loans"
       subtitle={`Compare ${products.length} business credit products for SMEs and large corporations across Nordic & Baltic markets.`}
@@ -19,5 +23,6 @@ export default function BusinessPage() {
       defaultFilters={{ customerType: 'corporate' }}
       alertProduct="personal-loan"
     />
+    </>
   );
 }

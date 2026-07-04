@@ -8,6 +8,7 @@ import {
   lifeInsurance,
 } from "@/data/insurance";
 import type { InsuranceOffer } from "@/data/insurance";
+import { enforceRateLimit } from "@/lib/security";
 
 const insuranceDataMap: Record<string, InsuranceOffer[]> = {
   motor:  motorInsurance,
@@ -22,6 +23,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ type: string }> }
 ) {
+  const limited = enforceRateLimit(request, 'catalog-insurance', 60);
+  if (limited) return limited;
+
   const { type } = await params;
   const searchParams = request.nextUrl.searchParams;
 

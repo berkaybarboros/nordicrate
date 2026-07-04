@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { personalLoans, mortgageLoans, carLoans } from "@/data/loans";
 import type { LoanOffer } from "@/data/loans";
+import { enforceRateLimit } from "@/lib/security";
 
 const loanDataMap: Record<string, LoanOffer[]> = {
   personal: personalLoans,
@@ -12,6 +13,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ type: string }> }
 ) {
+  const limited = enforceRateLimit(request, 'catalog-loans', 60);
+  if (limited) return limited;
+
   const { type } = await params;
   const searchParams = request.nextUrl.searchParams;
 

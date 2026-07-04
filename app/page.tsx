@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
+import { FAQS } from '@/lib/faq-data';
+import { buildFaqJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 import { PROGRAMS } from '@/lib/programs-data';
 import { getCountryStats, getInstitution, getCountry, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
 import RateCard from '@/components/RateCard';
@@ -33,6 +36,7 @@ export default function HomePage() {
 
   return (
     <div>
+      <JsonLd data={buildFaqJsonLd(FAQS)} />
 
       {/* ========== HERO — 2-column layout ========== */}
       <section className="relative bg-slate-950 text-white overflow-hidden">
