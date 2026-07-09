@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import type { ChatMessage } from '@/app/api/chat/route';
 import type { AssistantMode, OnboardingContext } from '@/lib/ai-context';
 import type { UserProfile, EligibilityResult } from '@/lib/profile';
@@ -444,7 +445,7 @@ export default function AIAssistant() {
               ×
             </button>
             <div className="flex items-start gap-2">
-              <span className="text-lg shrink-0">🤖</span>
+              <Image src="/nordicai.png" alt="NordicAI" width={32} height={32} className="shrink-0 rounded-full" />
               <div>
                 <p className="text-xs font-bold text-gray-800">NordicAI</p>
                 <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
@@ -510,9 +511,7 @@ export default function AIAssistant() {
           {/* Header */}
           <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-sm">
-                🤖
-              </div>
+              <Image src="/nordicai.png" alt="NordicAI" width={32} height={32} className="rounded-full bg-white" />
               <div>
                 <p className="text-white font-bold text-sm leading-none">NordicAI</p>
                 <p className="text-slate-400 text-xs mt-0.5">Credit & Loan Assistant</p>
