@@ -17,12 +17,12 @@ export const metadata: Metadata = {
     "life insurance Estonia",
     "CASCO Estonia",
   ],
-  alternates: { canonical: "https://balticrate.ee/insurance" },
+  alternates: { canonical: "https://nordicrate.com/insurance" },
   openGraph: {
-    title: "Insurance Estonia | Compare All Types | BalticRate",
+    title: "Insurance Estonia | Compare All Types | NordicRate",
     description:
       "Compare motor, CASCO, home, health, travel and life insurance in Estonia from all major insurers.",
-    url: "https://balticrate.ee/insurance",
+    url: "https://nordicrate.com/insurance",
     type: "website",
   },
 };
@@ -186,7 +186,7 @@ export default function InsurancePage() {
           </div>
           <p className="text-xs text-gray-400 mt-4 pt-4 border-t border-gray-50">
             All insurers are regulated by Finantsinspektsioon (Estonian Financial Supervision
-            Authority). BalticRate is an independent comparison service.
+            Authority). NordicRate is an independent comparison service.
           </p>
         </div>
 

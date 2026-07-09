@@ -319,7 +319,7 @@ export default function TravelInsuranceContent() {
               <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
                 Premiums shown are indicative annual prices. Exact premium depends on trip duration,
                 age, destination and declared activities. All insurers are licensed by
-                Finantsinspektsioon. BalticRate is a comparison service — we do not sell insurance
+                Finantsinspektsioon. NordicRate is a comparison service — we do not sell insurance
                 directly.
               </p>
             )}

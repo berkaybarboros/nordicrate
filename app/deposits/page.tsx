@@ -15,12 +15,12 @@ export const metadata: Metadata = {
     "Swedbank deposit Estonia",
     "fixed deposit Estonia",
   ],
-  alternates: { canonical: "https://balticrate.ee/deposits" },
+  alternates: { canonical: "https://nordicrate.com/deposits" },
   openGraph: {
-    title: "Time Deposits Estonia | Up to 4.3% p.a. | BalticRate",
+    title: "Time Deposits Estonia | Up to 4.3% p.a. | NordicRate",
     description:
       "Compare term deposits from Bigbank, LHV, Swedbank, SEB, Coop. Earn up to 4.3% p.a. DGSD-protected.",
-    url: "https://balticrate.ee/deposits",
+    url: "https://nordicrate.com/deposits",
     type: "website",
   },
 };
@@ -31,12 +31,12 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
         {
           "@type": "ListItem",
           position: 2,
           name: "Deposits",
-          item: "https://balticrate.ee/deposits",
+          item: "https://nordicrate.com/deposits",
         },
       ],
     },
@@ -44,7 +44,7 @@ const jsonLd = {
       "@type": "ItemList",
       name: "Term Deposits in Estonia — Best Rates 2026",
       description: "Compare fixed-term deposit rates from Estonian banks. Updated daily.",
-      url: "https://balticrate.ee/deposits",
+      url: "https://nordicrate.com/deposits",
       numberOfItems: 5,
       itemListElement: [
         {
@@ -84,8 +84,8 @@ const jsonLd = {
       name: "Term Deposits in Estonia",
       description:
         "Fixed-term savings deposits from Estonian banks. DGSD-protected up to €100,000.",
-      url: "https://balticrate.ee/deposits",
-      provider: { "@type": "Organization", name: "BalticRate" },
+      url: "https://nordicrate.com/deposits",
+      provider: { "@type": "Organization", name: "NordicRate" },
       interestRate: "4.3",
       currency: "EUR",
       amount: { "@type": "MonetaryAmount", currency: "EUR", minValue: 100, maxValue: 1000000 },

@@ -308,6 +308,7 @@ export default function AIAssistant() {
         signal: abortRef.current.signal,
       });
 
+      if (res.status === 429) throw new Error('rate_limited');
       if (!res.ok) throw new Error('API error');
 
       const reader = res.body?.getReader();
@@ -351,10 +352,13 @@ export default function AIAssistant() {
       }
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
+        const friendly = err.message === 'rate_limited'
+          ? '⏳ NordicAI is at capacity right now — please wait ~30 seconds and send your message again.'
+          : '⚠️ Something went wrong. Please try again.';
         setMessages(prev =>
           prev.map(m =>
             m.id === assistantId
-              ? { ...m, content: '⚠️ Something went wrong. Please try again.' }
+              ? { ...m, content: friendly }
               : m
           )
         );

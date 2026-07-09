@@ -37,11 +37,33 @@ export default function Header() {
     router.refresh();
   }
 
-  const navLinks = [
-    { href: '/loans',     label: t.nav.loans },
-    { href: '/mortgage',  label: t.nav.mortgage },
-    { href: '/business',  label: t.nav.business },
-    { href: '/insurance', label: t.nav.insurance },
+  // Sitemap kategori mimarisi: 2 ana kategori dropdown + 3 düz link
+  interface NavChild { href: string; label: string }
+  interface NavItem { href: string; label: string; highlight?: boolean; children?: NavChild[] }
+
+  const navLinks: NavItem[] = [
+    {
+      href: '/loans',
+      label: t.nav.loans,
+      children: [
+        { href: '/loans/personal', label: 'Personal Loans' },
+        { href: '/mortgage',       label: 'Mortgage' },
+        { href: '/loans/car',      label: 'Car Loans' },
+        { href: '/business',       label: 'Business Loans' },
+      ],
+    },
+    {
+      href: '/insurance',
+      label: t.nav.insurance,
+      children: [
+        { href: '/insurance/motor',  label: 'Motor (MTPL)' },
+        { href: '/insurance/casco',  label: 'CASCO' },
+        { href: '/insurance/home',   label: 'Home' },
+        { href: '/insurance/health', label: 'Health' },
+        { href: '/insurance/travel', label: 'Travel' },
+        { href: '/insurance/life',   label: 'Life' },
+      ],
+    },
     { href: '/deposits',  label: t.nav.deposits },
     { href: '/countries', label: t.nav.countries },
     { href: '/startup',   label: t.nav.programs, highlight: true },
@@ -61,23 +83,60 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav — kategori dropdown'ları hover + focus-within (klavye) ile açılır */}
           <nav className="hidden md:flex items-center gap-0.5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? 'bg-sky-50 text-sky-700'
-                    : link.highlight
-                    ? 'text-sky-700 hover:bg-sky-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href ||
+                (link.children?.some((c) => pathname === c.href) ?? false);
+              const baseClass = `flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-sky-50 text-sky-700'
+                  : link.highlight
+                  ? 'text-sky-700 hover:bg-sky-50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`;
+
+              if (!link.children) {
+                return (
+                  <Link key={link.href} href={link.href} className={baseClass}>
+                    {link.label}
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={link.href} className="relative group">
+                  <Link href={link.href} className={baseClass}>
+                    {link.label}
+                    <ChevronDown size={12} className="text-slate-400 group-hover:rotate-180 transition-transform" />
+                  </Link>
+                  <div className="absolute left-0 top-full pt-1 hidden group-hover:block group-focus-within:block z-50">
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 min-w-[190px]">
+                      <Link
+                        href={link.href}
+                        className="block px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                      >
+                        All {link.label}
+                      </Link>
+                      <div className="h-px bg-slate-100 my-1" />
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={`block px-4 py-2 text-sm transition-colors ${
+                            pathname === child.href
+                              ? 'text-sky-700 bg-sky-50 font-medium'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </nav>
 
           {/* Right: language + alert + auth */}
@@ -195,25 +254,55 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu — kategoriler başlık + alt linkler grid (mobile-first: büyük dokunma hedefleri) */}
         {menuOpen && (
           <div className="md:hidden pb-4 border-t border-slate-100 mt-1 pt-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? 'bg-sky-50 text-sky-700'
-                    : link.highlight
-                    ? 'text-sky-700 hover:bg-sky-50'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) =>
+              link.children ? (
+                <div key={link.href} className="px-1">
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`block px-3 py-2.5 rounded-lg text-sm font-bold transition-colors ${
+                      pathname === link.href ? 'bg-sky-50 text-sky-700' : 'text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                  <div className="grid grid-cols-2 gap-1 px-2 pb-1">
+                    {link.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                          pathname === child.href
+                            ? 'bg-sky-50 text-sky-700 font-medium'
+                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    pathname === link.href
+                      ? 'bg-sky-50 text-sky-700'
+                      : link.highlight
+                      ? 'text-sky-700 hover:bg-sky-50'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
 
             {/* Mobile Rate Alert */}
             <button

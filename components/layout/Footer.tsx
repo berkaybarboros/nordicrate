@@ -60,7 +60,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail size={14} className="text-[#f97316] flex-shrink-0" />
-                <span>info@balticrate.ee</span>
+                <span>info@nordicrate.com</span>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin size={14} className="text-[#f97316] flex-shrink-0 mt-0.5" />
@@ -82,7 +82,7 @@ export default function Footer() {
 
         {/* Legal */}
         <div className="border-t border-white/10 mt-6 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/40">
-          <p>© 2026 BalticRate OÜ. {t.footer.rights} Registration: 16XXXXXX</p>
+          <p>© 2026 NordicRate OÜ. {t.footer.rights} Registration: 16XXXXXX</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-white/70 transition">{t.footer.privacy}</Link>
             <Link href="/terms" className="hover:text-white/70 transition">Terms of Use</Link>

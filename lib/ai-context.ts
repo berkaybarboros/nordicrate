@@ -21,7 +21,15 @@ function formatProduct(p: typeof PRODUCTS[0]) {
   return `  - ${inst?.shortName} (${country?.flag}${country?.code}): ${p.name}, APR ${p.rateMin}%–${p.rateMax}%, ${p.currency} ${(p.limitMin/1000).toFixed(0)}k–${(p.limitMax/1000).toFixed(0)}k, term ${p.termMin}–${p.termMax}mo${p.collateralRequired ? ', collateral req.' : ''}${eRes}${digital}${website}`;
 }
 
-function buildDataContext(liveRates?: LiveRatesData): string {
+/**
+ * Kompakt data context — Groq on-demand tier TPM limiti 12k token/dk.
+ * Eski hali TÜM kataloğu (~8.8k token) her istekte gönderiyordu → 3. mesajda
+ * rate_limit_exceeded patlıyordu. Şimdi: mode'a göre sadece ilgili ürün tipleri,
+ * tip başına en iyi TOP_N ürün + kalanı özet satır. Hedef: ~2.5k token/istek.
+ */
+const TOP_N = 8;
+
+function buildDataContext(mode: AssistantMode, liveRates?: LiveRatesData): string {
   // Live rates block
   let liveRatesBlock = '';
   if (liveRates?.success) {
@@ -31,54 +39,56 @@ function buildDataContext(liveRates?: LiveRatesData): string {
       .join('\n');
     liveRatesBlock = `
 LIVE MARKET RATES (as of ${new Date(liveRates.fetchedAt).toLocaleDateString('en-GB')}):
-  EURIBOR 3M:  ${euribor3m.rate}% (${euribor3m.period})
-  EURIBOR 6M:  ${euribor6m.rate}% (${euribor6m.period})
-  EURIBOR 12M: ${euribor12m.rate}% (${euribor12m.period})
+  EURIBOR 3M: ${euribor3m.rate}% | 6M: ${euribor6m.rate}% | 12M: ${euribor12m.rate}%
 CENTRAL BANK RATES:
 ${cbRates}
-NOTE: Variable-rate mortgages in Nordic/Baltic countries are typically EURIBOR + bank margin (0.5%–2.5%).`;
+NOTE: Variable-rate mortgages are typically EURIBOR + bank margin (0.5%–2.5%).`;
   }
 
-  // Country summary
+  // Country summary (kompakt — her zaman dahil, coğrafi soruların bel kemiği)
   const countryLines = COUNTRIES.map(c => {
     const insts = INSTITUTIONS.filter(i => i.country === c.code);
     const prods = PRODUCTS.filter(p => INSTITUTIONS.find(i => i.id === p.institutionId)?.country === c.code);
     const personalMin = prods.filter(p => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin)[0];
     const mortgageMin = prods.filter(p => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin)[0];
     const businessMin = prods.filter(p => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin)[0];
-    return `${c.flag} ${c.name} (${c.code}) | ${c.currency} | EU:${c.inEU} | Eurozone:${c.inEurozone} | ${insts.length} institutions | Best: personal from ${personalMin?.rateMin ?? 'N/A'}%, mortgage from ${mortgageMin?.rateMin ?? 'N/A'}%, business from ${businessMin?.rateMin ?? 'N/A'}%`;
+    return `${c.flag}${c.code} ${c.currency}${c.inEurozone ? '/€zone' : ''} | ${insts.length} inst | best: personal ${personalMin?.rateMin ?? '–'}%, mortgage ${mortgageMin?.rateMin ?? '–'}%, business ${businessMin?.rateMin ?? '–'}%`;
   }).join('\n');
 
-  // All products grouped by type
-  const allPersonal = [...PRODUCTS].filter(p => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin);
-  const allMortgage = [...PRODUCTS].filter(p => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin);
-  const allBusiness = [...PRODUCTS].filter(p => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin);
+  // Tip başına top-N + kalan özeti
+  const productBlock = (type: 'personal' | 'mortgage' | 'business', label: string) => {
+    const all = [...PRODUCTS].filter(p => p.type === type).sort((a, b) => a.rateMin - b.rateMin);
+    const top = all.slice(0, TOP_N).map(formatProduct).join('\n');
+    const rest = all.length > TOP_N
+      ? `\n  …plus ${all.length - TOP_N} more ${type} products (rates up to ${all[all.length - 1].rateMax}%) — full list at nordicrate.com`
+      : '';
+    return `TOP ${label} (best ${Math.min(TOP_N, all.length)} of ${all.length}, by APR):\n${top}${rest}`;
+  };
 
-  // Programs with full detail
-  const programLines = PROGRAMS.map(p =>
-    `  ${p.flag} [${p.country}] ${p.name} (${p.type}) — audience: ${p.audience.join(', ')}${p.maxAmount ? ` | max: ${p.maxAmount.toLocaleString()} ${p.currency}` : ''}${p.rateMin != null ? ` | rate: ${p.rateMin}%${p.rateMax ? `–${p.rateMax}%` : ''}` : ''} | ${p.description.slice(0, 120)}...`
-  ).join('\n');
+  // Mode'a göre sadece ilgili bloklar — personal mode'a business/program dökme
+  const productSections = mode === 'personal'
+    ? [productBlock('personal', 'PERSONAL LOANS'), productBlock('mortgage', 'MORTGAGES')]
+    : [productBlock('business', 'BUSINESS LOANS')];
+
+  // Programlar sadece corporate mode'da, kompakt formatta
+  let programsSection = '';
+  if (mode === 'corporate') {
+    const programLines = PROGRAMS.map(p =>
+      `  ${p.flag}[${p.country}] ${p.name} (${p.type})${p.maxAmount ? ` max ${(p.maxAmount / 1000).toFixed(0)}k ${p.currency}` : ''}${p.rateMin != null ? ` rate ${p.rateMin}${p.rateMax ? `–${p.rateMax}` : ''}%` : ''} — ${p.audience.join('/')}`
+    ).join('\n');
+    programsSection = `\nGOVERNMENT & EU PROGRAMS (${PROGRAMS.length}):\n${programLines}\n`;
+  }
 
   return `
 === NORDICRATE PLATFORM DATA ===
 ${liveRatesBlock}
 
-COUNTRIES (8 total — 5 Nordic + 3 Baltic):
+COUNTRIES (5 Nordic + 3 Baltic):
 ${countryLines}
 
-ALL PERSONAL LOANS (${allPersonal.length} products, sorted by lowest APR):
-${allPersonal.map(formatProduct).join('\n')}
-
-ALL MORTGAGE PRODUCTS (${allMortgage.length} products, sorted by lowest APR):
-${allMortgage.map(formatProduct).join('\n')}
-
-ALL BUSINESS LOANS (${allBusiness.length} products, sorted by lowest APR):
-${allBusiness.map(formatProduct).join('\n')}
-
-GOVERNMENT & SPECIAL PROGRAMS (${PROGRAMS.length} total):
-${programLines}
-
-PLATFORM STATS: ${INSTITUTIONS.length} institutions | ${PRODUCTS.length} loan products | ${PROGRAMS.length} government programs
+${productSections.join('\n\n')}
+${programsSection}
+PLATFORM STATS: ${INSTITUTIONS.length} institutions | ${PRODUCTS.length} loan products | ${PROGRAMS.length} programs
 `.trim();
 }
 
@@ -112,7 +122,7 @@ IMPORTANT: The user completed onboarding and shared the above preferences. Use t
 }
 
 export function buildSystemPrompt(mode: AssistantMode, liveRates?: LiveRatesData, topProgramsText?: string, onboarding?: OnboardingContext): string {
-  const data = buildDataContext(liveRates);
+  const data = buildDataContext(mode, liveRates);
 
   const sharedRules = `
 RESPONSE RULES:

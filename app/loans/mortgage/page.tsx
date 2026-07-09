@@ -15,12 +15,12 @@ export const metadata: Metadata = {
     "Swedbank mortgage Estonia",
     "SEB kodulaen",
   ],
-  alternates: { canonical: "https://balticrate.ee/loans/mortgage" },
+  alternates: { canonical: "https://nordicrate.com/loans/mortgage" },
   openGraph: {
-    title: "Mortgages Estonia | Compare Rates from 1.75% | BalticRate",
+    title: "Mortgages Estonia | Compare Rates from 1.75% | NordicRate",
     description:
       "Compare home loans from LHV, Swedbank, SEB, Luminor. Euribor + margin from 1.75%. Borrow up to €600,000.",
-    url: "https://balticrate.ee/loans/mortgage",
+    url: "https://nordicrate.com/loans/mortgage",
     type: "website",
   },
 };
@@ -31,13 +31,13 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
-        { "@type": "ListItem", position: 2, name: "Loans", item: "https://balticrate.ee/loans" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
+        { "@type": "ListItem", position: 2, name: "Loans", item: "https://nordicrate.com/loans" },
         {
           "@type": "ListItem",
           position: 3,
           name: "Mortgages",
-          item: "https://balticrate.ee/loans/mortgage",
+          item: "https://nordicrate.com/loans/mortgage",
         },
       ],
     },
@@ -46,8 +46,8 @@ const jsonLd = {
       name: "Mortgage Loans in Estonia",
       description:
         "Home loans from Estonian banks. Euribor + margin, up to 30 years, up to 85% LTV.",
-      url: "https://balticrate.ee/loans/mortgage",
-      provider: { "@type": "Organization", name: "BalticRate" },
+      url: "https://nordicrate.com/loans/mortgage",
+      provider: { "@type": "Organization", name: "NordicRate" },
       interestRate: "1.75",
       loanTerm: "P240M",
       currency: "EUR",

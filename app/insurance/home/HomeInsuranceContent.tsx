@@ -149,7 +149,7 @@ export default function HomeInsuranceContent() {
 
             <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
               Home insurance premiums depend on the property size, location, construction type and
-              selected coverage level. All insurers are licensed by Finantsinspektsioon. BalticRate is a
+              selected coverage level. All insurers are licensed by Finantsinspektsioon. NordicRate is a
               comparison service — we do not provide insurance directly.
             </p>
           </div>

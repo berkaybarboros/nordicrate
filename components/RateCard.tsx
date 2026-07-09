@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import type { LoanProduct, Institution, CountryInfo } from '@/lib/types';
 import { trackApplyClick } from '@/lib/tracker';
 import {
@@ -25,6 +26,8 @@ interface RateCardProps {
 }
 
 export default function RateCard({ product, institution, country }: RateCardProps) {
+  // Mount anı — render içinde Date.now() impure sayılır (react-compiler kuralı)
+  const [mountedAt] = useState(() => Date.now());
   // Representative example: €10,000 over 60 months at product's min rate
   const repPrincipal = Math.min(10000, product.limitMax);
   const repMonths = Math.min(60, product.termMax);
@@ -156,12 +159,15 @@ export default function RateCard({ product, institution, country }: RateCardProp
             Apply Now →
           </a>
           <div className="flex items-center justify-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {new Date(product.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
-            </span>
+            {/* Tarih chip'i sadece taze veride (90 gün) — bayat "19 Nov 25" görünümü güven zedeler */}
+            {mountedAt - new Date(product.updatedAt).getTime() < 90 * 86400000 && (
+              <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verified {new Date(product.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+              </span>
+            )}
             {institution.isDigitalFriendly && (
               <span className="inline-flex items-center gap-1 text-xs text-sky-600 bg-sky-50 border border-sky-100 rounded-full px-2 py-0.5 font-medium">
                 <Smartphone size={10} /> 100% Online

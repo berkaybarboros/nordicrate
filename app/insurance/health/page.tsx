@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CategorySeoBlock from "@/components/seo/CategorySeoBlock";
 import HealthContent from "./HealthContent";
 
 export const metadata: Metadata = {
@@ -14,12 +15,12 @@ export const metadata: Metadata = {
     "ERGO tervisekindlustus",
     "expat health insurance Estonia",
   ],
-  alternates: { canonical: "https://balticrate.ee/insurance/health" },
+  alternates: { canonical: "https://nordicrate.com/insurance/health" },
   openGraph: {
-    title: "Health Insurance Estonia | Compare Private Plans | BalticRate",
+    title: "Health Insurance Estonia | Compare Private Plans | NordicRate",
     description:
       "Compare private health insurance from If, ERGO, Gjensidige. Access private clinics, dental and mental health coverage.",
-    url: "https://balticrate.ee/insurance/health",
+    url: "https://nordicrate.com/insurance/health",
     type: "website",
   },
 };
@@ -28,18 +29,18 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
     {
       "@type": "ListItem",
       position: 2,
       name: "Insurance",
-      item: "https://balticrate.ee/insurance",
+      item: "https://nordicrate.com/insurance",
     },
     {
       "@type": "ListItem",
       position: 3,
       name: "Health Insurance",
-      item: "https://balticrate.ee/insurance/health",
+      item: "https://nordicrate.com/insurance/health",
     },
   ],
 };
@@ -52,6 +53,7 @@ export default function HealthInsurancePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HealthContent />
+      <CategorySeoBlock slug="health" />
     </>
   );
 }

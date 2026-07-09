@@ -14,12 +14,12 @@ export const metadata: Metadata = {
     "LHV autolaen",
     "Swedbank car loan",
   ],
-  alternates: { canonical: "https://balticrate.ee/loans/car" },
+  alternates: { canonical: "https://nordicrate.com/loans/car" },
   openGraph: {
-    title: "Car Loans Estonia | From 8.9% p.a. | BalticRate",
+    title: "Car Loans Estonia | From 8.9% p.a. | NordicRate",
     description:
       "Compare car finance from Estonian banks. €3,000–€60,000, up to 84 months. Rates from 8.9%.",
-    url: "https://balticrate.ee/loans/car",
+    url: "https://nordicrate.com/loans/car",
     type: "website",
   },
 };
@@ -30,13 +30,13 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
-        { "@type": "ListItem", position: 2, name: "Loans", item: "https://balticrate.ee/loans" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
+        { "@type": "ListItem", position: 2, name: "Loans", item: "https://nordicrate.com/loans" },
         {
           "@type": "ListItem",
           position: 3,
           name: "Car Loans",
-          item: "https://balticrate.ee/loans/car",
+          item: "https://nordicrate.com/loans/car",
         },
       ],
     },
@@ -44,8 +44,8 @@ const jsonLd = {
       "@type": "FinancialProduct",
       name: "Car Loans in Estonia",
       description: "Vehicle finance from Estonian banks for new and used cars.",
-      url: "https://balticrate.ee/loans/car",
-      provider: { "@type": "Organization", name: "BalticRate" },
+      url: "https://nordicrate.com/loans/car",
+      provider: { "@type": "Organization", name: "NordicRate" },
       interestRate: "8.9",
       loanTerm: "P48M",
       currency: "EUR",

@@ -160,7 +160,7 @@ export default function HealthContent() {
 
             <p className="text-xs text-gray-400 text-center py-4">
               Health insurance is voluntary in Estonia. Premiums vary by age, health status and selected
-              coverage level. All insurers licensed by Finantsinspektsioon. BalticRate is a comparison service.
+              coverage level. All insurers licensed by Finantsinspektsioon. NordicRate is a comparison service.
             </p>
           </div>
         </div>

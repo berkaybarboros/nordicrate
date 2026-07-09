@@ -2,7 +2,8 @@
 
 import type { CountryCode, InstitutionType, LoanType, CustomerType, Region } from '@/lib/types';
 import { COUNTRIES } from '@/lib/data';
-import { LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
+import { LOAN_TYPE_LABELS } from '@/lib/utils';
+import CountryFlag from './CountryFlag';
 
 export interface FilterState {
   region: Region | 'all';
@@ -22,12 +23,21 @@ interface FilterSidebarProps {
 }
 
 const INSTITUTION_TYPE_OPTIONS: { value: InstitutionType; label: string }[] = [
-  { value: 'bank', label: '🏦 Bank' },
-  { value: 'insurance', label: '🛡️ Insurance' },
-  { value: 'cooperative', label: '🤝 Cooperative' },
-  { value: 'fintech', label: '📱 Fintech' },
-  { value: 'government', label: '🏛️ Government' },
+  { value: 'bank', label: 'Bank' },
+  { value: 'insurance', label: 'Insurance' },
+  { value: 'cooperative', label: 'Cooperative' },
+  { value: 'fintech', label: 'Fintech' },
+  { value: 'government', label: 'Government' },
 ];
+
+/** Bölüm başlığı — tutarlı tipografi tek yerden */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">
+      {children}
+    </p>
+  );
+}
 
 export default function FilterSidebar({ filters, onChange, availableLoanTypes }: FilterSidebarProps) {
   const nordicCountries = COUNTRIES.filter((c) => c.region === 'nordic');
@@ -77,27 +87,75 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
   }
 
   const loanTypeOptions = (availableLoanTypes ?? (Object.keys(LOAN_TYPE_LABELS) as LoanType[]));
+  const activeCount =
+    filters.countries.length +
+    filters.institutionTypes.length +
+    filters.loanTypes.length +
+    (filters.customerType !== 'all' ? 1 : 0) +
+    (filters.amountMin > 0 ? 1 : 0) +
+    (filters.amountMax < 1000000 ? 1 : 0);
+
+  const countryChip = (c: (typeof COUNTRIES)[number]) => {
+    const active = filters.countries.includes(c.code);
+    return (
+      <button
+        key={c.code}
+        onClick={() => toggleCountry(c.code)}
+        aria-pressed={active}
+        className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-xs font-medium transition-colors ${
+          active
+            ? 'bg-sky-50 border-sky-300 text-sky-800'
+            : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+        }`}
+      >
+        <CountryFlag code={c.code} size={16} rounded="sm" />
+        {c.code}
+      </button>
+    );
+  };
 
   return (
     <aside className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-slate-900">Filters</h2>
-        <button onClick={clearAll} className="text-xs text-sky-600 hover:text-sky-800 font-medium">
+        <h2 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+          Filters
+          {activeCount > 0 && (
+            <span className="bg-sky-600 text-white rounded-full min-w-5 h-5 px-1 flex items-center justify-center text-[11px] font-bold">
+              {activeCount}
+            </span>
+          )}
+        </h2>
+        <button
+          onClick={clearAll}
+          className="text-xs text-slate-400 hover:text-sky-700 font-medium transition-colors"
+        >
           Clear all
         </button>
       </div>
 
+      {/* Sort — en çok kullanılan kontrol en üstte */}
+      <div>
+        <SectionLabel>Sort by</SectionLabel>
+        <select
+          value={filters.sortBy}
+          onChange={(e) => onChange({ ...filters, sortBy: e.target.value as FilterState['sortBy'] })}
+          className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+        >
+          <option value="rateMin">Lowest rate first</option>
+          <option value="limitMax">Highest limit first</option>
+          <option value="updatedAt">Recently updated</option>
+        </select>
+      </div>
+
       {/* Loan amount range */}
       <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-          Loan Amount
-        </label>
+        <SectionLabel>Loan amount</SectionLabel>
         <div className="space-y-3">
           <div>
-            <div className="flex justify-between text-xs text-slate-500 mb-1">
-              <span>Min amount</span>
-              <span className="font-semibold text-slate-700">
+            <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+              <span>Min</span>
+              <span className="font-semibold text-slate-800">
                 {filters.amountMin > 0 ? `€${(filters.amountMin / 1000).toFixed(0)}K` : 'Any'}
               </span>
             </div>
@@ -108,14 +166,13 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
               step={5000}
               value={filters.amountMin}
               onChange={(e) => onChange({ ...filters, amountMin: Number(e.target.value) })}
-              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-              style={{ accentColor: '#0284c7' }}
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
             />
           </div>
           <div>
-            <div className="flex justify-between text-xs text-slate-500 mb-1">
-              <span>Max amount</span>
-              <span className="font-semibold text-slate-700">
+            <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+              <span>Max</span>
+              <span className="font-semibold text-slate-800">
                 {filters.amountMax < 1000000 ? `€${(filters.amountMax / 1000).toFixed(0)}K` : 'Any'}
               </span>
             </div>
@@ -126,60 +183,43 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
               step={5000}
               value={filters.amountMax}
               onChange={(e) => onChange({ ...filters, amountMax: Number(e.target.value) })}
-              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-              style={{ accentColor: '#0284c7' }}
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
             />
           </div>
         </div>
       </div>
 
-      {/* Sort */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-          Sort by
-        </label>
-        <select
-          value={filters.sortBy}
-          onChange={(e) => onChange({ ...filters, sortBy: e.target.value as FilterState['sortBy'] })}
-          className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-300"
-        >
-          <option value="rateMin">Lowest Rate First</option>
-          <option value="limitMax">Highest Limit First</option>
-          <option value="updatedAt">Recently Updated</option>
-        </select>
-      </div>
-
       {/* Customer type */}
       <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-          Customer Type
-        </label>
-        <div className="flex gap-2">
+        <SectionLabel>Customer type</SectionLabel>
+        <div className="grid grid-cols-3 gap-1.5">
           {(['all', 'individual', 'corporate'] as const).map((ct) => (
             <button
               key={ct}
               onClick={() => onChange({ ...filters, customerType: ct })}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors ${
+              aria-pressed={filters.customerType === ct}
+              className={`text-xs font-semibold py-2 rounded-lg border transition-colors ${
                 filters.customerType === ct
                   ? 'bg-sky-600 border-sky-600 text-white'
                   : 'border-slate-200 text-slate-600 hover:border-sky-300'
               }`}
             >
-              {ct === 'all' ? 'All' : ct === 'individual' ? '👤 Individual' : '🏢 Corporate'}
+              {ct === 'all' ? 'All' : ct === 'individual' ? 'Personal' : 'Business'}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Loan types (if multiple available) */}
+      {/* Loan types */}
       {loanTypeOptions.length > 1 && (
         <div>
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-            Loan Type
-          </label>
-          <div className="space-y-2">
+          <SectionLabel>Loan type</SectionLabel>
+          <div className="space-y-1">
             {loanTypeOptions.map((type) => (
-              <label key={type} className="flex items-center gap-2 cursor-pointer group">
+              <label
+                key={type}
+                className="flex items-center gap-2.5 cursor-pointer group rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-50 transition-colors"
+              >
                 <input
                   type="checkbox"
                   checked={filters.loanTypes.includes(type)}
@@ -187,7 +227,7 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
                   className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-400"
                 />
                 <span className="text-sm text-slate-700 group-hover:text-slate-900">
-                  {LOAN_TYPE_ICONS[type]} {LOAN_TYPE_LABELS[type]}
+                  {LOAN_TYPE_LABELS[type]}
                 </span>
               </label>
             ))}
@@ -197,12 +237,13 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
 
       {/* Institution type */}
       <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-          Institution Type
-        </label>
-        <div className="space-y-2">
+        <SectionLabel>Institution</SectionLabel>
+        <div className="space-y-1">
           {INSTITUTION_TYPE_OPTIONS.map(({ value, label }) => (
-            <label key={value} className="flex items-center gap-2 cursor-pointer group">
+            <label
+              key={value}
+              className="flex items-center gap-2.5 cursor-pointer group rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-50 transition-colors"
+            >
               <input
                 type="checkbox"
                 checked={filters.institutionTypes.includes(value)}
@@ -215,19 +256,18 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
         </div>
       </div>
 
-      {/* Region quick filter */}
+      {/* Region + countries */}
       <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-          Region
-        </label>
-        <div className="flex gap-2">
+        <SectionLabel>Region</SectionLabel>
+        <div className="grid grid-cols-3 gap-1.5 mb-3">
           {(['all', 'nordic', 'baltic'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRegion(r)}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors capitalize ${
+              aria-pressed={filters.region === r}
+              className={`text-xs font-semibold py-2 rounded-lg border transition-colors capitalize ${
                 filters.region === r
-                  ? 'bg-slate-800 border-slate-800 text-white'
+                  ? 'bg-slate-900 border-slate-900 text-white'
                   : 'border-slate-200 text-slate-600 hover:border-slate-400'
               }`}
             >
@@ -235,42 +275,14 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Countries */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-          Countries
-        </label>
-        <div className="space-y-1">
-          <p className="text-xs text-slate-400 font-medium mb-1">Nordic</p>
-          {nordicCountries.map((c) => (
-            <label key={c.code} className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={filters.countries.includes(c.code)}
-                onChange={() => toggleCountry(c.code)}
-                className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-400"
-              />
-              <span className="text-sm text-slate-700 group-hover:text-slate-900 flex items-center gap-1.5">
-                {c.flag} {c.name}
-              </span>
-            </label>
-          ))}
-          <p className="text-xs text-slate-400 font-medium mt-2 mb-1">Baltic</p>
-          {balticCountries.map((c) => (
-            <label key={c.code} className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={filters.countries.includes(c.code)}
-                onChange={() => toggleCountry(c.code)}
-                className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-400"
-              />
-              <span className="text-sm text-slate-700 group-hover:text-slate-900 flex items-center gap-1.5">
-                {c.flag} {c.name}
-              </span>
-            </label>
-          ))}
+        <p className="text-xs text-slate-400 font-medium mb-1.5">Nordic</p>
+        <div className="grid grid-cols-3 gap-1.5 mb-2.5">
+          {nordicCountries.map(countryChip)}
+        </div>
+        <p className="text-xs text-slate-400 font-medium mb-1.5">Baltic</p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {balticCountries.map(countryChip)}
         </div>
       </div>
     </aside>

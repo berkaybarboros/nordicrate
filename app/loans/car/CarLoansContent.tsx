@@ -155,7 +155,7 @@ export default function CarLoansContent() {
 
             <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
               Car loan rates are indicative APRs. Final rate depends on vehicle age, credit history
-              and income. BalticRate is a comparison service — we do not provide loans directly.
+              and income. NordicRate is a comparison service — we do not provide loans directly.
             </p>
           </div>
         </div>

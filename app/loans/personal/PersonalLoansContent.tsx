@@ -285,7 +285,7 @@ function PersonalLoansInner() {
                 Representative example: Borrowing {formatCurrency(amount)} over {termMonths} months
                 at {bestRate}% p.a. gives a monthly payment of {formatCurrency(bestMonthly)}. Total
                 repayable: {formatCurrency(bestMonthly * termMonths)}. Rates subject to individual
-                creditworthiness assessment. BalticRate is a comparison service — we do not provide
+                creditworthiness assessment. NordicRate is a comparison service — we do not provide
                 loans directly.
               </p>
             )}

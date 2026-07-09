@@ -348,7 +348,7 @@ export default function DepositsContent() {
           <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
             All deposits are covered by the Estonian Guarantee Fund (DGSD) up to €100,000 per
             depositor per bank. Interest rates are annual gross rates before tax (20% income tax
-            applies to interest income in Estonia). BalticRate is a comparison service — we do not
+            applies to interest income in Estonia). NordicRate is a comparison service — we do not
             accept deposits directly.
           </p>
         </div>

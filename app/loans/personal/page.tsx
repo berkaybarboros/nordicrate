@@ -15,12 +15,12 @@ export const metadata: Metadata = {
     "Swedbank personal loan",
     "SEB tarbimislaen",
   ],
-  alternates: { canonical: "https://balticrate.ee/loans/personal" },
+  alternates: { canonical: "https://nordicrate.com/loans/personal" },
   openGraph: {
-    title: "Personal Loans Estonia | Best Rates from 9.9% | BalticRate",
+    title: "Personal Loans Estonia | Best Rates from 9.9% | NordicRate",
     description:
       "Compare 6 personal loan offers in Estonia. Rates from 9.9% p.a. Borrow up to €30,000. LHV, Swedbank, SEB, Luminor & Bigbank.",
-    url: "https://balticrate.ee/loans/personal",
+    url: "https://nordicrate.com/loans/personal",
     type: "website",
   },
 };
@@ -31,13 +31,13 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
-        { "@type": "ListItem", position: 2, name: "Loans", item: "https://balticrate.ee/loans" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
+        { "@type": "ListItem", position: 2, name: "Loans", item: "https://nordicrate.com/loans" },
         {
           "@type": "ListItem",
           position: 3,
           name: "Personal Loans",
-          item: "https://balticrate.ee/loans/personal",
+          item: "https://nordicrate.com/loans/personal",
         },
       ],
     },
@@ -45,7 +45,7 @@ const jsonLd = {
       "@type": "ItemList",
       name: "Personal Loans in Estonia — Best Rates 2026",
       description: "Compare personal loan offers from Estonian banks, updated daily.",
-      url: "https://balticrate.ee/loans/personal",
+      url: "https://nordicrate.com/loans/personal",
       numberOfItems: 6,
       itemListElement: [
         {
@@ -79,8 +79,8 @@ const jsonLd = {
       name: "Personal Loans in Estonia",
       description:
         "Unsecured personal loans from Estonian banks. Borrow €500–€30,000, repay over 6–84 months.",
-      url: "https://balticrate.ee/loans/personal",
-      provider: { "@type": "Organization", name: "BalticRate" },
+      url: "https://nordicrate.com/loans/personal",
+      provider: { "@type": "Organization", name: "NordicRate" },
       interestRate: "9.9",
       loanTerm: "P36M",
       currency: "EUR",

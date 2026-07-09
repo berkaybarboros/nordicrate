@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CategorySeoBlock from "@/components/seo/CategorySeoBlock";
 import LifeInsuranceContent from "./LifeInsuranceContent";
 
 export const metadata: Metadata = {
@@ -17,12 +18,12 @@ export const metadata: Metadata = {
     "cheap life insurance Estonia",
     "life cover Baltic",
   ],
-  alternates: { canonical: "https://balticrate.ee/insurance/life" },
+  alternates: { canonical: "https://nordicrate.com/insurance/life" },
   openGraph: {
-    title: "Life Insurance Estonia | Compare elukindlustus | BalticRate",
+    title: "Life Insurance Estonia | Compare elukindlustus | NordicRate",
     description:
       "Compare life insurance from SEB Life, Swedbank Life, ERGO, If. Term life from €11/month. Death benefit up to €500,000 + critical illness cover.",
-    url: "https://balticrate.ee/insurance/life",
+    url: "https://nordicrate.com/insurance/life",
     type: "website",
   },
 };
@@ -33,16 +34,16 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
-        { "@type": "ListItem", position: 2, name: "Insurance", item: "https://balticrate.ee/insurance" },
-        { "@type": "ListItem", position: 3, name: "Life Insurance", item: "https://balticrate.ee/insurance/life" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
+        { "@type": "ListItem", position: 2, name: "Insurance", item: "https://nordicrate.com/insurance" },
+        { "@type": "ListItem", position: 3, name: "Life Insurance", item: "https://nordicrate.com/insurance/life" },
       ],
     },
     {
       "@type": "ItemList",
       name: "Life Insurance Estonia — Compare All Insurers",
       description: "Term life insurance and whole life cover from all major Estonian life insurers.",
-      url: "https://balticrate.ee/insurance/life",
+      url: "https://nordicrate.com/insurance/life",
       numberOfItems: 4,
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "SEB Life — elukindlustus", url: "https://www.seb.ee/en/insurance/life-insurance" },
@@ -91,6 +92,7 @@ export default function LifeInsurancePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <LifeInsuranceContent />
+      <CategorySeoBlock slug="life" />
     </>
   );
 }

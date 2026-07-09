@@ -129,7 +129,8 @@ export default function ProductListPage({
       <div className="flex gap-8">
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0`}>
-          <div className="sticky top-20">
+          {/* Sticky: panel viewport'tan uzunsa kendi içinde scroll etsin — yoksa yapışma görünmez */}
+          <div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1">
             <FilterSidebar
               filters={filters}
               onChange={setFilters}

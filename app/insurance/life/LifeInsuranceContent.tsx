@@ -343,7 +343,7 @@ export default function LifeInsuranceContent() {
               <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
                 Premiums are indicative. Actual premium is subject to medical underwriting, health
                 declaration and insurer assessment. All insurers are licensed by Finantsinspektsioon
-                (Estonian Financial Supervision Authority). BalticRate is a comparison service — we
+                (Estonian Financial Supervision Authority). NordicRate is a comparison service — we
                 do not sell insurance directly.
               </p>
             )}

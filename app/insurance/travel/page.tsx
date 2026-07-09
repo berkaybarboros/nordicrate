@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CategorySeoBlock from "@/components/seo/CategorySeoBlock";
 import TravelInsuranceContent from "./TravelInsuranceContent";
 
 export const metadata: Metadata = {
@@ -17,12 +18,12 @@ export const metadata: Metadata = {
     "cheap travel insurance Estonia",
     "travel medical cover Europe",
   ],
-  alternates: { canonical: "https://balticrate.ee/insurance/travel" },
+  alternates: { canonical: "https://nordicrate.com/insurance/travel" },
   openGraph: {
-    title: "Travel Insurance Estonia | Compare reisikindlustus | BalticRate",
+    title: "Travel Insurance Estonia | Compare reisikindlustus | NordicRate",
     description:
       "Compare travel insurance from If, ERGO, LHV, Gjensidige. Annual multi-trip from €49/year. Medical, cancellation, baggage cover included.",
-    url: "https://balticrate.ee/insurance/travel",
+    url: "https://nordicrate.com/insurance/travel",
     type: "website",
   },
 };
@@ -33,16 +34,16 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
-        { "@type": "ListItem", position: 2, name: "Insurance", item: "https://balticrate.ee/insurance" },
-        { "@type": "ListItem", position: 3, name: "Travel Insurance", item: "https://balticrate.ee/insurance/travel" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
+        { "@type": "ListItem", position: 2, name: "Insurance", item: "https://nordicrate.com/insurance" },
+        { "@type": "ListItem", position: 3, name: "Travel Insurance", item: "https://nordicrate.com/insurance/travel" },
       ],
     },
     {
       "@type": "ItemList",
       name: "Travel Insurance Estonia — Compare All Insurers",
       description: "Annual multi-trip and single-trip travel insurance from all major Estonian insurers.",
-      url: "https://balticrate.ee/insurance/travel",
+      url: "https://nordicrate.com/insurance/travel",
       numberOfItems: 4,
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "If P&C — Travel Insurance", url: "https://www.if.ee/en/travel/travel-insurance" },
@@ -91,6 +92,7 @@ export default function TravelInsurancePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <TravelInsuranceContent />
+      <CategorySeoBlock slug="travel" />
     </>
   );
 }

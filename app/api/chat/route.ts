@@ -72,22 +72,39 @@ export async function POST(req: Request) {
 
     const systemPrompt = buildSystemPrompt(mode, liveRates, topProgramsText, onboardingProfile);
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1024,
-        stream: true,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages.map((m) => ({ role: m.role, content: m.content })),
-        ],
-      }),
-    });
+    const callGroq = (model: string) =>
+      fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1024,
+          stream: true,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.map((m) => ({ role: m.role, content: m.content })),
+          ],
+        }),
+      });
+
+    let res = await callGroq('llama-3.3-70b-versatile');
+
+    // Groq TPM limiti dolduysa: küçük model AYRI kota kullanır — kullanıcı kesinti görmez
+    if (res.status === 429) {
+      console.warn('[chat] 70b TPM limit — falling back to 8b-instant');
+      res = await callGroq('llama-3.1-8b-instant');
+    }
+
+    if (res.status === 429) {
+      // Her iki model de dolu — dürüst mesaj + Retry-After
+      return Response.json(
+        { error: 'high_demand', message: 'NordicAI is at capacity right now. Please wait ~30 seconds and try again.' },
+        { status: 429, headers: { 'Retry-After': '30' } }
+      );
+    }
 
     if (!res.ok) {
       const err = await res.text();

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CategorySeoBlock from "@/components/seo/CategorySeoBlock";
 import MotorInsuranceContent from "./MotorInsuranceContent";
 
 export const metadata: Metadata = {
@@ -14,12 +15,12 @@ export const metadata: Metadata = {
     "cheap motor insurance Estonia",
     "liikluskindlustus võrdlus",
   ],
-  alternates: { canonical: "https://balticrate.ee/insurance/motor" },
+  alternates: { canonical: "https://nordicrate.com/insurance/motor" },
   openGraph: {
-    title: "Motor Insurance Estonia | Compare Liikluskindlustus | BalticRate",
+    title: "Motor Insurance Estonia | Compare Liikluskindlustus | NordicRate",
     description:
       "Compare motor insurance prices from If, ERGO, Swedbank, Gjensidige, LHV. Mandatory for all vehicles in Estonia. Save by comparing.",
-    url: "https://balticrate.ee/insurance/motor",
+    url: "https://nordicrate.com/insurance/motor",
     type: "website",
   },
 };
@@ -30,18 +31,18 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://balticrate.ee" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
         {
           "@type": "ListItem",
           position: 2,
           name: "Insurance",
-          item: "https://balticrate.ee/insurance",
+          item: "https://nordicrate.com/insurance",
         },
         {
           "@type": "ListItem",
           position: 3,
           name: "Motor Insurance",
-          item: "https://balticrate.ee/insurance/motor",
+          item: "https://nordicrate.com/insurance/motor",
         },
       ],
     },
@@ -50,7 +51,7 @@ const jsonLd = {
       name: "Motor Insurance Estonia — Compare All Insurers",
       description:
         "Mandatory vehicle liability insurance (liikluskindlustus) from all Estonian insurers.",
-      url: "https://balticrate.ee/insurance/motor",
+      url: "https://nordicrate.com/insurance/motor",
       numberOfItems: 5,
       itemListElement: [
         {
@@ -84,6 +85,7 @@ export default function MotorInsurancePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <MotorInsuranceContent />
+      <CategorySeoBlock slug="motor" />
     </>
   );
 }

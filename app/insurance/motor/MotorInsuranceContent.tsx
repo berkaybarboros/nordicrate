@@ -283,7 +283,7 @@ export default function MotorInsuranceContent() {
             <p className="text-xs text-gray-400 text-center py-4">
               Premiums are indicative based on provided vehicle details. Final price confirmed upon
               application. All insurers are licensed by Finantsinspektsioon (Estonian Financial
-              Supervision Authority). BalticRate is a comparison service.
+              Supervision Authority). NordicRate is a comparison service.
             </p>
           </div>
         </div>

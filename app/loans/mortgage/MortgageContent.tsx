@@ -169,7 +169,7 @@ export default function MortgageContent() {
 
             <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
               Mortgage rates are indicative (Euribor 6M + margin). Final rates depend on your
-              income, credit history, LTV ratio and property valuation. BalticRate is a comparison
+              income, credit history, LTV ratio and property valuation. NordicRate is a comparison
               service — we do not provide loans directly. All banks are supervised by
               Finantsinspektsioon.
             </p>
