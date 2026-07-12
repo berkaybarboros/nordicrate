@@ -3,7 +3,10 @@
  * n8n otomasyonu service-role ile yazar, site anon ile okur.
  */
 
-import { createSupabaseServer } from '@/lib/supabase-server';
+// DİKKAT: createSupabaseServer KULLANMA — cookies() çağırır ve ISR/statik blog
+// sayfalarını runtime'da dynamic'e zorlayıp 500 attırır. Blog okuma anonim;
+// cookie'siz düz client yeterli (db.ts ile aynı desen).
+import { supabase } from '@/lib/supabase';
 
 export interface BlogPost {
   slug: string;
@@ -20,7 +23,7 @@ const COLS = 'slug, title, description, content_md, locale, tags, author, publis
 
 export async function getPublishedPosts(limit = 50): Promise<BlogPost[]> {
   try {
-    const supabase = await createSupabaseServer();
+    
     const { data, error } = await supabase
       .from('blog_posts')
       .select(COLS)
@@ -36,7 +39,7 @@ export async function getPublishedPosts(limit = 50): Promise<BlogPost[]> {
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const supabase = await createSupabaseServer();
+    
     const { data, error } = await supabase
       .from('blog_posts')
       .select(COLS)
