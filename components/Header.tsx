@@ -37,6 +37,15 @@ export default function Header() {
     router.refresh();
   }
 
+  // Dil seçimi: client dict'i değiştirir; homepage'deyse SEO-lokalize sayfaya da götürür
+  const LOCALE_HOME: Record<Locale, string> = { en: '/', fi: '/fi', et: '/et' };
+  function chooseLocale(loc: Locale) {
+    setLocale(loc);
+    if (pathname === '/' || pathname === '/fi' || pathname === '/et') {
+      router.push(LOCALE_HOME[loc] ?? '/');
+    }
+  }
+
   // Sitemap kategori mimarisi: 2 ana kategori dropdown + 3 düz link
   interface NavChild { href: string; label: string }
   interface NavItem { href: string; label: string; highlight?: boolean; children?: NavChild[] }
@@ -66,6 +75,7 @@ export default function Header() {
     },
     { href: '/deposits',  label: t.nav.deposits },
     { href: '/countries', label: t.nav.countries },
+    { href: '/blog',      label: 'Blog' },
     { href: '/startup',   label: t.nav.programs, highlight: true },
   ];
 
@@ -160,7 +170,7 @@ export default function Header() {
                   {LOCALES.map((loc) => (
                     <button
                       key={loc}
-                      onClick={() => { setLocale(loc); setLangOpen(false); }}
+                      onClick={() => { chooseLocale(loc); setLangOpen(false); }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors text-left ${
                         locale === loc
                           ? 'bg-sky-50 text-sky-700 font-semibold'
@@ -318,7 +328,7 @@ export default function Header() {
               {LOCALES.map((loc) => (
                 <button
                   key={loc}
-                  onClick={() => setLocale(loc)}
+                  onClick={() => chooseLocale(loc)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                     locale === loc
                       ? 'bg-sky-50 border-sky-200 text-sky-700'

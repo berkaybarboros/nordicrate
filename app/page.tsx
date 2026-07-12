@@ -1,9 +1,23 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
 import { buildFaqJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
+
+// Homepage canonical + hreflang (FI/ET lokalize versiyonlar)
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://nordicrate.com',
+    languages: {
+      'en': 'https://nordicrate.com',
+      'fi': 'https://nordicrate.com/fi',
+      'et': 'https://nordicrate.com/et',
+      'x-default': 'https://nordicrate.com',
+    },
+  },
+};
 import { PROGRAMS } from '@/lib/programs-data';
 import { getCountryStats, getInstitution, getCountry, formatRate, LOAN_TYPE_LABELS, LOAN_TYPE_ICONS } from '@/lib/utils';
 import RateCard from '@/components/RateCard';

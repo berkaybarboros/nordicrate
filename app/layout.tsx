@@ -67,9 +67,9 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
     creator: '@nordicrate',
   },
-  alternates: {
-    canonical: BASE_URL,
-  },
+  // DİKKAT: Buraya alternates.canonical KOYMA — root layout metadata'sı alt sayfalara
+  // miras kalır ve kendi canonical'ı olmayan her sayfa homepage'i canonical gösterir
+  // (indexleme felaketi). Canonical'lar sayfa bazında tanımlanır.
 };
 
 export const viewport: Viewport = {
@@ -125,17 +125,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NF6L5Z36');`,
           }}
         />
-        {/* Google tag (gtag.js) — GA4 direkt ölçüm.
-            UYARI: GTM container'ına AYRICA GA4 config tag'i EKLEME — çift sayım olur. */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-490S0G7SX8" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-490S0G7SX8');`,
-          }}
-        />
+        {/* GA4 artık GTM container'ı içinden yönetiliyor (kullanıcı GTM'e GA4 tag'i ekledi) —
+            gtag.js kaldırıldı, çift sayım önlendi. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

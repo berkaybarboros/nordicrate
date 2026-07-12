@@ -4,6 +4,7 @@ import { buildProductsItemList } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
+  alternates: { canonical: 'https://nordicrate.com/mortgage' },
   title: 'Mortgage Rates – NordicRate | Nordic & Baltic Home Loans',
   description: 'Compare mortgage and home loan rates from banks across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };

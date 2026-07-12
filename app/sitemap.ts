@@ -1,11 +1,30 @@
 import type { MetadataRoute } from 'next';
+import { getPublishedPosts } from '@/lib/blog';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nordicrate.com';
 
 const COUNTRY_CODES = ['DK', 'FI', 'IS', 'NO', 'SE', 'EE', 'LV', 'LT'];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  // Blog yazıları (Supabase erişilemezse boş döner — sitemap kırılmaz)
+  const posts = await getPublishedPosts(200);
+  const blogRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
+    ...posts.map((p) => ({
+      url: `${BASE_URL}/blog/${p.slug}`,
+      lastModified: new Date(p.published_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+  ];
+
+  // Lokalize homepage'ler
+  const localeRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/fi`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/et`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+  ];
 
   // Static pages
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -163,6 +182,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticRoutes,
+    ...localeRoutes,
+    ...blogRoutes,
     ...countryLoanRoutes,
     ...countryMortgageRoutes,
     ...countryBusinessRoutes,

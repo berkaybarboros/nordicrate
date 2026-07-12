@@ -4,6 +4,7 @@ import { buildProductsItemList } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
+  alternates: { canonical: 'https://nordicrate.com/business' },
   title: 'Business Loans – NordicRate | Corporate Credit in Nordic & Baltic',
   description: 'Compare business and corporate loan rates from banks and insurers across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };
