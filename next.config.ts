@@ -4,13 +4,15 @@ const isDev = process.env.NODE_ENV === 'development';
 
 // CSP — pragmatik: Next.js inline script'leri için 'unsafe-inline' gerekli (nonce altyapısı yok),
 // dev'de HMR için 'unsafe-eval' ve ws: eklenir.
+// GTM/GA4 hostları: script + connect (ölçüm beacon'ları) + img (pixel fallback) + frame (noscript iframe)
 const csp = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' data: blob: https://flagcdn.com https://logo.clearbit.com https://www.google.com`,
+  `img-src 'self' data: blob: https://flagcdn.com https://logo.clearbit.com https://www.google.com https://*.googletagmanager.com https://*.google-analytics.com`,
   `font-src 'self' data:`,
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co${isDev ? ' ws:' : ''}`,
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${isDev ? ' ws:' : ''}`,
+  `frame-src https://www.googletagmanager.com`,
   `frame-ancestors 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
