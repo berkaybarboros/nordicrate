@@ -11,16 +11,45 @@ export const metadata: Metadata = {
 
 export const revalidate = 600; // 10 dk — n8n yeni yazı bastığında en geç 10 dk'da görünür
 
-export default async function BlogIndexPage() {
-  const posts = await getPublishedPosts();
+const LANGS = [
+  { code: 'en', label: 'English' },
+  { code: 'fi', label: 'Suomi' },
+  { code: 'et', label: 'Eesti' },
+] as const;
+
+interface PageProps {
+  searchParams: Promise<{ lang?: string }>;
+}
+
+export default async function BlogIndexPage({ searchParams }: PageProps) {
+  const { lang } = await searchParams;
+  const locale = lang === 'fi' || lang === 'et' ? lang : 'en';
+  const posts = await getPublishedPosts(50, locale);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-10">
+      <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-900">NordicRate Blog</h1>
         <p className="text-slate-500 mt-2">
           Guides and market insights on borrowing and insurance across the Nordics &amp; Baltics.
         </p>
+      </div>
+
+      {/* Dil sekmeleri — n8n otomasyonu 3 dilde yazıyor */}
+      <div className="flex gap-1.5 mb-8">
+        {LANGS.map(({ code, label }) => (
+          <Link
+            key={code}
+            href={code === 'en' ? '/blog' : `/blog?lang=${code}`}
+            className={`text-xs font-semibold px-4 py-2 rounded-lg border transition-colors ${
+              locale === code
+                ? 'bg-sky-600 border-sky-600 text-white'
+                : 'border-slate-200 text-slate-600 hover:border-sky-300'
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
       </div>
 
       {posts.length === 0 ? (

@@ -21,15 +21,16 @@ export interface BlogPost {
 
 const COLS = 'slug, title, description, content_md, locale, tags, author, published_at';
 
-export async function getPublishedPosts(limit = 50): Promise<BlogPost[]> {
+export async function getPublishedPosts(limit = 50, locale?: 'en' | 'fi' | 'et'): Promise<BlogPost[]> {
   try {
-    
-    const { data, error } = await supabase
+    let query = supabase
       .from('blog_posts')
       .select(COLS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(limit);
+    if (locale) query = query.eq('locale', locale);
+    const { data, error } = await query;
     if (error || !data) return [];
     return data as BlogPost[];
   } catch {
