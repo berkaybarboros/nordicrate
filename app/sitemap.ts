@@ -134,6 +134,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Ülke landing sayfaları (/loans/estonia vb.) — SEO ana sayfalar
+  const countryLandingRoutes: MetadataRoute.Sitemap = [
+    'estonia', 'finland', 'latvia', 'lithuania', 'sweden', 'norway', 'denmark', 'iceland',
+  ].map((slug) => ({
+    url: `${BASE_URL}/loans/${slug}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.88,
+  }));
+
   // Per-country loan pages (/loans?country=XX)
   const countryLoanRoutes: MetadataRoute.Sitemap = COUNTRY_CODES.map((code) => ({
     url: `${BASE_URL}/loans?country=${code}`,
@@ -184,6 +194,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...localeRoutes,
     ...blogRoutes,
+    ...countryLandingRoutes,
     ...countryLoanRoutes,
     ...countryMortgageRoutes,
     ...countryBusinessRoutes,

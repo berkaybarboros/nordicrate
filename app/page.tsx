@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
+import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 import { buildFaqJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 
@@ -132,7 +133,7 @@ export default function HomePage() {
               {COUNTRIES.map((c) => (
                 <Link
                   key={c.code}
-                  href={`/loans?country=${c.code}`}
+                  href={`/loans/${COUNTRY_SLUG_BY_CODE[c.code]}`}
                   className="flex items-center gap-1.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl px-3 py-1.5 transition-colors text-sm"
                 >
                   <CountryFlag code={c.code} size={24} rounded="sm" />
