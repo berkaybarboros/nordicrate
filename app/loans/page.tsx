@@ -3,6 +3,7 @@ import ProductListPage from '@/components/ProductListPage';
 import type { FilterState } from '@/components/FilterSidebar';
 import type { CountryCode } from '@/lib/types';
 import { buildProductsItemList } from '@/lib/seo';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
@@ -17,7 +18,9 @@ interface PageProps {
 
 export default async function LoansPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const products = PRODUCTS.filter(p => p.type === 'personal' || p.type === 'auto' || p.type === 'student');
+  const products = await applyScrapedOverrides(
+    PRODUCTS.filter(p => p.type === 'personal' || p.type === 'auto' || p.type === 'student')
+  );
 
   const defaultFilters: Partial<FilterState> = {};
   if (params.country) defaultFilters.countries = [params.country as CountryCode];

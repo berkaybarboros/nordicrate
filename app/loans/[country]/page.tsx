@@ -15,8 +15,10 @@ import { buildProductsItemList, buildFaqJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 import CountryFlag from '@/components/CountryFlag';
 import RateCard from '@/components/RateCard';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 
 export const dynamicParams = false;
+export const revalidate = 1800; // canlı oran override'ları taze kalsın
 
 export function generateStaticParams() {
   return COUNTRY_LANDINGS.map((c) => ({ country: c.slug }));
@@ -47,9 +49,9 @@ export default async function CountryLoansPage({ params }: PageProps) {
   if (!info) notFound();
 
   const institutions = INSTITUTIONS.filter((i) => i.country === landing.code);
-  const products = PRODUCTS
-    .filter((p) => institutions.some((i) => i.id === p.institutionId))
-    .sort((a, b) => a.rateMin - b.rateMin);
+  const products = (await applyScrapedOverrides(
+    PRODUCTS.filter((p) => institutions.some((i) => i.id === p.institutionId))
+  )).sort((a, b) => a.rateMin - b.rateMin);
 
   const bestPersonal = products.find((p) => p.type === 'personal');
   const bestMortgage = products.find((p) => p.type === 'mortgage');

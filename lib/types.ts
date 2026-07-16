@@ -79,6 +79,8 @@ export interface LoanProduct {
   processingFeePercent?: number;
   updatedAt: string;
   isPromoted?: boolean;
+  /** Scraper override katmanı işaretledi: rateMin bankanın sitesinden alınan güncel oran */
+  isLiveRate?: boolean;
 }
 
 export interface GovernmentProgram {

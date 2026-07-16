@@ -92,7 +92,16 @@ export default function RateCard({ product, institution, country }: RateCardProp
         </div>
 
         {/* BIG rate number — the hero metric */}
-        <div className="bg-slate-50 rounded-xl p-4 mb-4 text-center">
+        <div className={`rounded-xl p-4 mb-4 text-center ${product.isLiveRate ? 'bg-emerald-50/60 border border-emerald-100' : 'bg-slate-50'}`}>
+          {product.isLiveRate && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5 mb-1.5"
+              title="Rate pulled directly from the bank's website within the last 48 hours"
+            >
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              LIVE RATE
+            </span>
+          )}
           <p className={`text-4xl font-extrabold ${getRateColor(product.rateMin)}`}>
             {formatRate(product.rateMin)}
           </p>

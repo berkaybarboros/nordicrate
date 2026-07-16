@@ -2,6 +2,9 @@ import { PRODUCTS } from '@/lib/data';
 import ProductListPage from '@/components/ProductListPage';
 import { buildProductsItemList } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+
+export const revalidate = 1800; // 30 dk — canlı oran override'ları için ISR
 
 export const metadata = {
   alternates: { canonical: 'https://nordicrate.com/mortgage' },
@@ -9,8 +12,8 @@ export const metadata = {
   description: 'Compare mortgage and home loan rates from banks across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };
 
-export default function MortgagePage() {
-  const products = PRODUCTS.filter((p) => p.type === 'mortgage');
+export default async function MortgagePage() {
+  const products = await applyScrapedOverrides(PRODUCTS.filter((p) => p.type === 'mortgage'));
 
   return (
     <>

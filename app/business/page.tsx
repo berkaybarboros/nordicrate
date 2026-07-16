@@ -2,6 +2,9 @@ import { PRODUCTS } from '@/lib/data';
 import ProductListPage from '@/components/ProductListPage';
 import { buildProductsItemList } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+
+export const revalidate = 1800;
 
 export const metadata = {
   alternates: { canonical: 'https://nordicrate.com/business' },
@@ -9,8 +12,8 @@ export const metadata = {
   description: 'Compare business and corporate loan rates from banks and insurers across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };
 
-export default function BusinessPage() {
-  const products = PRODUCTS.filter((p) => p.type === 'business');
+export default async function BusinessPage() {
+  const products = await applyScrapedOverrides(PRODUCTS.filter((p) => p.type === 'business'));
 
   return (
     <>

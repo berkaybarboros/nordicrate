@@ -4,6 +4,9 @@ import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
 import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+
+export const revalidate = 1800;
 import { buildFaqJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 
@@ -31,12 +34,15 @@ import TrustBar from '@/components/TrustBar';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
 
-export default function HomePage() {
+export default async function HomePage() {
   const totalInstitutions = INSTITUTIONS.length;
   const totalProducts = PRODUCTS.length;
   const totalCountries = COUNTRIES.length;
 
-  const featuredProducts = PRODUCTS.filter((p) => p.isPromoted)
+  // Canlı oran override'ları — "Today's Best Rates" gerçek scrape verisini yansıtsın
+  const liveProducts = await applyScrapedOverrides(PRODUCTS);
+
+  const featuredProducts = liveProducts.filter((p) => p.isPromoted)
     .sort((a, b) => a.rateMin - b.rateMin)
     .slice(0, 6);
 
@@ -45,9 +51,9 @@ export default function HomePage() {
     ...getCountryStats(c.code),
   }));
 
-  const bestPersonal = [...PRODUCTS].filter((p) => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin)[0];
-  const bestMortgage = [...PRODUCTS].filter((p) => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin)[0];
-  const bestBusiness = [...PRODUCTS].filter((p) => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin)[0];
+  const bestPersonal = [...liveProducts].filter((p) => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin)[0];
+  const bestMortgage = [...liveProducts].filter((p) => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin)[0];
+  const bestBusiness = [...liveProducts].filter((p) => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin)[0];
 
   return (
     <div>
