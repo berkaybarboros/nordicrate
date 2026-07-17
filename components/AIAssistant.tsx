@@ -486,10 +486,14 @@ export default function AIAssistant() {
             </svg>
           ) : (
             <>
-              {/* Sparkle icon */}
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
+              {/* Tilki maskot — FAB avatarı */}
+              <Image
+                src="/nordicai-fab.png"
+                alt="NordicAI"
+                width={32}
+                height={32}
+                className="shrink-0 rounded-full bg-white ring-2 ring-white/60"
+              />
               {/* Label — hidden on mobile */}
               <span className="hidden md:inline text-sm">Ask NordicAI</span>
               {/* Unread or "AI" badge */}

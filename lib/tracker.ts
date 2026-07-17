@@ -41,6 +41,13 @@ function getSessionId(): string {
   return sid;
 }
 
+// GTM dataLayer tipi — GA4 event'leri GTM üzerinden akar
+declare global {
+  interface Window {
+    dataLayer?: Record<string, unknown>[];
+  }
+}
+
 export async function track(
   eventType: EventType,
   payload: TrackPayload = {}
@@ -48,6 +55,17 @@ export async function track(
   if (typeof window === 'undefined') return; // SSR'da çalıştırma
 
   const { product_id, product_type, page, ...rest } = payload;
+
+  // GTM/GA4 köprüsü: her event dataLayer'a da düşer (event adı: nr_<tip>).
+  // GTM'de "Custom Event: nr_apply_click" trigger'ı ile GA4'e conversion bağlanır.
+  try {
+    window.dataLayer?.push({
+      event: `nr_${eventType}`,
+      nr_product_id: product_id ?? null,
+      nr_product_type: product_type ?? null,
+      nr_page: page ?? window.location.pathname,
+    });
+  } catch { /* analytics asla UI'yı bozmaz */ }
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
