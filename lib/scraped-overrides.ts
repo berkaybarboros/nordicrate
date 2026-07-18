@@ -14,8 +14,27 @@
  * static-to-dynamic 500'üne yol açar (blog'da yaşandı).
  */
 
-import { supabase } from '@/lib/supabase';
 import type { LoanProduct } from '@/lib/types';
+
+// supabase-js YERİNE düz PostgREST fetch: Next Data Cache'i `next.revalidate` ile
+// kontrol edebilmek için (supabase-js fetch'i build'ler arası bayat cache'leniyordu —
+// Coop rozetleri bu yüzden görünmemişti). 900sn: sayfa ISR'ından (1800) kısa.
+const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+
+async function pgRest<T>(pathAndQuery: string): Promise<T | null> {
+  if (!SB_URL || !SB_KEY) return null;
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/${pathAndQuery}`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+      next: { revalidate: 900 },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
 
 const BANK_TO_INSTITUTION: Record<string, string> = {
   lhv: 'lhv-ee',
@@ -40,22 +59,17 @@ interface ScrapedRow {
 
 export async function applyScrapedOverrides(products: LoanProduct[]): Promise<LoanProduct[]> {
   try {
-    const { data, error } = await supabase
-      .from('latest_scraped_rates')
-      .select('bank_id, product_type, rate_min, raw_snippet, scraped_at');
-    if (error || !data || data.length === 0) return products;
-
-    const rows = data as ScrapedRow[];
+    const rows = await pgRest<ScrapedRow[]>(
+      'latest_scraped_rates?select=bank_id,product_type,rate_min,raw_snippet,scraped_at'
+    );
+    if (!rows || rows.length === 0) return products;
 
     // Marj tabanlı oranlar için canlı EURIBOR 6M (rate_snapshots — kendi cron'umuz besliyor)
     let euribor6m: number | null = null;
     if (rows.some((r) => /euribor/i.test(r.raw_snippet ?? ''))) {
-      const { data: snap } = await supabase
-        .from('rate_snapshots')
-        .select('rate')
-        .eq('key', 'euribor6m')
-        .order('fetched_at', { ascending: false })
-        .limit(1);
+      const snap = await pgRest<Array<{ rate: number | string }>>(
+        'rate_snapshots?select=rate&key=eq.euribor6m&order=fetched_at.desc&limit=1'
+      );
       const v = snap?.[0]?.rate;
       euribor6m = typeof v === 'number' ? v : v != null ? Number(v) : null;
       if (euribor6m != null && !Number.isFinite(euribor6m)) euribor6m = null;
