@@ -30,6 +30,7 @@ import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
 import HeroCta from '@/components/home/HeroCta';
+import InstitutionMarquee from '@/components/home/InstitutionMarquee';
 import TrustBar from '@/components/TrustBar';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
@@ -120,6 +121,9 @@ export default async function HomePage() {
 
       {/* ========== TRUST BAR ========== */}
       <TrustBar />
+
+      {/* ========== KURUM LOGO MARQUEE ========== */}
+      <InstitutionMarquee />
 
       {/* ========== LIVE RATES BANNER ========== */}
       <LiveRatesBanner />

@@ -33,25 +33,7 @@ export default function TrustBar() {
           ))}
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex-1 h-px bg-slate-100" />
-          <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Banks &amp; institutions we compare</span>
-          <div className="flex-1 h-px bg-slate-100" />
-        </div>
-
-        {/* Partner chips */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {PARTNER_NAMES.map((name) => (
-            <span
-              key={name}
-              className="text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1 rounded-full"
-            >
-              {name}
-            </span>
-          ))}
-          <span className="text-xs text-slate-400 font-medium self-center">&amp; 40+ more</span>
-        </div>
+        {/* Kurum listesi InstitutionMarquee'ye taşındı (homepage'de TrustBar'ın hemen altında) */}
       </div>
     </section>
   );
