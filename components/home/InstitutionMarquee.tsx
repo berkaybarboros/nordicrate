@@ -7,7 +7,9 @@
  * çelişen bir "Partners" başlığı UCPD + marka riski yaratır ve affiliate
  * ağlarının compliance kontrolüne takılır. Görsel etki aynı, iddia dürüst.
  *
- * Logolar: Clearbit (domain bazlı). Yüklenemeyen logo → monogram fallback.
+ * Logolar: Google s2 favicon servisi (Clearbit Logo API Aralık 2025'te
+ * kapatıldı — sunucudan curl bile bağlanamıyor). Yüklenemeyen → monogram.
+ * s2 gstatic.com'a redirect eder; CSP img-src'de *.gstatic.com izinli olmalı.
  * Motion: saf CSS sonsuz kayma (globals.css @keyframes marquee),
  * hover'da durur, prefers-reduced-motion globalde animasyonları kapatır.
  */
@@ -18,7 +20,8 @@ import { INSTITUTIONS, COUNTRIES } from '@/lib/data';
 function logoUrl(website?: string): string | null {
   if (!website) return null;
   try {
-    return `https://logo.clearbit.com/${new URL(website).hostname}?size=64&greyscale=true`;
+    const host = new URL(website).hostname.replace(/^www\./, '');
+    return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
   } catch {
     return null;
   }

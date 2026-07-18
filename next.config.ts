@@ -9,7 +9,7 @@ const csp = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' data: blob: https://flagcdn.com https://logo.clearbit.com https://www.google.com https://*.googletagmanager.com https://*.google-analytics.com`,
+  `img-src 'self' data: blob: https://flagcdn.com https://www.google.com https://*.gstatic.com https://*.googletagmanager.com https://*.google-analytics.com`,
   `font-src 'self' data:`,
   `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${isDev ? ' ws:' : ''}`,
   `frame-src https://www.googletagmanager.com`,
