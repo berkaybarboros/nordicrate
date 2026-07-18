@@ -16,6 +16,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import CountryFlag from '@/components/CountryFlag';
 import RateCard from '@/components/RateCard';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
 export const dynamicParams = false;
 export const revalidate = 1800; // canlı oran override'ları taze kalsın
@@ -64,6 +65,13 @@ export default async function CountryLoansPage({ params }: PageProps) {
       {/* Hero */}
       <section className="bg-slate-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <div className="mb-5 [&_a]:text-slate-500 [&_a:hover]:text-sky-300 [&_span.text-slate-600]:text-slate-300">
+            <Breadcrumbs items={[
+              { name: 'Home', href: '/' },
+              { name: 'Loans', href: '/loans' },
+              { name: info.name },
+            ]} />
+          </div>
           <div className="flex items-center gap-3 mb-4">
             <CountryFlag code={info.code} size={40} rounded="md" />
             <span className="text-xs font-semibold uppercase tracking-widest text-sky-300">

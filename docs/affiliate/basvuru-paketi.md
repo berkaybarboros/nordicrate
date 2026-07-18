@@ -1,76 +1,91 @@
-# Affiliate Başvuru Paketi (D2/D3)
+# Affiliate Başvuru Paketi v2 — Awin + Adtraction (2026-07-18)
 
-Hazırlanma: 2026-07-03. Kullanım: Awin publisher formuna kopyala-yapıştır + LHV'ye e-posta.
-**Öneri: başvuruları nordicrate.com canlıya alındıktan SONRA yap** — subdomain'li başvuru zayıf görünür.
+Strateji notu: Trafik düşük — bunu gizlemiyoruz, **altyapı ve niş kalitesiyle** konumlanıyoruz.
+Ağların gelir modeli komisyon paylaşımı: onlar "bu site dönüşüm üretir mi?" diye bakar.
+Cevabımız: niş kitle (expat/e-resident), günlük canlı veri, AI ön-eleme = az ama nitelikli tık.
 
 ---
 
-## 1. Awin Publisher Başvurusu (awin.com → Sign up as Publisher)
+## 1. AWIN — Publisher Başvurusu
 
-**Website URL**: https://nordicrate.com *(domain geçişi sonrası)*
+**Flow:** Affiliate partner → Comparison site. Account: Individual (Berkay Barboros, TR tax residency). Market: Sweden/Nordics.
 
-**Promotional space name**: NordicRate
+**Promotional space name:** NordicRate
+**URL:** https://nordicrate.com
+**Type:** Price/Product Comparison
 
-**Promotional type**: Comparison / Price Comparison Website
-
-**Site description (EN — forma yapıştır):**
+**Description (yapıştır):**
 
 > NordicRate is an independent loan, mortgage and insurance comparison platform
-> covering all 8 Nordic and Baltic markets (Denmark, Finland, Iceland, Norway,
-> Sweden, Estonia, Latvia, Lithuania). We compare 100+ credit products from 60+
-> banks, insurers and fintechs, enriched with live ECB EURIBOR and Norges Bank
-> policy-rate data updated daily. Our audience is English-speaking expats,
-> digital nomads, e-residents and SMEs seeking financing across the region —
-> a high-intent, underserved niche with no dominant English-language comparison
-> player. Users reach lenders via clearly labelled outbound referral links with
-> full UTM tracking. The platform features an AI-assisted eligibility advisor
-> that qualifies users (income, DTI, residency) before referring them, producing
-> higher-quality clicks than generic listing sites.
+> purpose-built for the Nordic and Baltic region (DK, FI, IS, NO, SE, EE, LV, LT).
+>
+> What makes us different from generic comparison sites:
+> • **Live data infrastructure** — daily ECB EURIBOR and central-bank feeds plus an
+> automated bank-rate monitoring pipeline; displayed rates are refreshed daily, not
+> copied once and forgotten.
+> • **AI-qualified intent** — an integrated AI advisor pre-qualifies visitors
+> (income, debt-to-income, residency, loan size) before they click through to a
+> lender, so outbound clicks represent applicants, not curiosity.
+> • **An underserved niche** — English-speaking expats, digital nomads and Estonian
+> e-residents comparing credit across borders. Domestic comparison sites don't serve
+> this audience; search competition in English is minimal.
+> • **Multilingual content engine** — automated SEO publishing in English, Finnish
+> and Estonian (3 articles/week per language) plus dedicated country landing pages
+> for all 8 markets.
+>
+> We are early-stage and growing organically. We're looking to establish tracking
+> partnerships now so that our traffic converts from day one as it scales. All
+> listings are objective; promoted placements are clearly labelled, and we comply
+> with EU consumer-protection (UCPD) requirements — no fabricated ratings or claims.
 
-**Traffic / promotion methods**: SEO (structured data, country landing pages), AI-assisted comparison tools, rate-drop email alerts.
-
-**İlgili advertiser'lar (Awin'de aranacak)**: Ferratum/Multitude, Bondora, Fellow Finance, Sambla, Lendo (Schibsted), Zmarta, Advisa, Bank Norwegian, Instabank, TF Bank, Svea, Resurs Bank.
+**Traffic sources:** SEO (structured data, country pages, multilingual blog), AI comparison tools, rate-drop email alerts.
+**Hedef advertiser'lar (onay sonrası join):** Bank Norwegian, TF Bank, Instabank, Svea, Resurs Bank, Ferratum/Multitude, Bondora, Fellow Finance, Sambla, Zmarta, Advisa, Lendo.
 
 ---
 
-## 2. LHV Partnerlik E-postası (D3)
+## 2. ADTRACTION — Publisher Başvurusu (adtraction.com → Partners → Sign up)
 
-**Kime**: partner@lhv.ee (veya info@lhv.ee üzerinden yönlendirme iste)
-**Konu**: Partnership inquiry — NordicRate loan comparison platform (Baltic & Nordic markets)
+Adtraction Nordics/Baltics finans programlarının ana ağı — bizim için Awin'den daha kritik.
+**Channel type:** Website / Comparison. **Market:** birden çok seçilebiliyorsa SE+FI+NO+DK; tek ise Sweden.
 
-> Dear LHV Partnerships Team,
+**Channel description (yapıştır):**
+
+> NordicRate (nordicrate.com) is an independent comparison platform for consumer
+> loans, mortgages and insurance across all eight Nordic and Baltic countries.
 >
-> I run NordicRate (https://nordicrate.com), an independent English-language
-> comparison platform for loans, mortgages and insurance across the Nordic and
-> Baltic markets. Our audience is primarily expats, e-residents and
-> internationally mobile professionals in Estonia and the wider region —
-> a segment where LHV is consistently the strongest banking option we list.
+> Audience: English-speaking expats, relocated professionals, digital nomads and
+> Estonian e-residents — a high-intent segment that domestic-language comparison
+> sites structurally cannot reach. Content is published in English, Finnish and
+> Estonian.
 >
-> LHV products already appear prominently in our comparisons (currently sourced
-> from your public rate pages, refreshed daily). We would like to make this
-> relationship official in one of two ways:
+> Technical foundation: daily ECB/central-bank rate feeds, automated bank-rate
+> monitoring, an AI eligibility advisor that pre-qualifies users (income, DTI,
+> residency) before referral, and server-side click tracking with full UTM/subid
+> support — technically ready for Adtraction tracking links from day one.
 >
-> 1. **Referral partnership** — tracked outbound referrals to LHV loan
->    applications, on a CPA or CPL basis;
-> 2. **Product data feed** — an official source for your current rates so our
->    listings always match your latest offers exactly.
->
-> We qualify users before referral (income, residency, loan size) via an
-> AI-assisted eligibility check, so the traffic we send is high-intent.
->
-> Could you point me to the right person to discuss this?
->
-> Best regards,
-> Berkay Barboros
-> Founder, NordicRate
-> berkaybarboros13@gmail.com
+> We are an early-stage site building traffic organically through programmatic SEO
+> and a 9-articles-per-week multilingual content engine. We prioritise honest,
+> compliant presentation: objective listings, labelled placements, EU UCPD-clean
+> copy. We're seeking loan and consumer-finance programs in FI, SE, NO, DK and the
+> Baltics on CPL or CPA terms.
+
+**Promotion method:** Comparison/price site + content (blog). **PPC on brand terms:** No.
 
 ---
 
-## 3. Başvuru sırası önerisi
+## 3. Gelir Modeli — ağların modeline göre kurgu
 
-1. nordicrate.com go-live (task #7) → site kendi domain'inde
-2. Awin başvurusu (onay 1-2 hafta sürebilir, erken başlat)
-3. LHV e-postası — Awin'den bağımsız, direkt ilişki
-4. Awin onayı gelince: ilgili advertiser programlarına join isteği + `buildUTMLink()`
-   çıktılarını Awin tracking linkleriyle değiştir (kod değişikliği: `lib/utils.ts`)
+| Model | Kimde | Bizim kullanım |
+|---|---|---|
+| **CPL** (lead başına, €15-60) | Adtraction'da yaygın (özellikle FI/SE kredi) | ÖNCELİK 1 — AI ön-eleme lead kalitemizi kanıtlar, düşük trafikte bile gelir üretir |
+| **CPA** (onaylı kredi başına, %/sabit) | Her iki ağ | ÖNCELİK 2 — funnel olgunlaşınca CPL'den yüksek kazanç; karışık portföy tut |
+| **Rev-share** (sigorta yenilemeleri) | Sigorta programları | Sigorta sayfaları için uzun vadeli pasif katman |
+| **Direkt anlaşma** | LHV (mail gönderildi), Baltık bankaları | Ağ komisyonu yok = en yüksek marj; ağ verisi pazarlık kozu |
+
+**Akış:** `/go` gateway → Awin/Adtraction tracking link (subid=ürün+sayfa) → GA4 `affiliate_click`
+conversion ile funnel ölçümü → aylık ağ raporu + kendi tıklama verimiz → düşük performanslı
+programı değiştir, yükseğe içerik yatır. Ödeme: ağlar öder (fatura derdi yok — Paddle sadece
+direkt B2B anlaşmalar için gerekecek).
+
+**Red gelirse:** sorun değil (kullanıcı onayladı) — 30 gün organik büyüme + GSC verisi sonrası
+tekrar başvur; Adtraction/Awin reddi direkt anlaşmaları (LHV yolu) etkilemez.

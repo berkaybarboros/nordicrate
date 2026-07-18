@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getPostBySlug, getPublishedPosts } from '@/lib/blog';
 import { renderMarkdown } from '@/lib/markdown';
 import JsonLd from '@/components/seo/JsonLd';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
 export const revalidate = 600;
 
@@ -48,9 +49,13 @@ export default async function BlogPostPage({ params }: PageProps) {
     <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <JsonLd data={articleJsonLd} />
 
-      <nav className="text-xs text-slate-400 mb-6">
-        <Link href="/blog" className="hover:text-sky-600">← All articles</Link>
-      </nav>
+      <div className="mb-6">
+        <Breadcrumbs items={[
+          { name: 'Home', href: '/' },
+          { name: 'Blog', href: '/blog' },
+          { name: post.title },
+        ]} />
+      </div>
 
       <header className="mb-8">
         <div className="flex items-center gap-2 mb-4">

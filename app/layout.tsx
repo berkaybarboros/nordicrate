@@ -115,6 +115,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Üçüncü parti asset hostlarına erken bağlantı — LCP/bayrak görselleri */}
+        <link rel="preconnect" href="https://flagcdn.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://flagcdn.com" />
+        <link rel="dns-prefetch" href="https://logo.clearbit.com" />
         {/* Google Tag Manager — head'de olabildiğince yukarıda */}
         <script
           dangerouslySetInnerHTML={{
