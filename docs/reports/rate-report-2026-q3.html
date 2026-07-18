@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Nordic &amp; Baltic Rate Report — Q3 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',Arial,sans-serif; color:#0E1525; background:#fff; font-size:15px; line-height:1.6; }
+  .page { width:210mm; min-height:296mm; padding:22mm 20mm; page-break-after:always; position:relative; }
+  .page:last-child { page-break-after:auto; }
+  .kicker { font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:#2563EB; font-weight:700; }
+  h1 { font-size:44px; line-height:1.12; font-weight:700; margin:14px 0 18px; }
+  h2 { font-size:26px; font-weight:700; margin:0 0 6px; }
+  h3 { font-size:17px; font-weight:700; margin:18px 0 6px; }
+  p { color:#475569; margin-bottom:12px; }
+  .rule { height:4px; width:64px; background:linear-gradient(90deg,#2563EB,#0891B2); border-radius:2px; margin:10px 0 22px; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:26px 0; }
+  .stat { background:#F6F7FB; border:1px solid #E6E9F2; border-radius:14px; padding:16px 14px; }
+  .stat b { display:block; font-size:26px; color:#0E1525; }
+  .stat span { font-size:12px; color:#8A97AC; }
+  table { width:100%; border-collapse:collapse; margin:14px 0 6px; font-size:13.5px; }
+  th { text-align:left; font-family:'Space Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:#8A97AC; padding:8px 10px; border-bottom:2px solid #E6E9F2; }
+  td { padding:9px 10px; border-bottom:1px solid #E6E9F2; color:#0E1525; }
+  td.mono, .mono { font-family:'Space Mono',monospace; }
+  .callout { background:#F6F7FB; border-left:4px solid #2563EB; border-radius:0 12px 12px 0; padding:14px 16px; margin:18px 0; font-size:14px; color:#0E1525; }
+  .callout.warn { border-color:#F59E0B; }
+  .footnote { font-size:11.5px; color:#8A97AC; margin-top:8px; }
+  .footer { position:absolute; bottom:12mm; left:20mm; right:20mm; display:flex; justify-content:space-between; font-family:'Space Mono',monospace; font-size:11px; color:#8A97AC; border-top:1px solid #E6E9F2; padding-top:8px; }
+  .cover { display:flex; flex-direction:column; justify-content:center; }
+  .cover .fox { width:88px; height:88px; border-radius:50%; border:3px solid #E6E9F2; margin-bottom:26px; }
+  .brand { font-weight:700; font-size:20px; } .brand .b { color:#2563EB; }
+  .cta { background:#0E1525; color:#fff; border-radius:16px; padding:24px 26px; margin-top:26px; }
+  .cta h3 { color:#fff; margin-top:0; } .cta p { color:#94A3B8; font-size:14px; }
+  .cta .link { color:#60A5FA; font-weight:700; }
+  ul { margin:0 0 12px 18px; color:#475569; } li { margin-bottom:6px; }
+</style></head><body>
+
+<!-- SAYFA 1 — KAPAK -->
+<div class="page cover">
+  <img class="fox" src="data:image/png;base64,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" alt="">
+  <div class="kicker">Quarterly Market Data · Q3 2026 Edition</div>
+  <h1>Nordic &amp; Baltic<br>Rate Report</h1>
+  <div class="rule"></div>
+  <p style="max-width:520px">Interbank reference rates, verified bank pricing and cross-market
+  loan comparison across eight Nordic and Baltic countries — built from NordicRate's live data
+  pipeline, not third-party summaries.</p>
+  <div class="stat-grid">
+    <div class="stat"><b>2.60%</b><span>EURIBOR 6M (Jul 13 wk)</span></div>
+    <div class="stat"><b>+20 bp</b><span>3M move, May→Jul</span></div>
+    <div class="stat"><b>4.50%</b><span>Norges Bank policy rate</span></div>
+    <div class="stat"><b>8 / 60+</b><span>markets / institutions tracked</span></div>
+  </div>
+  <div class="footer"><span>nordicrate.com</span><span>© 2026 NordicRate — Q3 Rate Report</span></div>
+</div>
+
+<!-- SAYFA 2 — EURIBOR TRENDİ -->
+<div class="page">
+  <div class="kicker">Section 01</div>
+  <h2>EURIBOR: the slow climb resumed</h2>
+  <div class="rule"></div>
+  <p>Weekly averages from our ECB data feed show all three key EURIBOR maturities drifting upward
+  through late Q2 and early Q3 2026. The 3-month rate rose from 2.14% (week of May 11) to 2.34%
+  (week of Jul 13) — a 20 basis-point move that flows directly into variable-rate loan resets.</p>
+  <svg width="760" height="340" viewBox="0 0 760 340" style="max-width:100%; margin:10px 0"><line x1="60" y1="296.0" x2="670" y2="296.0" stroke="#E6E9F2" stroke-width="1"/><text x="50" y="300.0" text-anchor="end" font-size="12" fill="#8A97AC">2.00%</text><line x1="60" y1="228.0" x2="670" y2="228.0" stroke="#E6E9F2" stroke-width="1"/><text x="50" y="232.0" text-anchor="end" font-size="12" fill="#8A97AC">2.25%</text><line x1="60" y1="160.0" x2="670" y2="160.0" stroke="#E6E9F2" stroke-width="1"/><text x="50" y="164.0" text-anchor="end" font-size="12" fill="#8A97AC">2.50%</text><line x1="60" y1="92.0" x2="670" y2="92.0" stroke="#E6E9F2" stroke-width="1"/><text x="50" y="96.0" text-anchor="end" font-size="12" fill="#8A97AC">2.75%</text><line x1="60" y1="24.0" x2="670" y2="24.0" stroke="#E6E9F2" stroke-width="1"/><text x="50" y="28.0" text-anchor="end" font-size="12" fill="#8A97AC">3.00%</text><text x="60.0" y="326" text-anchor="middle" font-size="11" fill="#8A97AC">May 11</text><text x="195.6" y="326" text-anchor="middle" font-size="11" fill="#8A97AC">May 25</text><text x="331.1" y="326" text-anchor="middle" font-size="11" fill="#8A97AC">Jun 8</text><text x="466.7" y="326" text-anchor="middle" font-size="11" fill="#8A97AC">Jun 22</text><text x="602.2" y="326" text-anchor="middle" font-size="11" fill="#8A97AC">Jul 6</text><polyline points="60.0,257.4 127.8,248.4 195.6,248.4 263.3,235.1 331.1,234.5 398.9,234.5 466.7,234.5 534.4,217.4 602.2,203.8 670.0,203.8" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linejoin="round"/><circle cx="670.0" cy="203.8" r="3.5" fill="#2563EB"/><text x="680.0" y="207.8" font-size="12" font-weight="700" fill="#2563EB">3M 2.34%</text><polyline points="60.0,189.4 127.8,172.5 195.6,172.5 263.3,151.0 331.1,150.2 398.9,150.2 466.7,150.2 534.4,141.0 602.2,133.9 670.0,133.9" fill="none" stroke="#0891B2" stroke-width="2.5" stroke-linejoin="round"/><circle cx="670.0" cy="133.9" r="3.5" fill="#0891B2"/><text x="680.0" y="137.9" font-size="12" font-weight="700" fill="#0891B2">6M 2.60%</text><polyline points="60.0,121.4 127.8,92.8 195.6,92.8 263.3,77.9 331.1,77.3 398.9,77.3 466.7,77.3 534.4,78.1 602.2,78.9 670.0,78.9" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linejoin="round"/><circle cx="670.0" cy="78.9" r="3.5" fill="#7C3AED"/><text x="680.0" y="82.9" font-size="12" font-weight="700" fill="#7C3AED">12M 2.80%</text></svg>
+  <div class="callout">
+    <b>What this means for borrowers:</b> loans referencing 3M EURIBOR reprice four times a year and
+    have already absorbed most of this move. 6M and 12M-referenced mortgages reset later — resets
+    landing in H2 2026 will price roughly 15–20 bp above the spring level.
+  </div>
+  <p>Norway sits apart: Norges Bank's policy rate held at 4.50% through the entire period, keeping
+  Norwegian floating mortgage costs materially higher than eurozone equivalents.</p>
+  <div class="footer"><span>nordicrate.com</span><span>Source: ECB SDMX + Norges Bank API, weekly averages</span></div>
+</div>
+
+<!-- SAYFA 3 — DOĞRULANMIŞ BANKA ORANLARI -->
+<div class="page">
+  <div class="kicker">Section 02</div>
+  <h2>Verified bank pricing: Estonia monitor</h2>
+  <div class="rule"></div>
+  <p>NordicRate runs automated daily monitoring of published loan pricing on bank websites.
+  Figures below were captured directly from each bank's public product pages on <b>18 July 2026</b>.</p>
+  <table>
+    <tr><th>Bank</th><th>Product</th><th>Published rate</th><th>Effective floor*</th></tr>
+    <tr><td>LHV Pank</td><td>Consumer loan</td><td class="mono">from 5.90%</td><td class="mono">5.90%</td></tr>
+    <tr><td>LHV Pank</td><td>Home loan (energy class A/B)</td><td class="mono">1.49% + 6M EURIBOR</td><td class="mono">4.09%</td></tr>
+    <tr><td>Coop Pank</td><td>Small loan</td><td class="mono">from 7.90%</td><td class="mono">7.90%</td></tr>
+    <tr><td>Coop Pank</td><td>Home loan (energy class A)</td><td class="mono">1.49% + 6M EURIBOR</td><td class="mono">4.09%</td></tr>
+    <tr><td>Coop Pank</td><td>Car loan</td><td class="mono">from 6.90%</td><td class="mono">6.90%</td></tr>
+  </table>
+  <p class="footnote">* Effective floor = published margin + 6M EURIBOR (2.60%, Jul 13 week) where the
+  bank prices against EURIBOR; otherwise the published "from" rate. Individual pricing depends on the
+  applicant's profile. Representative APRC on small consumer loans is substantially higher than the
+  nominal rate (Coop Pank's own example calculator shows 22.78% APRC on a small-amount scenario).</p>
+  <div class="callout warn">
+    <b>The margin illusion:</b> headline mortgage offers like "from 1.49%" are margins, not total
+    rates. The real floor today is ~4.1%. Any comparison site displaying the margin as the rate is
+    misleading its users — and its partners.
+  </div>
+  <div class="footer"><span>nordicrate.com</span><span>Automated monitoring, captured 2026-07-18</span></div>
+</div>
+
+<!-- SAYFA 4 — ÜLKE KARŞILAŞTIRMASI -->
+<div class="page">
+  <div class="kicker">Section 03</div>
+  <h2>Cross-market comparison</h2>
+  <div class="rule"></div>
+  <p>Lowest advertised rates currently listed on NordicRate, by market. Estonian figures are
+  verified daily by automated monitoring; other markets reflect catalogued bank listings.</p>
+  <table>
+    <tr><th>Market</th><th>Personal from</th><th>Mortgage from</th><th>Business from</th></tr>
+    <tr><td>🇩🇰 Denmark (DKK)</td><td class="mono">6.99% — Danske Bank</td><td class="mono">2.75% — Nykredit</td><td class="mono">4.99% — Danske Bank</td></tr>
+    <tr><td>🇫🇮 Finland (EUR)</td><td class="mono">6.50% — OP</td><td class="mono">3.25% — OP</td><td class="mono">4.50% — OP</td></tr>
+    <tr><td>🇮🇸 Iceland (ISK)</td><td class="mono">8.90% — Landsbankinn</td><td class="mono">5.25% — Landsbankinn</td><td class="mono">8.00% — Íslandsbanki</td></tr>
+    <tr><td>🇳🇴 Norway (NOK)</td><td class="mono">6.90% — DNB</td><td class="mono">3.80% — DNB</td><td class="mono">5.50% — DNB</td></tr>
+    <tr><td>🇸🇪 Sweden (SEK)</td><td class="mono">6.49% — Nordea</td><td class="mono">3.50% — SBAB</td><td class="mono">4.75% — SEB</td></tr>
+    <tr><td>🇪🇪 Estonia (EUR)†</td><td class="mono">5.90% — LHV</td><td class="mono">4.09% — LHV / Coop</td><td class="mono">6.50% — Swedbank</td></tr>
+    <tr><td>🇱🇻 Latvia (EUR)</td><td class="mono">11.00% — Luminor</td><td class="mono">4.75% — Swedbank</td><td class="mono">6.50% — RIB Bank</td></tr>
+    <tr><td>🇱🇹 Lithuania (EUR)</td><td class="mono">10.50% — Luminor</td><td class="mono">4.50% — Swedbank</td><td class="mono">6.50% — Swedbank</td></tr>
+  </table>
+  <p class="footnote">† Estonia: live-verified 2026-07-18. Danish mortgage figure reflects the covered-bond
+  (realkredit) system; Icelandic figures are non-indexed nominal rates. Rates are best advertised cases —
+  individual offers depend on creditworthiness, amount and term.</p>
+  <div class="callout">
+    <b>The spread that matters:</b> a eurozone borrower moving from Latvia to Estonia sees the same
+    currency and the same EURIBOR — yet a 5-point gap on entry-level personal loan pricing. Cross-border
+    rate awareness is worth real money, which is exactly the gap NordicRate exists to close.
+  </div>
+  <div class="footer"><span>nordicrate.com</span><span>Catalogue snapshot, July 2026</span></div>
+</div>
+
+<!-- SAYFA 5 — METODOLOJİ + CTA -->
+<div class="page">
+  <div class="kicker">Section 04</div>
+  <h2>Methodology &amp; about</h2>
+  <div class="rule"></div>
+  <h3>Data sources</h3>
+  <ul>
+    <li><b>Reference rates:</b> ECB SDMX API (EURIBOR 3/6/12M) and Norges Bank API, fetched hourly,
+    aggregated to weekly averages. 3,300+ observations in the underlying series.</li>
+    <li><b>Bank pricing:</b> automated daily capture of published rates from bank product pages,
+    with parse-quality controls and a human-readable evidence snippet stored per observation.</li>
+    <li><b>Catalogue:</b> 100+ loan and insurance products across 60+ institutions, maintained with
+    verify-before-publish policy.</li>
+  </ul>
+  <h3>Honesty rules</h3>
+  <ul>
+    <li>Margins are never presented as total rates — EURIBOR-linked offers are shown with the computed floor.</li>
+    <li>No invented statistics, ratings or user counts. Everything in this report traces to a source we operate.</li>
+    <li>Rates are indicative "best advertised" figures — individual pricing always depends on the applicant.</li>
+  </ul>
+  <div class="cta">
+    <h3>For lenders &amp; brokers</h3>
+    <p>NordicRate delivers AI-pre-qualified borrower leads (income, DTI, residency, loan size) across
+    8 markets on CPL/CPA terms — and this report's data pipeline is available as a partner feed.</p>
+    <p class="link">nordicrate.com/partners · berkaybarboros13@gmail.com</p>
+  </div>
+  <p class="footnote" style="margin-top:16px">This report is for information only and is not financial
+  advice. © 2026 NordicRate. Next edition: Q4 2026.</p>
+  <div class="footer"><span>nordicrate.com</span><span>Q3 2026 · v1.0</span></div>
+</div>
+
+</body></html>

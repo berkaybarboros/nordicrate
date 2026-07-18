@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { FileBarChart, CheckCircle2 } from 'lucide-react';
+import { FileBarChart, CheckCircle2, Download } from 'lucide-react';
+
+const REPORT_URL = '/reports/nordic-baltic-rate-report-2026-q3.pdf';
 
 /** B2B lead magnet — çeyreklik oran raporu için şirket e-postası toplar. */
 export default function RateReportSignup() {
@@ -37,8 +39,18 @@ export default function RateReportSignup() {
           </p>
         </div>
         {state === 'done' ? (
-          <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm shrink-0">
-            <CheckCircle2 size={18} /> You&apos;re on the list
+          <div className="shrink-0">
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm mb-2">
+              <CheckCircle2 size={18} /> You&apos;re on the list
+            </div>
+            <a
+              href={REPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors"
+            >
+              <Download size={15} /> Download Q3 2026 report (PDF)
+            </a>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex w-full sm:w-auto gap-2 shrink-0">
