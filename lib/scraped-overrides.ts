@@ -19,10 +19,15 @@ import type { LoanProduct } from '@/lib/types';
 
 const BANK_TO_INSTITUTION: Record<string, string> = {
   lhv: 'lhv-ee',
-  // coop: 'coop-ee'  ← Coop Pank scraper'ı eklenince aç
+  coop: 'coop-ee',
 };
 
-const ALLOWED_TYPES = new Set(['personal', 'mortgage']);
+// Banka bazlı güvenilir tipler — LHV auto public oran yayınlamıyor (yanlış-pozitif
+// riski), Coop ise 3 tipte de açık oran veriyor (2026-07-17 sayfa doğrulaması)
+const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
+  lhv: new Set(['personal', 'mortgage']),
+  coop: new Set(['personal', 'mortgage', 'auto']),
+};
 const FRESHNESS_MS = 48 * 60 * 60 * 1000;
 
 interface ScrapedRow {
@@ -58,7 +63,7 @@ export async function applyScrapedOverrides(products: LoanProduct[]): Promise<Lo
 
     const overrides = new Map<string, { rate: number; at: string }>();
     for (const r of rows) {
-      if (!ALLOWED_TYPES.has(r.product_type)) continue;
+      if (!ALLOWED_TYPES_BY_BANK[r.bank_id]?.has(r.product_type)) continue;
       if (Date.now() - new Date(r.scraped_at).getTime() > FRESHNESS_MS) continue;
       const instId = BANK_TO_INSTITUTION[r.bank_id];
       if (!instId) continue;
@@ -80,9 +85,16 @@ export async function applyScrapedOverrides(products: LoanProduct[]): Promise<Lo
 
     return products.map((p) => {
       const o = overrides.get(`${p.institutionId}:${p.type}`);
-      // rateMax'ı aşan override tutarsız görünür — atla
-      if (!o || o.rate >= p.rateMax) return p;
-      return { ...p, rateMin: o.rate, updatedAt: o.at, isLiveRate: true };
+      if (!o) return p;
+      // Kaba tutarsızlık koruması: scrape statik banttan %50+ yüksekse veri şüpheli
+      if (o.rate > p.rateMax * 1.5) return p;
+      return {
+        ...p,
+        rateMin: o.rate,
+        rateMax: Math.max(p.rateMax, o.rate), // 'up to' tutarlılığı
+        updatedAt: o.at,
+        isLiveRate: true,
+      };
     });
   } catch {
     return products; // veri katmanı asla sayfayı düşürmez
