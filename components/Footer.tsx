@@ -155,10 +155,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
-          <p>© {CURRENT_YEAR} NordicRate. All rights reserved.</p>
-          <p className="text-center text-slate-500">
-            Rates are indicative only. Always verify directly with the institution before applying.
+        <div className="border-t border-slate-800 pt-6 flex flex-col gap-3 text-xs">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© {CURRENT_YEAR} NordicRate. All rights reserved.</p>
+            <p className="text-center text-slate-500">
+              Rates are indicative only. Always verify directly with the institution before applying.
+            </p>
+          </div>
+          {/* Veri kaynağı atıfları (ECB/Norges yeniden kullanım koşulları) + marka feragatnamesi */}
+          <p className="text-[11px] text-slate-600 leading-relaxed text-center sm:text-left">
+            Reference rates sourced from the European Central Bank (EURIBOR) and Norges Bank, updated daily.
+            Bank rates marked &quot;live&quot; are captured from the institutions&apos; public websites with timestamps.
+            All bank and institution names, logos and trademarks belong to their respective owners;
+            NordicRate is an independent comparison service and is not affiliated with, sponsored or endorsed
+            by any listed institution.
           </p>
         </div>
       </div>

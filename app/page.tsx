@@ -29,7 +29,7 @@ import CountryCard from '@/components/CountryCard';
 import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
-import HeroSearch from '@/components/HeroSearch';
+import HeroCta from '@/components/home/HeroCta';
 import TrustBar from '@/components/TrustBar';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
@@ -59,7 +59,7 @@ export default async function HomePage() {
     <div>
       <JsonLd data={buildFaqJsonLd(FAQS)} />
 
-      {/* ========== HERO — 2-column layout ========== */}
+      {/* ========== HERO — tek ekrana sığan, aksiyon odaklı ========== */}
       <section className="relative bg-slate-950 text-white overflow-hidden">
         {/* Subtle brand glow */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden>
@@ -67,32 +67,35 @@ export default async function HomePage() {
           <div className="absolute -bottom-60 -left-40 w-[500px] h-[500px] bg-sky-800/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* lg'de header (4rem) düşülmüş viewport'a oturur — mesajın tamamı fold üstünde */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-0 lg:min-h-[calc(100dvh-4rem)] flex items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
 
-            {/* Left column — text */}
+            {/* Left column — action copy */}
             <div>
-              {/* Live data badge — gerçek iddia */}
-              <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                 Live EURIBOR &amp; central bank data
               </div>
 
-              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-[1.08] mb-5">
-                One search.
+              <h1 className="text-4xl sm:text-5xl xl:text-[3.4rem] font-extrabold leading-[1.08] mb-4">
+                Find your best loan.
                 <br />
-                Every Nordic &amp; Baltic
-                <br />
-                <span className="text-sky-400">loan rate.</span>
+                <span className="text-sky-400">Compare. Apply. Save.</span>
               </h1>
 
-              <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
-                Compare {totalProducts}+ products from {totalInstitutions}+ banks and insurers across{' '}
-                {totalCountries} countries — free, independent, and with no impact on your credit score.
+              <p className="text-slate-300 text-lg leading-relaxed mb-6 max-w-lg">
+                {totalProducts}+ offers from {totalInstitutions}+ banks across {totalCountries} Nordic
+                &amp; Baltic countries. Pick yours in minutes — free, independent, no impact on your
+                credit score.
               </p>
 
+              <div className="mb-6">
+                <HeroCta />
+              </div>
+
               {/* Honest trust chips */}
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className="flex flex-wrap gap-2">
                 {['100% free', 'No credit check', 'Independent comparison', 'GDPR compliant'].map((chip) => (
                   <span
                     key={chip}
@@ -105,47 +108,11 @@ export default async function HomePage() {
                   </span>
                 ))}
               </div>
-
-              {/* Hero Search */}
-              <div className="mb-8">
-                <HeroSearch />
-              </div>
-
-              {/* Micro stats */}
-              <div className="flex flex-wrap gap-8 text-sm">
-                {[
-                  { value: `${totalCountries}`, label: 'Countries' },
-                  { value: `${totalInstitutions}+`, label: 'Institutions' },
-                  { value: `${totalProducts}+`, label: 'Products' },
-                ].map(({ value, label }) => (
-                  <div key={label}>
-                    <p className="text-2xl font-extrabold text-white leading-none">{value}</p>
-                    <p className="text-xs text-slate-400 mt-1">{label}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Right column — calculator */}
             <div className="lg:pl-4">
               <LoanCalculator />
-            </div>
-          </div>
-
-          {/* Country flags row */}
-          <div className="mt-12 pt-8 border-t border-white/10">
-            <p className="text-xs text-slate-500 text-center mb-4 uppercase tracking-widest font-semibold">Compare rates in</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {COUNTRIES.map((c) => (
-                <Link
-                  key={c.code}
-                  href={`/loans/${COUNTRY_SLUG_BY_CODE[c.code]}`}
-                  className="flex items-center gap-1.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl px-3 py-1.5 transition-colors text-sm"
-                >
-                  <CountryFlag code={c.code} size={24} rounded="sm" />
-                  <span className="font-medium text-slate-200">{c.name}</span>
-                </Link>
-              ))}
             </div>
           </div>
         </div>
@@ -311,6 +278,19 @@ export default async function HomePage() {
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900">Browse by Country</h2>
               <p className="text-slate-500 text-sm mt-1">Explore credit markets across 8 Nordic &amp; Baltic countries</p>
+              {/* Ülke landing sayfalarına iç linkler (hero'dan taşındı — SEO değeri korunur) */}
+              <div className="flex flex-wrap gap-2 mt-3">
+                {COUNTRIES.map((c) => (
+                  <Link
+                    key={c.code}
+                    href={`/loans/${COUNTRY_SLUG_BY_CODE[c.code]}`}
+                    className="flex items-center gap-1.5 bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg px-2.5 py-1 transition-colors text-xs font-medium text-slate-600"
+                  >
+                    <CountryFlag code={c.code} size={16} rounded="sm" />
+                    {c.name}
+                  </Link>
+                ))}
+              </div>
             </div>
             <Link href="/countries" className="text-sky-600 hover:text-sky-800 font-semibold text-sm hidden sm:block">
               All countries →
