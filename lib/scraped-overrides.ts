@@ -39,13 +39,16 @@ async function pgRest<T>(pathAndQuery: string): Promise<T | null> {
 const BANK_TO_INSTITUTION: Record<string, string> = {
   lhv: 'lhv-ee',
   coop: 'coop-ee',
+  seb: 'seb-ee',
 };
 
 // Banka bazlı güvenilir tipler — LHV auto public oran yayınlamıyor (yanlış-pozitif
-// riski), Coop ise 3 tipte de açık oran veriyor (2026-07-17 sayfa doğrulaması)
+// riski), Coop ise 3 tipte de açık oran veriyor (2026-07-17 sayfa doğrulaması).
+// SEB: 3 tip de statik HTML'de açık oranla yayında (2026-07-19 doğrulaması).
 const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   lhv: new Set(['personal', 'mortgage']),
   coop: new Set(['personal', 'mortgage', 'auto']),
+  seb: new Set(['personal', 'mortgage', 'auto']),
 };
 const FRESHNESS_MS = 48 * 60 * 60 * 1000;
 

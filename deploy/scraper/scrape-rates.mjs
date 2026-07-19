@@ -1,16 +1,21 @@
 /**
- * D1 — Çok bankalı günlük rate scraper (LHV + Coop Pank).
+ * D1 — Çok bankalı günlük rate scraper (LHV + Coop Pank + SEB).
  * scrape-lhv.mjs'in halefi; cron bunu çağırır.
  *
  * Legal durum (2026-07 doğrulandı):
  * - lhv.ee/robots.txt: loan sayfaları tüm UA'lara açık
  * - cooppank.ee/robots.txt: "Allow: /" (Disallow /private/ KÖK path'tir;
  *   /en/private/... onu kapsamaz — prefix eşleşmesi)
+ * - seb.ee/robots.txt: sadece /media/oembed + /sites/default/files disallow —
+ *   loan sayfaları açık; ToS'ta anti-scraping maddesi bulunamadı (2026-07-19)
  * - Günde 1 çalıştırma + sayfalar arası 3sn — ölçülü kullanım
  *
  * marginPlusEuribor: sayfadaki oran marjdır (ör. "1,49% + Euribor" yapısı sayfada
  * dağınık yazılır) — snippet'e işaret eklenir ki override katmanı canlı EURIBOR
  * ile toplasın, marjı APR gibi basmasın (UCPD).
+ *
+ * preferFrom: sayfada temsili örnek hesap varsa ("fixed annual interest rate of 8%"
+ * gibi) genel interest-pattern yanlış değeri yakalar — önce "from X%" denenir (SEB).
  */
 
 import { chromium } from 'playwright';
@@ -30,6 +35,14 @@ const BANKS = [
       { productType: 'personal', url: 'https://www.cooppank.ee/en/private/small-loan' },
       { productType: 'mortgage', url: 'https://www.cooppank.ee/en/private/home/home-loan', marginPlusEuribor: true },
       { productType: 'auto',     url: 'https://www.cooppank.ee/en/private/car/car-loan' },
+    ],
+  },
+  {
+    bankId: 'seb',
+    targets: [
+      { productType: 'personal', url: 'https://www.seb.ee/en/private/loans/consumer-loan', preferFrom: true },
+      { productType: 'mortgage', url: 'https://www.seb.ee/en/private/loans/home-loan', marginPlusEuribor: true, preferFrom: true },
+      { productType: 'auto',     url: 'https://www.seb.ee/en/private/loans/car-loan', preferFrom: true },
     ],
   },
 ];
@@ -103,7 +116,12 @@ async function main() {
         await page.waitForTimeout(3000);
         const text = await page.evaluate(() => document.body.innerText);
 
-        const rate = extract(text, RATE_PATTERNS);
+        // preferFrom: "from X%" desenini öne al — temsili örnek hesapların
+        // ("interest rate of 8%") genel deseni yanlış yakalamasını önler
+        const patterns = target.preferFrom
+          ? [RATE_PATTERNS[2], ...RATE_PATTERNS.slice(0, 2)]
+          : RATE_PATTERNS;
+        const rate = extract(text, patterns);
         const aprc = extract(text, APRC_PATTERNS);
         const parseOk = rate !== null;
 
