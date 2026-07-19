@@ -121,7 +121,11 @@ function MarkdownText({ text }: { text: string }) {
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTeaser, setShowTeaser] = useState(false);
-  const [teaserDismissed, setTeaserDismissed] = useState(false);
+  // Teaser tercihi kalıcı — bir kez kapatan kullanıcı her yenilemede tekrar görmez
+  const [teaserDismissed, setTeaserDismissed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('nr-teaser-dismissed') === 'true';
+  });
   const [mode, setMode] = useState<AssistantMode>('personal');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -208,12 +212,20 @@ export default function AIAssistant() {
     }
   }, [messages, isOpen]);
 
-  // Show teaser bubble after 4s on first load (only once per session)
+  // Teaser balonu 4s sonra — SADECE hiç konuşma yoksa.
+  // Mevcut konuşma varsa kırmızı "okunmamış" noktası zaten sinyal veriyor;
+  // ikisini birden göstermek çelişkili ("yeni başla" vs "devam et").
   useEffect(() => {
-    if (isOpen || teaserDismissed) return;
+    if (isOpen || teaserDismissed || hasUnread || messages.length > 1) return;
     const timer = setTimeout(() => setShowTeaser(true), 4000);
     return () => clearTimeout(timer);
-  }, [isOpen, teaserDismissed]);
+  }, [isOpen, teaserDismissed, hasUnread, messages.length]);
+
+  const dismissTeaser = useCallback(() => {
+    setShowTeaser(false);
+    setTeaserDismissed(true);
+    try { localStorage.setItem('nr-teaser-dismissed', 'true'); } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     if (Object.keys(userProfile).length === 0) {
@@ -434,33 +446,29 @@ export default function AIAssistant() {
 
   return (
     <>
-      {/* Teaser bubble — auto-appears after 4s */}
+      {/* Teaser bubble — 4s sonra, tek satır. Maskot/başlık yok: hemen altındaki
+          FAB zaten "Ask NordicAI" + maskot gösteriyor, tekrar etmiyoruz. */}
       {showTeaser && !isOpen && !teaserDismissed && (
-        <div className="fixed bottom-28 right-6 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="bg-white border border-violet-200 rounded-2xl shadow-2xl px-4 py-3 max-w-[240px] relative">
+        <div className="fixed bottom-24 right-6 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl px-4 py-3 max-w-[220px] relative">
             <button
-              onClick={() => { setShowTeaser(false); setTeaserDismissed(true); }}
-              className="absolute -top-2 -right-2 w-5 h-5 bg-gray-400 hover:bg-gray-500 text-white rounded-full text-xs flex items-center justify-center transition"
+              onClick={dismissTeaser}
+              aria-label="Dismiss"
+              className="absolute -top-2 -right-2 w-5 h-5 bg-slate-300 hover:bg-slate-400 text-white rounded-full text-xs flex items-center justify-center transition"
             >
               ×
             </button>
-            <div className="flex items-start gap-2">
-              <Image src="/nordicai.png" alt="NordicAI" width={32} height={32} className="shrink-0 rounded-full" />
-              <div>
-                <p className="text-xs font-bold text-gray-800">NordicAI</p>
-                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
-                  👋 Need help comparing loans or checking your eligibility?
-                </p>
-                <button
-                  onClick={() => { setShowTeaser(false); setTeaserDismissed(true); handleOpen(); }}
-                  className="mt-2 text-xs font-bold text-violet-600 hover:text-violet-700 flex items-center gap-1"
-                >
-                  Chat now →
-                </button>
-              </div>
-            </div>
-            {/* Tail */}
-            <div className="absolute -bottom-2 right-6 w-3 h-3 bg-white border-r border-b border-violet-200 rotate-45" />
+            <p className="text-[13px] text-slate-700 leading-snug">
+              👋 Need help comparing loans or checking your eligibility?
+            </p>
+            <button
+              onClick={() => { dismissTeaser(); handleOpen(); }}
+              className="mt-2 text-xs font-bold text-violet-600 hover:text-violet-700"
+            >
+              Chat now →
+            </button>
+            {/* Tail — FAB'a doğru ok */}
+            <div className="absolute -bottom-2 right-8 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45" />
           </div>
         </div>
       )}
