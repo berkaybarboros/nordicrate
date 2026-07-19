@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
+import { Calculator, BarChart3, CheckCircle2, Check } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
 import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
@@ -31,7 +31,6 @@ import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
 import HeroCta from '@/components/home/HeroCta';
 import InstitutionMarquee from '@/components/home/InstitutionMarquee';
-import TrustBar from '@/components/TrustBar';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
 
@@ -40,7 +39,7 @@ export default async function HomePage() {
   const totalProducts = PRODUCTS.length;
   const totalCountries = COUNTRIES.length;
 
-  // Canlı oran override'ları — "Today's Best Rates" gerçek scrape verisini yansıtsın
+  // Canlı oran override'ları — tip kartları gerçek scrape verisini yansıtsın
   const liveProducts = await applyScrapedOverrides(PRODUCTS);
 
   const featuredProducts = liveProducts.filter((p) => p.isPromoted)
@@ -52,136 +51,129 @@ export default async function HomePage() {
     ...getCountryStats(c.code),
   }));
 
-  const bestPersonal = [...liveProducts].filter((p) => p.type === 'personal').sort((a, b) => a.rateMin - b.rateMin)[0];
-  const bestMortgage = [...liveProducts].filter((p) => p.type === 'mortgage').sort((a, b) => a.rateMin - b.rateMin)[0];
-  const bestBusiness = [...liveProducts].filter((p) => p.type === 'business').sort((a, b) => a.rateMin - b.rateMin)[0];
+  // Ürün tipi başına en iyi oran — Altero pattern: tile'da gerçek "from X%" göster
+  const typeStats = (
+    [
+      { type: 'personal', href: '/loans', desc: 'Unsecured personal finance' },
+      { type: 'mortgage', href: '/mortgage', desc: 'Home & property loans' },
+      { type: 'auto', href: '/loans?type=auto', desc: 'Vehicle financing' },
+      { type: 'business', href: '/business', desc: 'SME & corporate credit' },
+    ] as const
+  ).map(({ type, href, desc }) => {
+    const prods = liveProducts.filter((p) => p.type === type);
+    const best = [...prods].sort((a, b) => a.rateMin - b.rateMin)[0];
+    const inst = best ? getInstitution(best.institutionId) : null;
+    return { type, href, desc, count: prods.length, best, inst };
+  });
 
   return (
     <div>
       <JsonLd data={buildFaqJsonLd(FAQS)} />
 
-      {/* ========== HERO — tek ekrana sığan, aksiyon odaklı ========== */}
-      <section className="relative bg-slate-950 text-white overflow-hidden">
-        {/* Subtle brand glow */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden>
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-sky-600/15 rounded-full blur-3xl" />
-          <div className="absolute -bottom-60 -left-40 w-[500px] h-[500px] bg-sky-800/10 rounded-full blur-3xl" />
-        </div>
-
-        {/* lg'de header (4rem) düşülmüş viewport'a oturur — mesajın tamamı fold üstünde */}
+      {/* ========== HERO — açık tema, form-first (Lendo/Altero pattern) ========== */}
+      <section className="relative bg-gradient-to-b from-sky-50 via-white to-white border-b border-slate-100 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-0 lg:min-h-[calc(100dvh-4rem)] flex items-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center w-full py-2">
 
-            {/* Left column — action copy */}
-            <div>
-              <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+            {/* Left — kısa mesaj + somut değer maddeleri + tek CTA */}
+            <div className="lg:col-span-5">
+              <div className="inline-flex items-center gap-2 bg-white border border-sky-200 text-sky-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5 shadow-sm">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                 Live EURIBOR &amp; central bank data
               </div>
 
-              <h1 className="text-4xl sm:text-5xl xl:text-[3.4rem] font-extrabold leading-[1.08] mb-4">
+              <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.08] text-slate-900 mb-5">
                 Find your best loan.
                 <br />
-                <span className="text-sky-400">Compare. Apply. Save.</span>
+                <span className="text-sky-600">Compare. Apply. Save.</span>
               </h1>
 
-              <p className="text-slate-300 text-lg leading-relaxed mb-6 max-w-lg">
-                {totalProducts}+ offers from {totalInstitutions}+ banks across {totalCountries} Nordic
-                &amp; Baltic countries. Pick yours in minutes — free, independent, no impact on your
-                credit score.
-              </p>
-
-              <div className="mb-6">
-                <HeroCta />
-              </div>
-
-              {/* Honest trust chips */}
-              <div className="flex flex-wrap gap-2">
-                {['100% free', 'No credit check', 'Independent comparison', 'GDPR compliant'].map((chip) => (
-                  <span
-                    key={chip}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-300 bg-white/5 border border-white/10 rounded-full px-3 py-1.5"
-                  >
-                    <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    {chip}
-                  </span>
+              {/* Lendo tarzı somut bullet'lar — pazarlama paragrafı yerine */}
+              <ul className="space-y-3 mb-7">
+                {[
+                  `${totalProducts}+ offers from ${totalInstitutions}+ banks in one view`,
+                  `${totalCountries} Nordic & Baltic countries covered`,
+                  'Free & independent — no credit check, no sign-up',
+                  'Live EURIBOR & bank-verified rates, updated daily',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-slate-700">
+                    <span className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    <span className="text-[15px] font-medium leading-snug">{item}</span>
+                  </li>
                 ))}
+              </ul>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <HeroCta />
+                <Link href="/loans" className="text-sm font-bold text-slate-600 hover:text-sky-700 transition-colors">
+                  Browse all loans →
+                </Link>
               </div>
             </div>
 
-            {/* Right column — calculator */}
-            <div className="lg:pl-4">
+            {/* Right — hesaplayıcı ana aktör (kendi kart stili var) */}
+            <div className="lg:col-span-7">
               <LoanCalculator />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== TRUST BAR ========== */}
-      <TrustBar />
-
-      {/* ========== KURUM LOGO MARQUEE ========== */}
-      <InstitutionMarquee />
-
-      {/* ========== LIVE RATES BANNER ========== */}
-      <LiveRatesBanner />
-
-      {/* ========== TODAY'S BEST RATES ========== */}
-      <section className="py-12 px-4 bg-white">
+      {/* ========== ÜRÜN TİPİ KARTLARI — gerçek "from X%" oranlarıyla ========== */}
+      <section className="py-10 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-extrabold text-slate-900">Today&apos;s Best Market Rates</h2>
-            <p className="text-slate-500 text-sm mt-1">Live lowest APR from our database — updated daily</p>
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-extrabold text-slate-900">What do you need financing for?</h2>
+              <p className="text-slate-500 text-sm mt-1">Lowest APR in our database right now — per loan type</p>
+            </div>
+            <Link href="/loans" className="text-sky-600 hover:text-sky-800 font-semibold text-sm hidden sm:block">
+              View all {totalProducts} products →
+            </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Tailwind v4 dinamik class üretmez — accent renkleri statik map'ten gelir */}
-            {[
-              {
-                product: bestPersonal, label: 'Best Personal Loan', href: '/loans', icon: '👤',
-                border: 'border-sky-100 hover:border-sky-300', text: 'text-sky-600',
-              },
-              {
-                product: bestMortgage, label: 'Best Mortgage Rate', href: '/mortgage', icon: '🏠',
-                border: 'border-emerald-100 hover:border-emerald-300', text: 'text-emerald-600',
-              },
-              {
-                product: bestBusiness, label: 'Best Business Loan', href: '/business', icon: '🏢',
-                border: 'border-purple-100 hover:border-purple-300', text: 'text-purple-600',
-              },
-            ].map(({ product, label, href, icon, border, text }) => {
-              if (!product) return null;
-              const inst = getInstitution(product.institutionId);
-              const country = inst ? getCountry(inst.country) : null;
-              return (
-                <Link
-                  key={label}
-                  href={href}
-                  className={`bg-white rounded-2xl border-2 ${border} p-5 hover:shadow-lg transition-all group`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${text}`}>
-                      <span>{icon}</span>
-                      <span>{label}</span>
-                    </div>
-                    {country && <CountryFlag code={country.code} size={32} rounded="sm" />}
-                  </div>
-                  <p className={`text-4xl font-extrabold ${text} mb-1`}>
-                    {formatRate(product.rateMin)}
-                  </p>
-                  <p className="text-xs text-slate-500 mb-3">APR from</p>
-                  <p className="text-sm font-bold text-slate-800">{inst?.shortName}</p>
-                  <p className="text-xs text-slate-500 mb-4">{product.name}</p>
-                  <p className={`text-xs font-semibold ${text} group-hover:underline`}>
-                    Compare all rates →
-                  </p>
-                </Link>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {typeStats.map(({ type, href, desc, count, best, inst }) => (
+              <Link
+                key={type}
+                href={href}
+                className="bg-white rounded-2xl border-2 border-slate-100 hover:border-sky-300 hover:shadow-lg p-5 transition-all group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-3xl">{LOAN_TYPE_ICONS[type]}</span>
+                  {best?.isLiveRate && (
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
+                      <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                      Live rate
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors">
+                  {LOAN_TYPE_LABELS[type]}
+                </h3>
+                <p className="text-xs text-slate-500 mb-3">{desc}</p>
+                {best && (
+                  <>
+                    <p className="text-3xl font-extrabold text-sky-600 leading-none">
+                      {formatRate(best.rateMin)}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1 mb-3">
+                      APR from · {inst?.shortName}
+                    </p>
+                  </>
+                )}
+                <p className="text-sm font-bold text-sky-600 group-hover:underline">
+                  Compare {count} offers →
+                </p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* ========== LIVE RATES BANNER ========== */}
+      <LiveRatesBanner />
 
       {/* ========== HOW IT WORKS ========== */}
       <section className="py-12 px-4 bg-slate-50 border-y border-slate-200">
@@ -210,6 +202,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ========== KURUM LOGO MARQUEE ========== */}
+      <InstitutionMarquee />
 
       {/* ========== EDITORIAL PICKS ========== */}
       <EditorialPicks />
@@ -245,50 +240,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== BROWSE BY TYPE ========== */}
-      <section className="py-12 px-4 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-8 text-center">Browse by Loan Type</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {(
-              [
-                { type: 'personal', href: '/loans', count: PRODUCTS.filter(p => p.type === 'personal').length, desc: 'Unsecured personal finance' },
-                { type: 'mortgage', href: '/mortgage', count: PRODUCTS.filter(p => p.type === 'mortgage').length, desc: 'Home & property loans' },
-                { type: 'business', href: '/business', count: PRODUCTS.filter(p => p.type === 'business').length, desc: 'SME & corporate credit' },
-                { type: 'auto', href: '/loans?type=auto', count: PRODUCTS.filter(p => p.type === 'auto').length, desc: 'Vehicle financing' },
-              ] as const
-            ).map(({ type, href, count, desc }) => (
-              <Link
-                key={type}
-                href={href}
-                className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-sky-300 transition-all group"
-              >
-                <div className="text-3xl mb-3">{LOAN_TYPE_ICONS[type]}</div>
-                <h3 className="font-bold text-slate-900 mb-1 group-hover:text-sky-700 transition-colors">
-                  {LOAN_TYPE_LABELS[type]}
-                </h3>
-                <p className="text-xs text-slate-500 mb-3">{desc}</p>
-                <p className="text-sm font-bold text-sky-600">{count} products →</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ========== COUNTRIES ========== */}
-      <section className="py-14 px-4 bg-white border-t border-slate-200">
+      <section className="py-14 px-4 bg-slate-50 border-t border-slate-200">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900">Browse by Country</h2>
               <p className="text-slate-500 text-sm mt-1">Explore credit markets across 8 Nordic &amp; Baltic countries</p>
-              {/* Ülke landing sayfalarına iç linkler (hero'dan taşındı — SEO değeri korunur) */}
+              {/* Ülke landing sayfalarına iç linkler (SEO değeri korunur) */}
               <div className="flex flex-wrap gap-2 mt-3">
                 {COUNTRIES.map((c) => (
                   <Link
                     key={c.code}
                     href={`/loans/${COUNTRY_SLUG_BY_CODE[c.code]}`}
-                    className="flex items-center gap-1.5 bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg px-2.5 py-1 transition-colors text-xs font-medium text-slate-600"
+                    className="flex items-center gap-1.5 bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg px-2.5 py-1 transition-colors text-xs font-medium text-slate-600"
                   >
                     <CountryFlag code={c.code} size={16} rounded="sm" />
                     {c.name}
