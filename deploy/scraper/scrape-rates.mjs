@@ -20,29 +20,36 @@
 
 import { chromium } from 'playwright';
 
+// band: [min,max] — hedef için makul oran aralığı (statik katalog + sayfa doğrulaması).
+// Bandın dışına düşen adaylar atlanır: kampanya örnekleri, başka ürünün oranı,
+// peşinat yüzdesi gibi yanlış-pozitifleri keser. Marjlı hedeflerde band = marj aralığı.
+const BAND_RATE   = [4, 25];    // tam faiz (personal/auto)
+const BAND_MARGIN = [0.8, 3.5]; // marj (+ Euribor sonra eklenir)
+
 const BANKS = [
   {
     bankId: 'lhv',
     targets: [
-      { productType: 'personal', url: 'https://www.lhv.ee/en/consumer-loan' },
-      { productType: 'mortgage', url: 'https://www.lhv.ee/en/home-loan' },
-      { productType: 'auto',     url: 'https://www.lhv.ee/en/car-loan' },
+      { productType: 'personal', url: 'https://www.lhv.ee/en/consumer-loan', band: BAND_RATE },
+      // LHV home loan sayfası marj yayınlıyor ("from 1.49%" + Euribor) — 2026-07-19 doğrulandı
+      { productType: 'mortgage', url: 'https://www.lhv.ee/en/home-loan', marginPlusEuribor: true, band: BAND_MARGIN },
+      { productType: 'auto',     url: 'https://www.lhv.ee/en/car-loan', band: BAND_RATE },
     ],
   },
   {
     bankId: 'coop',
     targets: [
-      { productType: 'personal', url: 'https://www.cooppank.ee/en/private/small-loan' },
-      { productType: 'mortgage', url: 'https://www.cooppank.ee/en/private/home/home-loan', marginPlusEuribor: true },
-      { productType: 'auto',     url: 'https://www.cooppank.ee/en/private/car/car-loan' },
+      { productType: 'personal', url: 'https://www.cooppank.ee/en/private/small-loan', band: BAND_RATE },
+      { productType: 'mortgage', url: 'https://www.cooppank.ee/en/private/home/home-loan', marginPlusEuribor: true, band: BAND_MARGIN },
+      { productType: 'auto',     url: 'https://www.cooppank.ee/en/private/car/car-loan', band: BAND_RATE },
     ],
   },
   {
     bankId: 'seb',
     targets: [
-      { productType: 'personal', url: 'https://www.seb.ee/en/private/loans/consumer-loan', preferFrom: true },
-      { productType: 'mortgage', url: 'https://www.seb.ee/en/private/loans/home-loan', marginPlusEuribor: true, preferFrom: true },
-      { productType: 'auto',     url: 'https://www.seb.ee/en/private/loans/car-loan', preferFrom: true },
+      { productType: 'personal', url: 'https://www.seb.ee/en/private/loans/consumer-loan', band: BAND_RATE },
+      { productType: 'mortgage', url: 'https://www.seb.ee/en/private/loans/home-loan', marginPlusEuribor: true, band: BAND_MARGIN },
+      { productType: 'auto',     url: 'https://www.seb.ee/en/private/loans/car-loan', band: BAND_RATE },
     ],
   },
 ];
@@ -62,12 +69,12 @@ const APRC_PATTERNS = [
 const FEE_WORDS = /fee|contract|service|tasu|lepingutasu|haldustasu|penalty|viivis|self-financing|omafinantseering|down payment|sissemakse|price of the vehicle|of the loan amount/i;
 
 /**
- * Tüm pattern'lerin TÜM eşleşmelerini toplar, ücret/peşinat bağlamlarını eler,
- * en düşük geçerli değeri döner ("from X%" = taban oranı semantiği).
- * Tek-eşleşme yaklaşımı kampanya/örnek-hesap metinlerine takılıyordu (SEB 2026-07-19).
+ * Öncelik sıralı ilk GEÇERLİ eşleşme: pattern öncelik sırasıyla, belge sırasında
+ * ilerler; ücret/peşinat penceresi, "Euribor ... X%" alıntısı ve band dışı değerler
+ * atlanır. Global-min yaklaşımı başka ürünlerin oranlarını çalıyordu (Coop 3.5
+ * regresyonu, 2026-07-19) — belge sırası + band birlikte doğru değeri seçiyor.
  */
-function extract(text, patterns) {
-  const candidates = [];
+function extract(text, patterns, band = [0.5, 35]) {
   for (const re of patterns) {
     const global = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
     for (const m of text.matchAll(global)) {
@@ -78,13 +85,11 @@ function extract(text, patterns) {
       // marj metinlerinde euribor sayıdan SONRA gelir ("1.35% + Euribor")
       if (/euribor/i.test(text.slice(Math.max(0, idx - 30), idx))) continue;
       const value = parseFloat(m[1].replace(',', '.'));
-      if (!Number.isFinite(value) || value < 0.5 || value > 35) continue;
-      candidates.push({ value, snippet: window });
+      if (!Number.isFinite(value) || value < band[0] || value > band[1]) continue;
+      return { value, snippet: window };
     }
   }
-  if (candidates.length === 0) return null;
-  candidates.sort((a, b) => a.value - b.value);
-  return candidates[0];
+  return null;
 }
 
 async function insertRow(url, key, row) {
@@ -128,12 +133,7 @@ async function main() {
         await page.waitForTimeout(3000);
         const text = await page.evaluate(() => document.body.innerText);
 
-        // preferFrom: "from X%" desenini öne al — temsili örnek hesapların
-        // ("interest rate of 8%") genel deseni yanlış yakalamasını önler
-        const patterns = target.preferFrom
-          ? [RATE_PATTERNS[2], ...RATE_PATTERNS.slice(0, 2)]
-          : RATE_PATTERNS;
-        const rate = extract(text, patterns);
+        const rate = extract(text, RATE_PATTERNS, target.band);
         const aprc = extract(text, APRC_PATTERNS);
         const parseOk = rate !== null;
 
