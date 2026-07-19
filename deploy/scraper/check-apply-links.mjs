@@ -12,6 +12,7 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -46,7 +47,23 @@ async function check(url) {
     if (res.status >= 400) return { url, status: res.status, finalUrl, broken: true, reason: `http ${res.status}` };
     return { url, status: res.status, finalUrl, broken: false };
   } catch (e) {
-    return { url, status: 0, finalUrl: url, broken: true, reason: e.name === 'AbortError' ? 'timeout' : e.message };
+    // Node fetch bazı bankalarda TLS parmak izi yüzünden düşüyor (ör. SEB) —
+    // curl ile ikinci deneme; o da düşerse gerçekten ölü.
+    try {
+      const out = execFileSync('curl', [
+        '-sL', '-A', UA, '-o', '/dev/null', '-m', '15',
+        '-w', '%{http_code} %{url_effective}', url,
+      ], { encoding: 'utf8', timeout: 20000 });
+      const [codeStr, finalUrl = url] = out.trim().split(' ');
+      const code = parseInt(codeStr) || 0;
+      if (code === 0) return { url, status: 0, finalUrl: url, broken: true, reason: 'unreachable (fetch+curl)' };
+      if (SOFT_404.test(finalUrl)) return { url, status: code, finalUrl, broken: true, reason: 'soft-404 redirect (curl)' };
+      if (code === 403) return { url, status: 403, finalUrl, broken: false, reason: 'bot-protected (assumed OK)' };
+      if (code >= 400) return { url, status: code, finalUrl, broken: true, reason: `http ${code} (curl)` };
+      return { url, status: code, finalUrl, broken: false, reason: 'curl fallback OK' };
+    } catch {
+      return { url, status: 0, finalUrl: url, broken: true, reason: e.name === 'AbortError' ? 'timeout' : e.message };
+    }
   } finally {
     clearTimeout(t);
   }

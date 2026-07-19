@@ -974,7 +974,7 @@ export const deposits = [
     termOptions: [3, 6, 12, 18, 24],
     rates: { 3: 3.4, 6: 3.7, 12: 4.0, 18: 3.8, 24: 3.6 },
     features: ["Low minimum deposit", "Community banking", "Local offices"],
-    applyUrl: "https://www.cooppank.ee/en/savings/term-deposit",
+    applyUrl: "https://www.cooppank.ee/en/private/growing-funds/term-deposit",
     websiteUrl: "https://www.cooppank.ee/en/savings",
   },
   {

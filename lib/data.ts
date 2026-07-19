@@ -39,7 +39,6 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'arion-is', name: 'Arion banki', shortName: 'Arion banki', type: 'bank', country: 'IS', description: 'Icelandic commercial bank — digital-first approach', founded: 2008, website: 'https://www.arionbanki.is' },
   { id: 'landsbankinn-is', name: 'Landsbankinn', shortName: 'Landsbankinn', type: 'bank', country: 'IS', description: "Iceland's largest state-owned bank", founded: 1886, website: 'https://www.landsbankinn.is' },
   { id: 'kvika-is', name: 'Kvika banki', shortName: 'Kvika', type: 'bank', country: 'IS', description: 'Icelandic investment and commercial bank targeting growth companies', founded: 2006, website: 'https://www.kvika.is' },
-  { id: 'spron-is', name: 'Sparisjóður Reykjavíkur og nágrennis', shortName: 'SPRON', type: 'cooperative', country: 'IS', description: 'Icelandic savings bank cooperative with community focus', founded: 1886, website: 'https://www.spron.is' },
 
   // NORWAY
   { id: 'dnb-no', name: 'DNB Bank', shortName: 'DNB', type: 'bank', country: 'NO', description: "Norway's largest financial services group", founded: 1822, website: 'https://www.dnb.no' },
@@ -75,9 +74,7 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'seb-lv', name: 'SEB banka', shortName: 'SEB', type: 'bank', country: 'LV', description: 'Swedish bank with strong Latvian retail and corporate banking', founded: 1994, website: 'https://www.seb.lv' },
   { id: 'luminor-lv', name: 'Luminor Latvia', shortName: 'Luminor', type: 'bank', country: 'LV', description: 'Baltic banking group combining former DNB/Nordea operations', founded: 2017, website: 'https://www.luminor.lv' },
   { id: 'citadele-lv', name: 'Citadele banka', shortName: 'Citadele', type: 'bank', country: 'LV', description: 'Latvian bank with innovative digital mortgage', founded: 2010, website: 'https://www.citadele.lv' },
-  { id: 'industra-lv', name: 'Industra Bank', shortName: 'Industra', type: 'bank', country: 'LV', description: 'Latvian private bank — corporate and real estate focus', founded: 2006, website: 'https://www.industra.bank' },
   { id: 'bluor-lv', name: 'BluOr Bank', shortName: 'BluOr', type: 'bank', country: 'LV', description: 'Latvian bank focused on digital and private banking', founded: 2009, website: 'https://www.bluorbank.lv', isDigitalFriendly: true },
-  { id: 'rig-invest-lv', name: 'Reģionālā investīciju banka', shortName: 'RIB Bank', type: 'bank', country: 'LV', description: 'Latvian regional investment and business bank', founded: 1995, website: 'https://www.rib.lv' },
 
   // LITHUANIA
   { id: 'swedbank-lt', name: 'Swedbank Lietuva', shortName: 'Swedbank', type: 'bank', country: 'LT', description: 'Major bank in Lithuania — widest branch network', founded: 1992, website: 'https://www.swedbank.lt' },
@@ -202,7 +199,6 @@ export const PRODUCTS: LoanProduct[] = [
   { id: 'luminor-lv-p1', institutionId: 'luminor-lv', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 11.0, rateMax: 25.0, limitMin: 500, limitMax: 25000, termMin: 6, termMax: 96, currency: 'EUR', features: ['Pan-Baltic presence', 'Online application', 'Quick disbursement'], collateralRequired: false, updatedAt: '2025-11-16' },
   { id: 'luminor-lv-b1', institutionId: 'luminor-lv', name: 'Business Finance', type: 'business', customerType: 'corporate', rateMin: 6.75, rateMax: 13.5, limitMin: 10000, limitMax: 1000000, termMin: 12, termMax: 84, currency: 'EUR', features: ['Regional expertise', 'Trade finance', 'Working capital solutions'], collateralRequired: false, updatedAt: '2025-11-14' },
 
-  { id: 'industra-lv-b1', institutionId: 'industra-lv', name: 'Corporate Loan', type: 'business', customerType: 'corporate', rateMin: 7.0, rateMax: 13.0, limitMin: 20000, limitMax: 2000000, termMin: 12, termMax: 60, currency: 'EUR', features: ['Private banking approach', 'Tailored solutions', 'Real estate financing'], collateralRequired: true, updatedAt: '2025-11-10' },
 
   // ==================== LITHUANIA (EUR) ====================
   { id: 'swedbank-lt-p1', institutionId: 'swedbank-lt', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 10.9, rateMax: 24.9, limitMin: 500, limitMax: 30000, termMin: 6, termMax: 120, currency: 'EUR', features: ['Mobile banking', 'Smart-ID', 'Quick approval'], collateralRequired: false, updatedAt: '2025-11-20' },
@@ -248,8 +244,6 @@ export const PRODUCTS: LoanProduct[] = [
   // ==================== NEW: LATVIA LOCAL ====================
   { id: 'bluor-lv-p1', institutionId: 'bluor-lv', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 13.9, rateMax: 29.9, limitMin: 500, limitMax: 15000, termMin: 6, termMax: 60, currency: 'EUR', features: ['Digital-first bank', 'Quick online approval', 'Transparent pricing'], collateralRequired: false, updatedAt: '2025-11-15' },
   { id: 'bluor-lv-b1', institutionId: 'bluor-lv', name: 'Business Loan', type: 'business', customerType: 'corporate', rateMin: 7.9, rateMax: 15.9, limitMin: 10000, limitMax: 500000, termMin: 12, termMax: 60, currency: 'EUR', features: ['Private banking approach', 'Digital Latvia', 'Tailored terms'], collateralRequired: false, updatedAt: '2025-11-12' },
-  { id: 'rib-lv-b1', institutionId: 'rig-invest-lv', name: 'Investment Loan', type: 'business', customerType: 'corporate', rateMin: 6.5, rateMax: 12.5, limitMin: 20000, limitMax: 1500000, termMin: 12, termMax: 84, currency: 'EUR', features: ['Regional expertise', 'Real estate focus', 'SME-friendly'], collateralRequired: true, updatedAt: '2025-11-10' },
 
   // ==================== NEW: ICELAND LOCAL ====================
-  { id: 'spron-is-p1', institutionId: 'spron-is', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 9.9, rateMax: 22.9, limitMin: 100000, limitMax: 6000000, termMin: 12, termMax: 84, currency: 'ISK', features: ['Reykjavik community focus', 'Savings bank tradition', 'Personalised service'], collateralRequired: false, updatedAt: '2025-11-11' },
 ];
