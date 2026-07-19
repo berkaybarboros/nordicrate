@@ -83,26 +83,26 @@ export default async function HomePage() {
     <div>
       <JsonLd data={buildFaqJsonLd(FAQS)} />
 
-      {/* ========== HERO — açık tema, form-first (Lendo/Altero pattern) ========== */}
+      {/* ========== HERO — kompakt, dengeli iki kolon (Lendo pattern) ========== */}
       <section className="relative bg-gradient-to-b from-sky-50 via-white to-white border-b border-slate-100 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-0 lg:min-h-[calc(100dvh-4rem)] flex items-center">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center w-full py-2">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 
             {/* Left — kısa mesaj + somut değer maddeleri + tek CTA */}
-            <div className="lg:col-span-5">
+            <div>
               <div className="inline-flex items-center gap-2 bg-white border border-sky-200 text-sky-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5 shadow-sm">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                 Live EURIBOR &amp; central bank data
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.08] text-slate-900 mb-5">
+              <h1 className="text-4xl xl:text-[2.9rem] font-extrabold leading-[1.1] text-slate-900 mb-5">
                 Find your best loan.
                 <br />
                 <span className="text-sky-600">Compare. Apply. Save.</span>
               </h1>
 
               {/* Lendo tarzı somut bullet'lar — pazarlama paragrafı yerine */}
-              <ul className="space-y-3 mb-7">
+              <ul className="space-y-2.5 mb-7">
                 {[
                   `${totalProducts}+ offers from ${totalInstitutions}+ banks in one view`,
                   `${totalCountries} Nordic & Baltic countries covered`,
@@ -126,8 +126,8 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right — hesaplayıcı ana aktör (kendi kart stili var) */}
-            <div className="lg:col-span-7">
+            {/* Right — kompakt hesaplayıcı (tek iş: tutar+vade → aylık ödeme → CTA) */}
+            <div>
               <LoanCalculator />
             </div>
           </div>
