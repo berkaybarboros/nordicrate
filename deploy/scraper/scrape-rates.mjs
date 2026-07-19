@@ -66,7 +66,8 @@ const APRC_PATTERNS = [
 ];
 
 // Faiz yerine ücret/peşinat yakalamayı önler ("Contract fee 2%", "Self-financing from 10%")
-const FEE_WORDS = /fee|contract|service|tasu|lepingutasu|haldustasu|penalty|viivis|self-financing|omafinantseering|down payment|sissemakse|price of the vehicle|of the loan amount/i;
+// 'service' tek başına DEĞİL ('self-service' legit faiz bağlamı — Coop 2026-07-19)
+const FEE_WORDS = /fee|contract|service (?:fee|charge)|tasu|lepingutasu|haldustasu|penalty|viivis|self-financing|omafinantseering|down payment|sissemakse|price of the vehicle|of the loan amount/i;
 
 /**
  * Öncelik sıralı ilk GEÇERLİ eşleşme: pattern öncelik sırasıyla, belge sırasında
