@@ -42,7 +42,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.lhv.ee/en/loans/consumer-loan",
+    applyUrl: "https://www.lhv.ee/en/consumer-loan",
   },
   {
     id: "swedbank-personal",
@@ -85,7 +85,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Same day",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.seb.ee/en/private/loans/personal-loan",
+    applyUrl: "https://www.seb.ee/en/private/loans/consumer-loan",
   },
   {
     id: "luminor-personal",
@@ -106,7 +106,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "1-3 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.ee/en/personal/loans",
+    applyUrl: "https://www.luminor.ee/en/private/consumer-loan",
   },
   {
     id: "bigbank-personal",
@@ -128,7 +128,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 20,
     requiresIncome: true,
-    applyUrl: "https://www.bigbank.ee/en/loans",
+    applyUrl: "https://www.bigbank.ee/",
   },
   {
     id: "coop-personal",
@@ -149,7 +149,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "1-2 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.cooppank.ee/en/private/loans",
+    applyUrl: "https://www.cooppank.ee/en/private/small-loan",
   },
   // ── ESTONIA — Digital & fintech lenders ──────────────────────────────────
   {
@@ -172,7 +172,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.inbank.ee/en/consumer-loan",
+    applyUrl: "https://www.inbank.ee/en/loan/personal-loan",
   },
   {
     id: "ferratum-personal",
@@ -237,7 +237,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Same day",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.citadele.lv/en/private/loans/consumer-loan",
+    applyUrl: "https://www.citadele.lv/en/private/consumer/",
   },
   {
     id: "bigbank-personal-lv",
@@ -259,7 +259,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 20,
     requiresIncome: true,
-    applyUrl: "https://www.bigbank.lv/en/loans",
+    applyUrl: "https://www.bigbank.lv/privatpersonam/paterina-kredits/",
   },
   {
     id: "inbank-personal-lv",
@@ -280,7 +280,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.inbank.lv/en/consumer-loan",
+    applyUrl: "https://www.inbank.lv/en/loan/small-loan",
   },
   {
     id: "swedbank-personal-lv",
@@ -302,7 +302,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "1-2 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.swedbank.lv/en/private/loans/consumer",
+    applyUrl: "https://www.swedbank.lv/private/credit/loans/consumer?language=ENG",
   },
   // ── LITHUANIA ────────────────────────────────────────────────────────────
   {
@@ -325,7 +325,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Same day",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.sb.lt/en/private/loans/consumer-loan",
+    applyUrl: "https://www.artea.lt/en/private/credits-leasing/credits/consumer-credit",
   },
   {
     id: "inbank-personal-lt",
@@ -346,7 +346,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.inbank.lt/en/consumer-loan",
+    applyUrl: "https://www.inbank.lt/en/loan/personal-loan",
   },
   {
     id: "seb-personal-lt",
@@ -388,7 +388,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "1-2 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.lt/en/personal/loans",
+    applyUrl: "https://www.luminor.lt/en/private/consumer-loan",
   },
   // ── NORDIC — Pan-Nordic digital lenders ──────────────────────────────────
   {
@@ -411,7 +411,7 @@ export const personalLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.banknorwegian.com/en/loans",
+    applyUrl: "https://www.banknorwegian.no/lan/",
   },
   {
     id: "resurs-personal",
@@ -457,7 +457,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "5-10 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.lhv.ee/en/loans/home-loan",
+    applyUrl: "https://www.lhv.ee/en/home-loan",
   },
   {
     id: "swedbank-mortgage",
@@ -521,7 +521,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "7-10 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.ee/en/personal/home-loan",
+    applyUrl: "https://www.luminor.ee/en/private/housing-loans",
   },
   {
     id: "coop-mortgage",
@@ -542,7 +542,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "7-14 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.cooppank.ee/en/private/home-loan",
+    applyUrl: "https://www.cooppank.ee/en/private/home/home-loan",
   },
   {
     id: "inbank-mortgage",
@@ -563,7 +563,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "5-10 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.inbank.ee/en/home-loan",
+    applyUrl: "https://www.inbank.ee/en/loan/small-home-loan",
   },
   // ── LATVIA ────────────────────────────────────────────────────────────────
   {
@@ -607,7 +607,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "7-14 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.lv/en/personal/home-loan",
+    applyUrl: "https://www.luminor.lv/en/private/housing-loan",
   },
   {
     id: "seb-mortgage-lv",
@@ -628,7 +628,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "5-10 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.seb.lv/en/private/loans/mortgage",
+    applyUrl: "https://www.seb.lv/en/private/loans/home-loan",
   },
   // ── LITHUANIA ────────────────────────────────────────────────────────────
   {
@@ -651,7 +651,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "7-14 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.sb.lt/en/private/loans/mortgage",
+    applyUrl: "https://www.artea.lt/en/private/credits-leasing/mortage-loans/mortgage-loan",
   },
   {
     id: "luminor-mortgage-lt",
@@ -672,7 +672,7 @@ export const mortgageLoans: LoanOffer[] = [
     processingTime: "7-14 days",
     minAge: 18,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.lt/en/personal/home-loan",
+    applyUrl: "https://www.luminor.lt/en/private/housing-loan",
   },
 ];
 
@@ -697,7 +697,7 @@ export const carLoans: LoanOffer[] = [
     processingTime: "1-2 days",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.lhv.ee/en/loans/car-loan",
+    applyUrl: "https://www.lhv.ee/en/car-loan",
   },
   {
     id: "swedbank-car",
@@ -740,7 +740,7 @@ export const carLoans: LoanOffer[] = [
     processingTime: "1-3 days",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.luminor.ee/en/personal/loans",
+    applyUrl: "https://www.luminor.ee/en/private/consumer-loan",
   },
   {
     id: "inbank-car",
@@ -762,7 +762,7 @@ export const carLoans: LoanOffer[] = [
     processingTime: "Instant",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.inbank.ee/en/car-loan",
+    applyUrl: "https://www.inbank.ee/en/loan/car-loan",
   },
   {
     id: "bigbank-car",
@@ -783,7 +783,7 @@ export const carLoans: LoanOffer[] = [
     processingTime: "Same day",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.bigbank.ee/en/car-loan",
+    applyUrl: "https://www.bigbank.ee/autolaen/",
   },
   {
     id: "seb-car",
@@ -827,6 +827,6 @@ export const carLoans: LoanOffer[] = [
     processingTime: "Same day",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.citadele.lv/en/private/car-loan",
+    applyUrl: "https://www.citadele.lv/en/private/autocredit/",
   },
 ];

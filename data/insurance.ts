@@ -39,7 +39,7 @@ export const motorInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.if.ee/en/car/motor-liability",
+    applyUrl: "https://www.if.ee/en/eraklient/kindlustused/liikluskindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
   {
@@ -62,7 +62,7 @@ export const motorInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.ergo.ee/en/car-insurance/motor-liability",
+    applyUrl: "https://www.ergo.ee/en/private-clients/motor-tpl-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
   {
@@ -106,8 +106,8 @@ export const motorInsurance: InsuranceOffer[] = [
     features: ["Nordic reliability", "Fast online quote", "No-claims bonus"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 7,
-    applyUrl: "https://www.gjensidige.ee/en/car-insurance",
-    websiteUrl: "https://www.gjensidige.ee/en",
+    applyUrl: "https://www.gjensidige.ee/eraklient/soidukite-kindlustamine/liikluskindlustus",
+    websiteUrl: "https://www.gjensidige.ee/",
   },
   {
     id: "lhv-motor",
@@ -129,7 +129,7 @@ export const motorInsurance: InsuranceOffer[] = [
     badge: "Estonian Choice",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 12,
-    applyUrl: "https://www.lhv.ee/en/insurance/motor",
+    applyUrl: "https://www.lhv.ee/en/motor-third-party-liability-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
   {
@@ -152,7 +152,7 @@ export const motorInsurance: InsuranceOffer[] = [
     features: ["Pan-Baltic insurer (EE/LV/LT)", "Vienna Insurance Group member", "Fast claims settlement", "Multi-country coverage"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.bta.ee/en/motor-liability",
+    applyUrl: "https://www.bta.ee/en/private/mtpl-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
   {
@@ -175,7 +175,7 @@ export const motorInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.compensa.ee/en/motor",
+    applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
   {
@@ -224,7 +224,7 @@ export const cascoInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.if.ee/en/car/casco",
+    applyUrl: "https://www.if.ee/en/eraklient/kindlustused/kaskokindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
   {
@@ -247,7 +247,7 @@ export const cascoInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.ergo.ee/en/car-insurance/casco",
+    applyUrl: "https://www.ergo.ee/en/private-clients/motor-hull-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
   {
@@ -269,7 +269,7 @@ export const cascoInsurance: InsuranceOffer[] = [
     features: ["Low excess option", "LHV customer discount", "Digital claims"],
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 12,
-    applyUrl: "https://www.lhv.ee/en/insurance/casco",
+    applyUrl: "https://www.lhv.ee/en/casco-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
   {
@@ -293,7 +293,7 @@ export const cascoInsurance: InsuranceOffer[] = [
     features: ["Pan-Baltic coverage", "24/7 claims hotline", "Mobile claims app", "Courtesy car arrangement"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.bta.ee/en/casco",
+    applyUrl: "https://www.bta.ee/en/private/casco-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
   {
@@ -317,7 +317,7 @@ export const cascoInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.compensa.ee/en/casco",
+    applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
   {
@@ -341,8 +341,8 @@ export const cascoInsurance: InsuranceOffer[] = [
     features: ["Nordic reliability", "No-claims bonus up to 75%", "Replacement car included", "App-based claims"],
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 7,
-    applyUrl: "https://www.gjensidige.ee/en/casco",
-    websiteUrl: "https://www.gjensidige.ee/en",
+    applyUrl: "https://www.gjensidige.ee/eraklient/soidukite-kindlustamine/kaskokindlustus",
+    websiteUrl: "https://www.gjensidige.ee/",
   },
 ];
 
@@ -368,7 +368,7 @@ export const homeInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.if.ee/en/home/home-insurance",
+    applyUrl: "https://www.if.ee/en/eraklient/kindlustused/kodukindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
   {
@@ -391,7 +391,7 @@ export const homeInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.ergo.ee/en/home-insurance",
+    applyUrl: "https://www.ergo.ee/en/private-clients/home-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
   {
@@ -414,8 +414,8 @@ export const homeInsurance: InsuranceOffer[] = [
     features: ["Nordic expertise", "No-claims bonus", "Comprehensive coverage"],
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 7,
-    applyUrl: "https://www.gjensidige.ee/en/home-insurance",
-    websiteUrl: "https://www.gjensidige.ee/en",
+    applyUrl: "https://www.gjensidige.ee/eraklient/kodukindlustus/mis-on-kodukindlustus",
+    websiteUrl: "https://www.gjensidige.ee/",
   },
   {
     id: "lhv-home",
@@ -438,7 +438,7 @@ export const homeInsurance: InsuranceOffer[] = [
     badge: "Estonian Choice",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 12,
-    applyUrl: "https://www.lhv.ee/en/insurance/home",
+    applyUrl: "https://www.lhv.ee/en/home-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
   {
@@ -462,7 +462,7 @@ export const homeInsurance: InsuranceOffer[] = [
     features: ["Pan-Baltic coverage", "Vienna Insurance Group", "Fast claim payout", "Discount for security systems"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.bta.ee/en/home-insurance",
+    applyUrl: "https://www.bta.ee/en/private/home-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
   {
@@ -486,7 +486,7 @@ export const homeInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.compensa.ee/en/home",
+    applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
   {
@@ -536,7 +536,7 @@ export const healthInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 5,
-    applyUrl: "https://www.if.ee/en/health/health-insurance",
+    applyUrl: "https://www.if.ee/en/ariklient/kindlustused/tervisekindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
   {
@@ -559,32 +559,10 @@ export const healthInsurance: InsuranceOffer[] = [
     badge: "Best Value",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.ergo.ee/en/health-insurance",
+    applyUrl: "https://www.ergo.ee/en/private-clients/health-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
-  {
-    id: "gjensidige-health",
-    companyId: "gjensidige",
-    companyName: "Gjensidige",
-    companyLogo: "🔴",
-    type: "health",
-    annualPremiumMin: 200,
-    annualPremiumMax: 780,
-    representativePremium: 420,
-    coverage: [
-      "Full private healthcare",
-      "Specialist & GP",
-      "Hospitalisation",
-      "Dental & vision",
-      "Wellness programs",
-    ],
-    excess: 0,
-    features: ["Zero excess option", "Premium clinics", "Health app included"],
-    paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 5,
-    applyUrl: "https://www.gjensidige.ee/en/health-insurance",
-    websiteUrl: "https://www.gjensidige.ee/en",
-  },
+
   {
     id: "bta-health",
     companyId: "bta",
@@ -605,7 +583,7 @@ export const healthInsurance: InsuranceOffer[] = [
     features: ["Pan-Baltic health network", "Vienna Insurance Group", "Short waiting times", "Mobile claims app"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 5,
-    applyUrl: "https://www.bta.ee/en/health-insurance",
+    applyUrl: "https://www.bta.ee/en/private/health-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
   {
@@ -629,7 +607,7 @@ export const healthInsurance: InsuranceOffer[] = [
     badge: "Best Value",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 8,
-    applyUrl: "https://www.compensa.ee/en/health",
+    applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
   {
@@ -653,7 +631,7 @@ export const healthInsurance: InsuranceOffer[] = [
     features: ["No excess option", "LHV bank integration", "Telemedicine included", "Digital policy management"],
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 10,
-    applyUrl: "https://www.lhv.ee/en/insurance/health",
+    applyUrl: "https://www.lhv.ee/en/health-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
 ];
@@ -681,7 +659,7 @@ export const travelInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Annual", "Per trip"],
     onlineDiscount: 10,
-    applyUrl: "https://www.if.ee/en/travel/travel-insurance",
+    applyUrl: "https://www.if.ee/en/eraklient/kindlustused/reisikindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
   {
@@ -705,7 +683,7 @@ export const travelInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Annual", "Per trip", "Monthly"],
     onlineDiscount: 8,
-    applyUrl: "https://www.ergo.ee/en/travel-insurance",
+    applyUrl: "https://www.ergo.ee/en/private-clients/travel-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
   {
@@ -730,7 +708,7 @@ export const travelInsurance: InsuranceOffer[] = [
     badge: "Best Value",
     paymentOptions: ["Annual", "Per trip"],
     onlineDiscount: 5,
-    applyUrl: "https://www.lhv.ee/en/insurance/travel",
+    applyUrl: "https://www.lhv.ee/en/travel-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
   {
@@ -754,8 +732,8 @@ export const travelInsurance: InsuranceOffer[] = [
     features: ["Nordic market leader", "Premium worldwide cover", "Adventure & extreme sports", "24/7 multilingual support"],
     paymentOptions: ["Annual", "Monthly"],
     onlineDiscount: 7,
-    applyUrl: "https://www.gjensidige.ee/en/travel-insurance",
-    websiteUrl: "https://www.gjensidige.ee/en",
+    applyUrl: "https://www.gjensidige.ee/eraklient/reisikindlustus",
+    websiteUrl: "https://www.gjensidige.ee/",
   },
   {
     id: "bta-travel",
@@ -778,7 +756,7 @@ export const travelInsurance: InsuranceOffer[] = [
     features: ["Pan-Baltic insurer", "Competitive annual multi-trip plan", "Family plan available", "Vienna Insurance Group backing"],
     paymentOptions: ["Annual", "Per trip"],
     onlineDiscount: 8,
-    applyUrl: "https://www.bta.ee/en/travel-insurance",
+    applyUrl: "https://www.bta.ee/en/private/travel-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
   {
@@ -802,7 +780,7 @@ export const travelInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Annual", "Per trip"],
     onlineDiscount: 10,
-    applyUrl: "https://www.compensa.ee/en/travel",
+    applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
   {
@@ -852,7 +830,7 @@ export const lifeInsurance: InsuranceOffer[] = [
     badge: "Most Popular",
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 0,
-    applyUrl: "https://www.seb.ee/en/insurance/life",
+    applyUrl: "https://www.seb.ee/en/private/insurance/life-and-health-insurance",
     websiteUrl: "https://www.seb.ee/en/insurance",
   },
   {
@@ -898,56 +876,11 @@ export const lifeInsurance: InsuranceOffer[] = [
     features: ["German-backed insurer", "Competitive premiums", "Flexible sum assured", "No medical exam under €250k"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
     onlineDiscount: 5,
-    applyUrl: "https://www.ergo.ee/en/life-insurance",
+    applyUrl: "https://www.ergo.ee/en/private-clients/life-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
-  {
-    id: "if-life",
-    companyId: "if",
-    companyName: "If Life Insurance",
-    companyLogo: "🔵",
-    type: "life",
-    annualPremiumMin: 108,
-    annualPremiumMax: 720,
-    representativePremium: 216,
-    coverage: [
-      "Death benefit up to €1,000,000",
-      "Critical illness (50+ conditions)",
-      "Total disability",
-      "Children's benefit",
-      "Repatriation costs",
-    ],
-    excess: 0,
-    features: ["Largest Nordic insurer", "Maximum coverage available", "Business keyman cover", "Online instant quote"],
-    badge: "Best Value",
-    paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
-    applyUrl: "https://www.if.ee/en/life-insurance",
-    websiteUrl: "https://www.if.ee/en",
-  },
-  {
-    id: "bta-life",
-    companyId: "bta",
-    companyName: "BTA Life Insurance",
-    companyLogo: "🔷",
-    type: "life",
-    annualPremiumMin: 78,
-    annualPremiumMax: 510,
-    representativePremium: 144,
-    coverage: [
-      "Death benefit up to €500,000",
-      "Accidental death (2× payout)",
-      "Critical illness cover",
-      "Permanent total disability",
-      "Mortgage protection option",
-    ],
-    excess: 0,
-    features: ["Pan-Baltic coverage", "Vienna Insurance Group", "No medical exam under €200K", "Competitive premiums"],
-    paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 0,
-    applyUrl: "https://www.bta.ee/en/life-insurance",
-    websiteUrl: "https://www.bta.ee/en",
-  },
+
+
   {
     id: "compensa-life",
     companyId: "compensa",
@@ -969,32 +902,10 @@ export const lifeInsurance: InsuranceOffer[] = [
     badge: "Best Price",
     paymentOptions: ["Monthly", "Annual"],
     onlineDiscount: 5,
-    applyUrl: "https://www.compensa.ee/en/life-insurance",
+    applyUrl: "https://www.compensalife.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
-  {
-    id: "gjensidige-life",
-    companyId: "gjensidige",
-    companyName: "Gjensidige Life",
-    companyLogo: "🔴",
-    type: "life",
-    annualPremiumMin: 90,
-    annualPremiumMax: 630,
-    representativePremium: 168,
-    coverage: [
-      "Death benefit up to €750,000",
-      "Critical illness (40+ conditions)",
-      "Total & permanent disability",
-      "Children's rider available",
-      "Mortgage life insurance",
-    ],
-    excess: 0,
-    features: ["Nordic group expertise", "Combined home + life discount", "Group policy for businesses", "Simple online application"],
-    paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 5,
-    applyUrl: "https://www.gjensidige.ee/en/life-insurance",
-    websiteUrl: "https://www.gjensidige.ee/en",
-  },
+
 ];
 
 export const deposits = [
@@ -1009,7 +920,7 @@ export const deposits = [
     rates: { 3: 3.5, 6: 3.8, 12: 4.1, 18: 3.9, 24: 3.7, 36: 3.5 },
     features: ["DGSD protected up to €100k", "Online management", "Auto-renewal option"],
     badge: "Best Rate",
-    applyUrl: "https://www.lhv.ee/en/savings/term-deposit",
+    applyUrl: "https://www.lhv.ee/en/fixed-term-deposit",
     websiteUrl: "https://www.lhv.ee/en/savings",
   },
   {
@@ -1023,7 +934,7 @@ export const deposits = [
     rates: { 3: 3.6, 6: 4.0, 12: 4.3, 18: 4.1, 24: 3.9, 36: 3.7, 48: 3.5, 60: 3.4 },
     features: ["Deposit specialist", "High limits", "Guaranteed interest"],
     badge: "Highest Rate",
-    applyUrl: "https://www.bigbank.ee/savings/term-deposit",
+    applyUrl: "https://www.bigbank.ee/hoiused/",
     websiteUrl: "https://www.bigbank.ee/savings",
   },
   {
@@ -1050,7 +961,7 @@ export const deposits = [
     termOptions: [3, 6, 12, 24, 36],
     rates: { 3: 3.3, 6: 3.6, 12: 3.9, 24: 3.6, 36: 3.4 },
     features: ["Swedish banking reliability", "Digital management", "Auto-renewal"],
-    applyUrl: "https://www.seb.ee/en/savings/term-deposit",
+    applyUrl: "https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit-privates",
     websiteUrl: "https://www.seb.ee/en/savings",
   },
   {
@@ -1077,8 +988,8 @@ export const deposits = [
     rates: { 3: 3.7, 6: 4.0, 12: 4.25, 18: 4.0, 24: 3.85, 36: 3.65 },
     features: ["Digital-first savings", "Pan-Baltic deposits accepted", "Auto-renewal", "DGSD protected"],
     badge: "Best Rate",
-    applyUrl: "https://www.inbank.ee/en/savings",
-    websiteUrl: "https://www.inbank.ee/en/savings",
+    applyUrl: "https://www.inbank.ee/en/deposit",
+    websiteUrl: "https://www.inbank.ee/en/deposit",
   },
   {
     id: "citadele-deposit-lv",
@@ -1090,7 +1001,7 @@ export const deposits = [
     termOptions: [3, 6, 12, 24, 36],
     rates: { 3: 3.4, 6: 3.75, 12: 4.1, 24: 3.8, 36: 3.6 },
     features: ["Latvian bank DGSD protection", "Online management", "Competitive rates", "Multi-currency option"],
-    applyUrl: "https://www.citadele.lv/en/private/savings/deposits",
+    applyUrl: "https://www.citadele.lv/en/private/savings/",
     websiteUrl: "https://www.citadele.lv/en/private/savings",
   },
   {
@@ -1103,8 +1014,8 @@ export const deposits = [
     termOptions: [3, 6, 12, 24],
     rates: { 3: 3.3, 6: 3.6, 12: 3.95, 24: 3.7 },
     features: ["Pan-Baltic savings", "DGSD protected", "Fixed rate guarantee", "Digital management"],
-    applyUrl: "https://www.luminor.ee/en/personal/savings",
-    websiteUrl: "https://www.luminor.ee/en/personal/savings",
+    applyUrl: "https://www.luminor.ee/en/private/term-deposit",
+    websiteUrl: "https://www.luminor.ee/en/private/term-deposit",
   },
   {
     id: "siauliu-deposit-lt",
@@ -1117,7 +1028,7 @@ export const deposits = [
     rates: { 1: 2.8, 3: 3.5, 6: 3.8, 12: 4.15, 24: 3.9, 36: 3.7 },
     features: ["Lithuanian-owned bank", "Low minimum", "DGSD protected", "Competitive 12-month rate"],
     badge: "Best Rate LT",
-    applyUrl: "https://www.sb.lt/en/private/savings/deposits",
+    applyUrl: "https://www.artea.lt/en/private/saving-investment/deposits/term-deposit",
     websiteUrl: "https://www.sb.lt/en/private/savings",
   },
 ];
