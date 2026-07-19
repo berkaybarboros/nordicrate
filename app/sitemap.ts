@@ -30,6 +30,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/fi/kulutusluotto`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
   ];
 
+  // Entity/glossary rehberleri
+  const guideRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    ...['euribor', 'apr-kkm', 'ltv', 'kredex', 'dsti', 'withdrawal-right'].map((slug) => ({
+      url: `${BASE_URL}/guides/${slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    })),
+  ];
+
   // Static pages
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -209,6 +220,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...localeRoutes,
+    ...guideRoutes,
     ...blogRoutes,
     ...countryLandingRoutes,
     ...countryLoanRoutes,
