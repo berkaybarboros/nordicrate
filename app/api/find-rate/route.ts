@@ -4,6 +4,7 @@ import { enforceRateLimit, isValidEmail, isValidSessionId, clampNumber } from '@
 
 export const runtime = 'nodejs';
 import { buildUTMLink } from '@/lib/utils';
+import { logoFromBankId, monogram } from '@/lib/logos';
 
 // Product catalogs
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
@@ -149,7 +150,8 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             rank:          r.rank,
             productId:     ins.id,
             name:          ins.companyName,
-            logo:          ins.companyLogo,
+            logo:          logoFromBankId(ins.companyId),   // lokal webp path | null
+            mono:          monogram(ins.companyName),
             badge:         ins.badge ?? null,
             annualPremium: ins.representativePremium,
             excess:        ins.excess,
@@ -163,7 +165,8 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             rank:              r.rank,
             productId:         loan.id,
             name:              loan.bankName,
-            logo:              loan.bankLogo,
+            logo:              logoFromBankId(loan.bankId),   // lokal webp path | null
+            mono:              monogram(loan.bankName),
             badge:             loan.badge ?? null,
             representativeRate: loan.representativeRate,
             processingTime:    loan.processingTime,

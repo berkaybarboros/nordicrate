@@ -16,7 +16,8 @@ interface Recommendation {
   rank: number;
   productId: string;
   name: string;
-  logo: string;
+  logo: string | null;   // lokal webp path | null → mono
+  mono?: string;
   badge: string | null;
   representativeRate?: number;
   annualPremium?: number;
@@ -50,6 +51,25 @@ function generateSessionId(): string {
 }
 
 const isInsurance = (t: ProductType) => ['motor', 'casco', 'home', 'health'].includes(t);
+
+/** Sonuç kartı logosu — lokal webp, yüklenemezse monograma düşer */
+function RecLogo({ logo, mono }: { logo: string | null; mono: string }) {
+  const [failed, setFailed] = useState(false);
+  if (logo && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- küçük lokal webp
+      <img
+        src={logo}
+        alt=""
+        width={28}
+        height={28}
+        className="w-7 h-7 object-contain"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return <span className="text-sm font-extrabold text-slate-500">{mono}</span>;
+}
 
 // ─── Modal ──────────────────────────────────────────────────────────────────────
 interface Props {
@@ -200,6 +220,9 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                     key={opt.value}
                     onClick={() => {
                       setProductType(opt.value);
+                      // Tipe göre mantıklı varsayılan term (dropdown seçenekleriyle uyumlu)
+                      setTermMonths(opt.value === 'mortgage' ? 240 : 36);
+                      if (opt.value === 'mortgage') setAmount(200_000);
                       setStep(2);
                     }}
                     className="flex items-center gap-4 w-full p-3.5 rounded-2xl border-2 text-left transition-all hover:border-sky-400 hover:bg-sky-50 border-gray-100 group"
@@ -240,11 +263,12 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                 <select
                   value={country}
                   onChange={e => setCountry(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
                 >
-                  <option value="">🌍 Any country</option>
+                  {/* value = ülke KODU (API ≤4 karakter bekliyor; ad gönderince 'Invalid country' oluyordu) */}
+                  <option value="" className="text-slate-900 bg-white">Any country</option>
                   {COUNTRIES.map(c => (
-                    <option key={c.code} value={c.name}>{c.name}</option>
+                    <option key={c.code} value={c.code} className="text-slate-900 bg-white">{c.name}</option>
                   ))}
                 </select>
               </div>
@@ -274,25 +298,24 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Loan Term</label>
-                    <div className="grid grid-cols-4 gap-2">
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
+                      {productType === 'mortgage' ? 'Mortgage Term' : 'Loan Term'}
+                    </label>
+                    <select
+                      value={termMonths}
+                      onChange={e => setTermMonths(Number(e.target.value))}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-300"
+                    >
+                      {/* Baltık mortgage'ları 30 yıla kadar; tüketici kredileri 10 yıla kadar */}
                       {(productType === 'mortgage'
-                        ? [60, 120, 180, 240, 300, 360]
-                        : [12, 24, 36, 48, 60, 84]
-                      ).map(m => (
-                        <button
-                          key={m}
-                          onClick={() => setTermMonths(m)}
-                          className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                            termMonths === m
-                              ? 'bg-sky-500 text-white border-sky-500'
-                              : 'border-gray-200 text-gray-500 hover:border-sky-300'
-                          }`}
-                        >
-                          {m >= 12 ? `${m / 12}y` : `${m}m`}
-                        </button>
+                        ? [5, 10, 15, 20, 25, 30, 35]
+                        : [1, 2, 3, 4, 5, 6, 7, 8, 10]
+                      ).map(y => (
+                        <option key={y} value={y * 12} className="text-slate-900 bg-white">
+                          {y} year{y > 1 ? 's' : ''}
+                        </option>
                       ))}
-                    </div>
+                    </select>
                   </div>
                 </>
               )}
@@ -385,8 +408,8 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <div className="relative">
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl border ${i === 0 ? 'border-sky-200 bg-sky-50' : 'border-gray-100 bg-gray-50'}`}>
-                            {rec.logo}
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden border ${i === 0 ? 'border-sky-200 bg-white' : 'border-gray-100 bg-white'}`}>
+                            <RecLogo logo={rec.logo} mono={rec.mono ?? '••'} />
                           </div>
                           {i === 0 && (
                             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-sky-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold">

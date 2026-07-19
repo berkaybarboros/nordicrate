@@ -31,6 +31,7 @@ import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
 import HeroCta from '@/components/home/HeroCta';
 import InstitutionMarquee from '@/components/home/InstitutionMarquee';
+import { logoFromWebsite, monogram } from '@/lib/logos';
 import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
 
@@ -50,6 +51,18 @@ export default async function HomePage() {
     country: c,
     ...getCountryStats(c.code),
   }));
+
+  // Marquee: SADECE ürünü olan kurumlar (nordicrate.com'da gerçekten karşılaştırılanlar) + resmi logolar
+  const institutionIdsWithProducts = new Set(PRODUCTS.map((p) => p.institutionId));
+  const marqueeItems = INSTITUTIONS
+    .filter((inst) => institutionIdsWithProducts.has(inst.id))
+    .map((inst) => ({
+      id: inst.id,
+      name: inst.name,
+      shortName: inst.shortName,
+      logo: logoFromWebsite(inst.website),
+      mono: monogram(inst.shortName),
+    }));
 
   // Ürün tipi başına en iyi oran — Altero pattern: tile'da gerçek "from X%" göster
   const typeStats = (
@@ -204,7 +217,7 @@ export default async function HomePage() {
       </section>
 
       {/* ========== KURUM LOGO MARQUEE ========== */}
-      <InstitutionMarquee />
+      <InstitutionMarquee items={marqueeItems} countryCount={totalCountries} />
 
       {/* ========== EDITORIAL PICKS ========== */}
       <EditorialPicks />

@@ -4,71 +4,67 @@
  * Kayan kurum logoları — "kalabalık" sosyal kanıt şeridi.
  * ETİKET BİLİNÇLİ OLARAK "institutions we compare" — "partners" DEĞİL:
  * kurumlarla imzalı ortaklık yok; footer'daki bağımsızlık feragatnamesiyle
- * çelişen bir "Partners" başlığı UCPD + marka riski yaratır ve affiliate
- * ağlarının compliance kontrolüne takılır. Görsel etki aynı, iddia dürüst.
+ * çelişen bir "Partners" başlığı UCPD + marka riski yaratır.
  *
- * Logolar: Google s2 favicon servisi (Clearbit Logo API Aralık 2025'te
- * kapatıldı — sunucudan curl bile bağlanamıyor). Yüklenemeyen → monogram.
- * s2 gstatic.com'a redirect eder; CSP img-src'de *.gstatic.com izinli olmalı.
- * Motion: saf CSS sonsuz kayma (globals.css @keyframes marquee),
- * hover'da durur, prefers-reduced-motion globalde animasyonları kapatır.
+ * Logolar: public/logos/<domain>.webp (resmi, lokalde host'lu, sıkıştırılmış).
+ * Yüklenemeyen logo → monogram fallback.
+ * Öğeler SADECE ürünü olan kurumlar — sunucudan `items` prop'u ile gelir.
  */
 
 import { useState } from 'react';
-import { INSTITUTIONS, COUNTRIES } from '@/lib/data';
 
-function logoUrl(website?: string): string | null {
-  if (!website) return null;
-  try {
-    const host = new URL(website).hostname.replace(/^www\./, '');
-    return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-  } catch {
-    return null;
-  }
+export interface MarqueeItem {
+  id: string;
+  name: string;
+  shortName: string;
+  logo: string | null;
+  mono: string;
 }
 
-function LogoChip({ name, shortName, website }: { name: string; shortName: string; website?: string }) {
+function LogoChip({ item }: { item: MarqueeItem }) {
   const [failed, setFailed] = useState(false);
-  const src = logoUrl(website);
+  const showImg = item.logo && !failed;
 
   return (
     <div
       className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shrink-0 select-none"
-      title={name}
+      title={item.name}
     >
-      {src && !failed ? (
-        // eslint-disable-next-line @next/next/no-img-element -- küçük 3P logolar, next/image optimizasyonu gereksiz
+      {showImg ? (
+        // eslint-disable-next-line @next/next/no-img-element -- küçük lokal webp, next/image gereksiz
         <img
-          src={src}
+          src={item.logo!}
           alt=""
-          width={24}
-          height={24}
+          width={22}
+          height={22}
           loading="lazy"
-          className="rounded-sm opacity-70"
+          className="w-[22px] h-[22px] object-contain rounded-sm"
           onError={() => setFailed(true)}
         />
       ) : (
-        <span className="w-6 h-6 rounded-md bg-slate-100 text-slate-500 text-[10px] font-extrabold flex items-center justify-center">
-          {shortName.slice(0, 2).toUpperCase()}
+        <span className="w-[22px] h-[22px] rounded-md bg-slate-100 text-slate-500 text-[10px] font-extrabold flex items-center justify-center">
+          {item.mono}
         </span>
       )}
-      <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">{shortName}</span>
+      <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">{item.shortName}</span>
     </div>
   );
 }
 
-export default function InstitutionMarquee() {
+export default function InstitutionMarquee({ items, countryCount }: { items: MarqueeItem[]; countryCount: number }) {
+  if (items.length === 0) return null;
+
   // İki yarıya böl — iki şerit zıt yönde kayar, "kalabalık" hissi artar
-  const half = Math.ceil(INSTITUTIONS.length / 2);
-  const rowA = INSTITUTIONS.slice(0, half);
-  const rowB = INSTITUTIONS.slice(half);
+  const half = Math.ceil(items.length / 2);
+  const rowA = items.slice(0, half);
+  const rowB = items.slice(half);
 
   return (
     <section className="bg-slate-50 border-y border-slate-200 py-10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-sky-600 mb-1">
-            {INSTITUTIONS.length}+ institutions · {COUNTRIES.length} countries
+            {items.length} institutions · {countryCount} countries
           </p>
           <h2 className="text-xl font-extrabold text-slate-900">
             Banks, insurers &amp; lenders we compare
@@ -87,8 +83,8 @@ export default function InstitutionMarquee() {
           <div key={i} className="overflow-hidden">
             <div className={`flex gap-3 w-max ${cls} group-hover:[animation-play-state:paused]`}>
               {/* Kesintisiz döngü için liste iki kez render edilir */}
-              {[...row, ...row].map((inst, j) => (
-                <LogoChip key={`${inst.id}-${j}`} name={inst.name} shortName={inst.shortName} website={inst.website} />
+              {[...row, ...row].map((item, j) => (
+                <LogoChip key={`${item.id}-${j}`} item={item} />
               ))}
             </div>
           </div>
