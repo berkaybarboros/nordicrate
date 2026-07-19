@@ -1,26 +1,40 @@
 import type { Metadata } from "next";
 import MortgageContent from "./MortgageContent";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT, DEEP_CONTENT_ROUTES } from "@/lib/deep-content";
 
+const content = DEEP_CONTENT.mortgage.en;
+
+// NOT: Meta'da sabit oran YOK (eski "From 1.75%" kaldırıldı) — canlı scrape
+// oranı meta'daki sabit rakamın altına düşerse SERP snippet'i yanıltıcı olur (UCPD).
 export const metadata: Metadata = {
-  title: "Mortgages Estonia | Compare Home Loan Rates — From 1.75%",
-  description:
-    "Compare mortgage rates in Estonia from LHV, Swedbank, SEB and Luminor. Euribor + margin from 1.75%. Borrow €20,000–€600,000 for up to 30 years. Free comparison, no registration.",
+  title: content.metaTitle,
+  description: content.metaDescription,
   keywords: [
     "mortgage Estonia",
     "home loan Estonia",
     "kodulaen",
     "eluasemelaen",
     "Euribor mortgage Estonia",
-    "LHV mortgage",
-    "Swedbank mortgage Estonia",
-    "SEB kodulaen",
+    "Euribor 6 month margin",
+    "LTV Estonia",
+    "KredEx guarantee",
   ],
-  alternates: { canonical: "https://nordicrate.com/loans/mortgage" },
+  alternates: {
+    canonical: DEEP_CONTENT_ROUTES.mortgage.en,
+    languages: {
+      en: DEEP_CONTENT_ROUTES.mortgage.en,
+      et: DEEP_CONTENT_ROUTES.mortgage.et,
+      fi: DEEP_CONTENT_ROUTES.mortgage.fi,
+      "x-default": DEEP_CONTENT_ROUTES.mortgage.en,
+    },
+  },
   openGraph: {
-    title: "Mortgages Estonia | Compare Rates from 1.75% | NordicRate",
-    description:
-      "Compare home loans from LHV, Swedbank, SEB, Luminor. Euribor + margin from 1.75%. Borrow up to €600,000.",
-    url: "https://nordicrate.com/loans/mortgage",
+    title: content.metaTitle,
+    description: content.metaDescription,
+    url: DEEP_CONTENT_ROUTES.mortgage.en,
     type: "website",
   },
 };
@@ -33,25 +47,19 @@ const jsonLd = {
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
         { "@type": "ListItem", position: 2, name: "Loans", item: "https://nordicrate.com/loans" },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: "Mortgages",
-          item: "https://nordicrate.com/loans/mortgage",
-        },
+        { "@type": "ListItem", position: 3, name: "Mortgages", item: DEEP_CONTENT_ROUTES.mortgage.en },
       ],
     },
     {
       "@type": "FinancialProduct",
       name: "Mortgage Loans in Estonia",
       description:
-        "Home loans from Estonian banks. Euribor + margin, up to 30 years, up to 85% LTV.",
-      url: "https://nordicrate.com/loans/mortgage",
+        "Home loans from Estonian banks. Euribor + margin pricing, up to 30 years, up to 85% LTV.",
+      url: DEEP_CONTENT_ROUTES.mortgage.en,
       provider: { "@type": "Organization", name: "NordicRate" },
-      interestRate: "1.75",
-      loanTerm: "P240M",
+      // interestRate bilinçli olarak YOK — canlı oranlar sayfadaki kartlarda
+      loanTerm: "P360M",
       currency: "EUR",
-      amount: { "@type": "MonetaryAmount", currency: "EUR", minValue: 20000, maxValue: 600000 },
     },
   ],
 };
@@ -59,11 +67,12 @@ const jsonLd = {
 export default function MortgagePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={buildFaqJsonLd(content.faqs)} />
       <MortgageContent />
+      <div className="bg-white border-t border-slate-100">
+        <DeepContentBlock content={content} />
+      </div>
     </>
   );
 }

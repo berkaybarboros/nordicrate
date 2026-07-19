@@ -1,29 +1,49 @@
 import type { Metadata } from "next";
 import PersonalLoansContent from "./PersonalLoansContent";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd, buildProductsItemList } from "@/lib/seo";
+import { DEEP_CONTENT, DEEP_CONTENT_ROUTES } from "@/lib/deep-content";
+import { PRODUCTS } from "@/lib/data";
 
+const content = DEEP_CONTENT.personal.en;
+
+// NOT: Meta'da sabit oran YOK (eski "from 9.9%" kaldırıldı — canlı veriyle
+// çelişirse SERP snippet'i yanıltıcı olur). ItemList artık elle yazılmış
+// (ve kırık) banka URL'leri yerine gerçek PRODUCTS verisinden üretiliyor.
 export const metadata: Metadata = {
-  title: "Personal Loans Estonia | Compare 6 Offers from 9.9% p.a.",
-  description:
-    "Compare personal loans in Estonia from LHV, Swedbank, SEB, Luminor and Bigbank. Best rate 9.9% p.a. Borrow €500–€30,000. No setup fee options. Instant online decision. Updated daily.",
+  title: content.metaTitle,
+  description: content.metaDescription,
   keywords: [
     "personal loan Estonia",
     "tarbimislaen",
     "consumer credit Estonia",
-    "best loan rate Estonia",
-    "LHV tarbimislaen",
-    "Bigbank laen",
-    "Swedbank personal loan",
-    "SEB tarbimislaen",
+    "APR KKM Estonia",
+    "krediidi kulukuse määr",
+    "compare loans Estonia",
   ],
-  alternates: { canonical: "https://nordicrate.com/loans/personal" },
+  alternates: {
+    canonical: DEEP_CONTENT_ROUTES.personal.en,
+    languages: {
+      en: DEEP_CONTENT_ROUTES.personal.en,
+      et: DEEP_CONTENT_ROUTES.personal.et,
+      fi: DEEP_CONTENT_ROUTES.personal.fi,
+      "x-default": DEEP_CONTENT_ROUTES.personal.en,
+    },
+  },
   openGraph: {
-    title: "Personal Loans Estonia | Best Rates from 9.9% | NordicRate",
-    description:
-      "Compare 6 personal loan offers in Estonia. Rates from 9.9% p.a. Borrow up to €30,000. LHV, Swedbank, SEB, Luminor & Bigbank.",
-    url: "https://nordicrate.com/loans/personal",
+    title: content.metaTitle,
+    description: content.metaDescription,
+    url: DEEP_CONTENT_ROUTES.personal.en,
     type: "website",
   },
 };
+
+const estonianPersonal = PRODUCTS.filter((p) => {
+  if (p.type !== "personal") return false;
+  // Estonya kurumları -ee suffix'li
+  return p.institutionId.endsWith("-ee");
+});
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -33,58 +53,16 @@ const jsonLd = {
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://nordicrate.com" },
         { "@type": "ListItem", position: 2, name: "Loans", item: "https://nordicrate.com/loans" },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: "Personal Loans",
-          item: "https://nordicrate.com/loans/personal",
-        },
-      ],
-    },
-    {
-      "@type": "ItemList",
-      name: "Personal Loans in Estonia — Best Rates 2026",
-      description: "Compare personal loan offers from Estonian banks, updated daily.",
-      url: "https://nordicrate.com/loans/personal",
-      numberOfItems: 6,
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "LHV Personal Loan — from 9.9% p.a.",
-          url: "https://www.lhv.ee/en/loans/consumer-loan",
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Swedbank Personal Loan — from 11.9% p.a.",
-          url: "https://www.swedbank.ee/private/credit/loans/personal",
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: "SEB Personal Loan — from 12.4% p.a.",
-          url: "https://www.seb.ee/en/loans/personal-loan",
-        },
-        {
-          "@type": "ListItem",
-          position: 4,
-          name: "Bigbank Personal Loan — from 14.9% p.a.",
-          url: "https://www.bigbank.ee/loans",
-        },
+        { "@type": "ListItem", position: 3, name: "Personal Loans", item: DEEP_CONTENT_ROUTES.personal.en },
       ],
     },
     {
       "@type": "FinancialProduct",
       name: "Personal Loans in Estonia",
-      description:
-        "Unsecured personal loans from Estonian banks. Borrow €500–€30,000, repay over 6–84 months.",
-      url: "https://nordicrate.com/loans/personal",
+      description: "Unsecured consumer loans from Estonian banks and licensed fintech lenders.",
+      url: DEEP_CONTENT_ROUTES.personal.en,
       provider: { "@type": "Organization", name: "NordicRate" },
-      interestRate: "9.9",
-      loanTerm: "P36M",
       currency: "EUR",
-      amount: { "@type": "MonetaryAmount", currency: "EUR", minValue: 500, maxValue: 30000 },
     },
   ],
 };
@@ -92,11 +70,15 @@ const jsonLd = {
 export default function PersonalLoansPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <JsonLd data={jsonLd} />
+      <JsonLd
+        data={buildProductsItemList(estonianPersonal, "Personal Loans in Estonia", "/loans/personal")}
       />
+      <JsonLd data={buildFaqJsonLd(content.faqs)} />
       <PersonalLoansContent />
+      <div className="bg-white border-t border-slate-100">
+        <DeepContentBlock content={content} />
+      </div>
     </>
   );
 }

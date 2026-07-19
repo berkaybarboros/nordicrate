@@ -20,10 +20,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  // Lokalize homepage'ler
+  // Lokalize homepage'ler + derin kategori sayfaları (ET/FI)
   const localeRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/fi`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE_URL}/et`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/et/kodulaen`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/et/tarbimislaen`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/fi/asuntolaina`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${BASE_URL}/fi/kulutusluotto`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
   ];
 
   // Static pages
@@ -113,6 +117,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.88,
+    },
+    {
+      url: `${BASE_URL}/loans/mortgage`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.88,
+    },
+    {
+      url: `${BASE_URL}/loans/car`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
     },
     {
       url: `${BASE_URL}/loans/business`,
