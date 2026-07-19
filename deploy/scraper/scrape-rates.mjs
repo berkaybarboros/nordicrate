@@ -58,21 +58,33 @@ const APRC_PATTERNS = [
   /krediidi kulukuse m[aä]{1,2}r[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
 ];
 
-// Faiz yerine ücret yakalamayı önler ("Contract fee 2% of loan sum" gibi)
-const FEE_WORDS = /fee|contract|service|tasu|lepingutasu|haldustasu|penalty|viivis/i;
+// Faiz yerine ücret/peşinat yakalamayı önler ("Contract fee 2%", "Self-financing from 10%")
+const FEE_WORDS = /fee|contract|service|tasu|lepingutasu|haldustasu|penalty|viivis|self-financing|omafinantseering|down payment|sissemakse|price of the vehicle|of the loan amount/i;
 
+/**
+ * Tüm pattern'lerin TÜM eşleşmelerini toplar, ücret/peşinat bağlamlarını eler,
+ * en düşük geçerli değeri döner ("from X%" = taban oranı semantiği).
+ * Tek-eşleşme yaklaşımı kampanya/örnek-hesap metinlerine takılıyordu (SEB 2026-07-19).
+ */
 function extract(text, patterns) {
+  const candidates = [];
   for (const re of patterns) {
-    const m = text.match(re);
-    if (!m) continue;
-    if (FEE_WORDS.test(m[0])) continue;
-    const value = parseFloat(m[1].replace(',', '.'));
-    if (!Number.isFinite(value) || value < 0.5 || value > 35) continue;
-    const idx = m.index ?? 0;
-    const snippet = text.slice(Math.max(0, idx - 60), idx + m[0].length + 60).replace(/\s+/g, ' ').trim();
-    return { value, snippet };
+    const global = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    for (const m of text.matchAll(global)) {
+      const idx = m.index ?? 0;
+      const window = text.slice(Math.max(0, idx - 60), idx + m[0].length + 60).replace(/\s+/g, ' ').trim();
+      if (FEE_WORDS.test(window)) continue;
+      // "Euribor ... 2.69%" alıntısı (sayıdan ÖNCE euribor) faiz tabanı değildir;
+      // marj metinlerinde euribor sayıdan SONRA gelir ("1.35% + Euribor")
+      if (/euribor/i.test(text.slice(Math.max(0, idx - 30), idx))) continue;
+      const value = parseFloat(m[1].replace(',', '.'));
+      if (!Number.isFinite(value) || value < 0.5 || value > 35) continue;
+      candidates.push({ value, snippet: window });
+    }
   }
-  return null;
+  if (candidates.length === 0) return null;
+  candidates.sort((a, b) => a.value - b.value);
+  return candidates[0];
 }
 
 async function insertRow(url, key, row) {
