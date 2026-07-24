@@ -90,14 +90,28 @@ function extract(text, patterns, band = [0.5, 35]) {
     const global = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
     for (const m of text.matchAll(global)) {
       const idx = m.index ?? 0;
-      const window = text.slice(Math.max(0, idx - 60), idx + m[0].length + 60).replace(/\s+/g, ' ').trim();
-      if (FEE_WORDS.test(window)) continue;
+      // Ücret kontrolü CÜMLE SEGMENTİ bazlı: sabit ±60 pencere komşu cümledeki
+      // "fees." kelimesini görüp gerçek oranı eliyordu (Swedbank 2026-07-19).
+      // Segment = eşleşmeyi içeren cümle/satır — fee kelimesi ancak aynı
+      // cümledeyse bu % bir ücrettir.
+      const segStart = Math.max(
+        text.lastIndexOf('.', idx), text.lastIndexOf('\n', idx),
+        text.lastIndexOf('!', idx), text.lastIndexOf('?', idx),
+      ) + 1;
+      const endOf = m[0].length + idx;
+      const segEnds = ['.', '\n', '!', '?']
+        .map((c) => text.indexOf(c, endOf))
+        .filter((x) => x !== -1);
+      const segEnd = segEnds.length ? Math.min(...segEnds) : endOf + 60;
+      const segment = text.slice(segStart, segEnd);
+      if (FEE_WORDS.test(segment)) continue;
       // "Euribor ... 2.69%" alıntısı (sayıdan ÖNCE euribor) faiz tabanı değildir;
       // marj metinlerinde euribor sayıdan SONRA gelir ("1.35% + Euribor")
-      if (/euribor/i.test(text.slice(Math.max(0, idx - 30), idx))) continue;
+      if (/euribor/i.test(text.slice(Math.max(segStart, idx - 30), idx))) continue;
       const value = parseFloat(m[1].replace(',', '.'));
       if (!Number.isFinite(value) || value < band[0] || value > band[1]) continue;
-      return { value, snippet: window };
+      const snippet = text.slice(Math.max(0, idx - 60), endOf + 60).replace(/\s+/g, ' ').trim();
+      return { value, snippet };
     }
   }
   return null;
