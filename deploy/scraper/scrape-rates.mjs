@@ -62,6 +62,15 @@ const BANKS = [
       { productType: 'personal', url: 'https://www.swedbank.ee/private/credit/loans/personal?language=ENG', band: BAND_RATE, waitMs: 8000 },
     ],
   },
+  {
+    // Inbank EE: robots.txt açık (sadece /auth disallow), oranlar statik (2026-07-19).
+    // "Small home loan" BİLİNÇLİ dışarıda: teminatsız tadilat kredisi, mortgage değil.
+    bankId: 'inbank',
+    targets: [
+      { productType: 'personal', url: 'https://www.inbank.ee/en/loan/personal-loan', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'auto',     url: 'https://www.inbank.ee/en/loan/car-loan', band: BAND_RATE, waitMs: 5000 },
+    ],
+  },
 ];
 
 const RATE_PATTERNS = [
