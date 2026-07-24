@@ -58,7 +58,8 @@ const BANKS = [
     // Luminor değerlendirildi ve ELENDİ: Cloudflare tüm otomasyonu blokluyor, aşmayız.
     bankId: 'swedbank',
     targets: [
-      { productType: 'personal', url: 'https://www.swedbank.ee/private/credit/loans/personal?language=ENG', band: BAND_RATE },
+      // SPA — oran metni geç render oluyor, uzun bekleme şart
+      { productType: 'personal', url: 'https://www.swedbank.ee/private/credit/loans/personal?language=ENG', band: BAND_RATE, waitMs: 8000 },
     ],
   },
 ];
@@ -140,7 +141,7 @@ async function main() {
         if (resp && resp.status() >= 400) {
           throw new Error(`HTTP ${resp.status()} — URL değişmiş olabilir`);
         }
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(target.waitMs ?? 3000);
         const text = await page.evaluate(() => document.body.innerText);
 
         const rate = extract(text, RATE_PATTERNS, target.band);
