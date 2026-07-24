@@ -71,6 +71,18 @@ const BANKS = [
       { productType: 'auto',     url: 'https://www.inbank.ee/en/loan/car-loan', band: BAND_RATE, waitMs: 5000 },
     ],
   },
+  {
+    // Bigbank EE: robots.txt açık; EN site kapandı, sayfalar Estonca —
+    // pattern'ler 'intress/alates' desteğiyle zaten uyumlu (2026-07-19).
+    // kodulaen scrape edilir ama katalogda ürünü YOK (max limit yayınlanmıyor,
+    // uydurmayız) — ürün doğrulanmış limitle eklendiği gün otomatik canlanır.
+    bankId: 'bigbank',
+    targets: [
+      { productType: 'personal', url: 'https://www.bigbank.ee/vaikelaen/', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'auto',     url: 'https://www.bigbank.ee/autolaen/', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'mortgage', url: 'https://www.bigbank.ee/kodulaen/', marginPlusEuribor: true, band: BAND_MARGIN, waitMs: 5000 },
+    ],
+  },
 ];
 
 const RATE_PATTERNS = [

@@ -42,6 +42,7 @@ const BANK_TO_INSTITUTION: Record<string, string> = {
   seb: 'seb-ee',
   swedbank: 'swedbank-ee',
   inbank: 'inbank-ee',
+  bigbank: 'bigbank-ee',
 };
 
 // Banka bazlı güvenilir tipler — LHV auto public oran yayınlamıyor (yanlış-pozitif
@@ -53,6 +54,9 @@ const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   seb: new Set(['personal', 'mortgage', 'auto']),
   swedbank: new Set(['personal']), // mortgage sayfası oran yayınlamıyor
   inbank: new Set(['personal', 'auto']), // small-home-loan mortgage değil — dışarıda
+  // mortgage dahil: katalogda henüz bigbank-ee mortgage ürünü yok (max limit
+  // yayınlanmıyor), ürün doğrulanmış limitle eklenince scrape verisi hazır olacak
+  bigbank: new Set(['personal', 'auto', 'mortgage']),
 };
 const FRESHNESS_MS = 48 * 60 * 60 * 1000;
 
