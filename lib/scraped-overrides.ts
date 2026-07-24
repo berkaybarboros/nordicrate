@@ -40,6 +40,7 @@ const BANK_TO_INSTITUTION: Record<string, string> = {
   lhv: 'lhv-ee',
   coop: 'coop-ee',
   seb: 'seb-ee',
+  swedbank: 'swedbank-ee',
 };
 
 // Banka bazlı güvenilir tipler — LHV auto public oran yayınlamıyor (yanlış-pozitif
@@ -49,6 +50,7 @@ const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   lhv: new Set(['personal', 'mortgage']),
   coop: new Set(['personal', 'mortgage', 'auto']),
   seb: new Set(['personal', 'mortgage', 'auto']),
+  swedbank: new Set(['personal']), // mortgage sayfası oran yayınlamıyor
 };
 const FRESHNESS_MS = 48 * 60 * 60 * 1000;
 

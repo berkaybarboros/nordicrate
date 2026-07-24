@@ -52,6 +52,15 @@ const BANKS = [
       { productType: 'auto',     url: 'https://www.seb.ee/en/private/loans/car-loan', band: BAND_RATE },
     ],
   },
+  {
+    // Swedbank EE: robots.txt kredi sayfalarına açık (2026-07-19); SADECE personal —
+    // mortgage sayfası oran yayınlamıyor, car URL'i personal içeriğine düşüyor.
+    // Luminor değerlendirildi ve ELENDİ: Cloudflare tüm otomasyonu blokluyor, aşmayız.
+    bankId: 'swedbank',
+    targets: [
+      { productType: 'personal', url: 'https://www.swedbank.ee/private/credit/loans/personal?language=ENG', band: BAND_RATE },
+    ],
+  },
 ];
 
 const RATE_PATTERNS = [

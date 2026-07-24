@@ -571,9 +571,13 @@ export default function AIAssistant() {
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center text-xs shrink-0 mr-2 mt-0.5">
-                    🤖
-                  </div>
+                  <Image
+                    src="/nordicai-fab.png"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="w-6 h-6 rounded-full bg-sky-100 shrink-0 mr-2 mt-0.5"
+                  />
                 )}
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
