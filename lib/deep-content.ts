@@ -34,7 +34,7 @@ export interface DeepContent {
 const MORTGAGE_EN: DeepContent = {
   locale: 'en',
   h1: 'Mortgages in Estonia: compare Euribor home-loan rates',
-  metaTitle: 'Mortgages in Estonia: Compare Euribor Home-Loan Rates',
+  metaTitle: 'Mortgages Estonia: Compare Euribor Rates',
   metaDescription:
     'Compare Estonian mortgage offers from LHV, Swedbank, SEB, Luminor and Coop Pank. See how Euribor + margin, LTV limits and state guarantees work.',
   intro:
@@ -290,7 +290,7 @@ const MORTGAGE_FI: DeepContent = {
 const PERSONAL_EN: DeepContent = {
   locale: 'en',
   h1: 'Personal loans in Estonia: compare bank and fintech rates',
-  metaTitle: 'Personal Loans in Estonia: Compare Bank & Fintech Rates',
+  metaTitle: 'Personal Loans Estonia: Compare Live Bank Rates',
   metaDescription:
     'Compare consumer loans (tarbimislaen) in Estonia from LHV, Swedbank, SEB, Luminor, Bigbank and Inbank. Understand APR (KKM), fees and eligibility.',
   intro:

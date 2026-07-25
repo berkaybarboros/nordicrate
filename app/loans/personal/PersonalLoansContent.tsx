@@ -132,17 +132,11 @@ function PersonalLoansInner() {
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-[#1a3c6e] to-[#2563eb] text-white py-8">
+      {/* Page Header — H1 ve breadcrumb SERVER'da (page.tsx); burada yalnız sayaç + alert */}
+      <div className="bg-gradient-to-r from-[#1a3c6e] to-[#2563eb] text-white pb-6">
         <div className="max-w-7xl mx-auto px-4">
-          <nav aria-label="breadcrumb" className="text-sm text-white/60 mb-3">
-            <span>{t.common.home}</span> <span className="mx-2">/</span>
-            <span>{t.nav.loans}</span> <span className="mx-2">/</span>
-            <span className="text-white">{t.nav.personalLoans}</span>
-          </nav>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold mb-2">{t.loans.personalTitle}</h1>
               <p className="text-white/80">
                 {loading ? "Loading..." : `${offers.length} ${t.loans.offersFound}`} · Updated today
               </p>

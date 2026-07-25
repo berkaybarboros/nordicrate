@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import DeepContentBlock from '@/components/seo/DeepContentBlock';
 import JsonLd from '@/components/seo/JsonLd';
+import SetHtmlLang from '@/components/SetHtmlLang';
 import { buildFaqJsonLd } from '@/lib/seo';
 import type { DeepContent } from '@/lib/deep-content';
 
@@ -32,6 +33,7 @@ export default function LocalizedDeepPage({
 
   return (
     <>
+      {content.locale !== 'en' && <SetHtmlLang lang={content.locale} />}
       <JsonLd data={jsonLd} />
       <JsonLd data={buildFaqJsonLd(content.faqs)} />
       <div className="bg-gradient-to-b from-sky-50 to-white border-b border-slate-100">

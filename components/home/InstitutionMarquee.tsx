@@ -34,7 +34,7 @@ function LogoChip({ item }: { item: MarqueeItem }) {
         // eslint-disable-next-line @next/next/no-img-element -- küçük lokal webp, next/image gereksiz
         <img
           src={item.logo!}
-          alt=""
+          alt={`${item.name} logo`}
           width={22}
           height={22}
           loading="lazy"

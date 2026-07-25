@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | NordicRate',
   },
   description:
-    'Compare personal loans, mortgages, and business credit rates from 50+ banks and insurers across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania. Free, instant, no credit check.',
+    'Compare personal loans, mortgages and business credit from 50+ banks across 8 Nordic & Baltic countries. Free, instant, no credit check.',
   keywords: [
     'nordic loans', 'baltic credit', 'mortgage rates', 'personal loan comparison',
     'Scandinavia finance', 'Estonia loan', 'Finland bank', 'Norway mortgage',

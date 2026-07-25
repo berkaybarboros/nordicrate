@@ -61,9 +61,14 @@ export function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const dest = sp.get('u');
 
-  // Geçersiz/izinsiz hedef → ana sayfaya güvenli düşüş (asla arbitrary redirect)
+  // Geçersiz/izinsiz hedef → ana sayfaya güvenli düşüş (asla arbitrary redirect).
+  // DİKKAT: req.url proxy arkasında localhost:3001 — fallback MUTLAKA public base URL
+  // (SEO audit 2026-07-25: /go, localhost:3001'e 302 atıyordu)
+  const BASE = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nordicrate.com';
   if (!dest || !isAllowedApplyUrl(dest)) {
-    return NextResponse.redirect(new URL('/', req.url), 302);
+    const res = NextResponse.redirect(new URL('/', BASE), 302);
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return res;
   }
 
   const institutionId = clampString(sp.get('i'), 64);
@@ -82,5 +87,7 @@ export function GET(req: NextRequest) {
   });
 
   const finalUrl = buildUTMLink(dest, institutionId ?? 'unknown', productType ?? undefined);
-  return NextResponse.redirect(finalUrl, 302);
+  const res = NextResponse.redirect(finalUrl, 302);
+  res.headers.set('X-Robots-Tag', 'noindex, nofollow'); // redirect endpoint'i indekslenmesin
+  return res;
 }

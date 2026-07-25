@@ -1,9 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { getPublishedPosts } from '@/lib/blog';
 
+// Sitemap saatte bir yenilensin — blog cron'la yayınlanıyor, build-time snapshot
+// yeni yazıları kaçırıyordu (SEO audit 2026-07-25: 5 yazıdan 4'ü sitemap dışıydı)
+export const revalidate = 3600;
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nordicrate.com';
 
-const COUNTRY_CODES = ['DK', 'FI', 'IS', 'NO', 'SE', 'EE', 'LV', 'LT'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -171,51 +174,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }));
 
-  // Per-country loan pages (/loans?country=XX)
-  const countryLoanRoutes: MetadataRoute.Sitemap = COUNTRY_CODES.map((code) => ({
-    url: `${BASE_URL}/loans?country=${code}`,
-    lastModified: now,
-    changeFrequency: 'daily' as const,
-    priority: 0.85,
-  }));
-
-  // Per-country mortgage pages
-  const countryMortgageRoutes: MetadataRoute.Sitemap = COUNTRY_CODES.map((code) => ({
-    url: `${BASE_URL}/mortgage?country=${code}`,
-    lastModified: now,
-    changeFrequency: 'daily' as const,
-    priority: 0.8,
-  }));
-
-  // Per-country business pages
-  const countryBusinessRoutes: MetadataRoute.Sitemap = COUNTRY_CODES.map((code) => ({
-    url: `${BASE_URL}/business?country=${code}`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: 0.75,
-  }));
-
-  // Region filter pages
-  const regionRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/countries?region=nordic`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/countries?region=baltic`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/programs?tab=e_residency`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-  ];
+  // NOT: ?country= / ?region= / ?tab= parametreli URL'ler BİLİNÇLİ olarak yok —
+  // hepsi base path'e canonicalize oluyor; sitemap'te olmaları GSC'de 26 adet
+  // "Duplicate, submitted URL not selected as canonical" üretiyordu (audit 2026-07-25).
 
   return [
     ...staticRoutes,
@@ -223,9 +184,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...guideRoutes,
     ...blogRoutes,
     ...countryLandingRoutes,
-    ...countryLoanRoutes,
-    ...countryMortgageRoutes,
-    ...countryBusinessRoutes,
-    ...regionRoutes,
   ];
 }

@@ -75,6 +75,18 @@ export default function PersonalLoansPage() {
         data={buildProductsItemList(estonianPersonal, "Personal Loans in Estonia", "/loans/personal")}
       />
       <JsonLd data={buildFaqJsonLd(content.faqs)} />
+      {/* SERVER-rendered başlık: client bölge useSearchParams yüzünden Suspense
+          içinde CSR — H1 orada kalırsa prerender HTML'inde H1 OLMAZ (SEO audit bulgusu) */}
+      <div className="bg-gradient-to-r from-[#1a3c6e] to-[#2563eb] text-white pt-8 pb-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <nav aria-label="breadcrumb" className="text-sm text-white/60 mb-3">
+            <span>Home</span> <span className="mx-2">/</span>
+            <span>Loans</span> <span className="mx-2">/</span>
+            <span className="text-white">Personal Loans</span>
+          </nav>
+          <h1 className="text-2xl md:text-3xl font-extrabold">{content.h1}</h1>
+        </div>
+      </div>
       <PersonalLoansContent />
       <div className="bg-white border-t border-slate-100">
         <DeepContentBlock content={content} />

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import LocalizedHome from '@/components/home/LocalizedHome';
+import SetHtmlLang from '@/components/SetHtmlLang';
 import { HOME_DICTS } from '@/lib/home-i18n';
 
 const dict = HOME_DICTS.et;
@@ -24,5 +25,10 @@ export const metadata: Metadata = {
 };
 
 export default function EstonianHomePage() {
-  return <LocalizedHome dict={dict} />;
+  return (
+    <>
+      <SetHtmlLang lang="et" />
+      <LocalizedHome dict={dict} />
+    </>
+  );
 }
