@@ -33,6 +33,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/fi/kulutusluotto`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
   ];
 
+  // Hesaplayıcı sayfaları (3 dil, karşılıklı hreflang)
+  const calculatorRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/loan-calculator`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/et/laenukalkulaator`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/fi/lainalaskuri`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+  ];
+
   // Entity/glossary rehberleri
   const guideRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
@@ -181,6 +188,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...localeRoutes,
+    ...calculatorRoutes,
     ...guideRoutes,
     ...blogRoutes,
     ...countryLandingRoutes,

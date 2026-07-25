@@ -149,6 +149,7 @@ export default function Footer() {
               <li><Link href="/programs" className="hover:text-white transition-colors">About NordicRate</Link></li>
               <li><Link href="/partners" className="hover:text-white transition-colors font-semibold text-sky-400">For Partners (B2B)</Link></li>
               <li><Link href="/guides" className="hover:text-white transition-colors">Borrowing Guides</Link></li>
+              <li><Link href="/loan-calculator" className="hover:text-white transition-colors">Loan Calculator</Link></li>
               <li><span className="cursor-default opacity-50">Privacy Policy</span></li>
               <li><span className="cursor-default opacity-50">Terms of Use</span></li>
             </ul>

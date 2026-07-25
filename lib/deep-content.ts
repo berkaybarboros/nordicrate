@@ -110,6 +110,7 @@ const MORTGAGE_EN: DeepContent = {
     { label: 'Home insurance', href: '/insurance/home' },
     { label: 'Life insurance', href: '/insurance/life' },
     { label: 'Business financing', href: '/loans/business' },
+    { label: 'Loan calculator', href: '/loan-calculator' },
   ],
 };
 
@@ -195,6 +196,7 @@ const MORTGAGE_ET: DeepContent = {
     { label: 'Tarbimislaen Eestis', href: '/et/tarbimislaen' },
     { label: 'Kodukindlustus', href: '/insurance/home' },
     { label: 'Elukindlustus', href: '/insurance/life' },
+    { label: 'Laenukalkulaator', href: '/et/laenukalkulaator' },
   ],
 };
 
@@ -280,6 +282,7 @@ const MORTGAGE_FI: DeepContent = {
     { label: 'Kulutusluotot Suomessa', href: '/fi/kulutusluotto' },
     { label: 'Kotivakuutus', href: '/insurance/home' },
     { label: 'Vertaile asuntolainoja', href: '/mortgage' },
+    { label: 'Lainalaskuri', href: '/fi/lainalaskuri' },
   ],
 };
 
@@ -364,6 +367,7 @@ const PERSONAL_EN: DeepContent = {
     { label: 'Car loans', href: '/loans/car' },
     { label: 'Business financing', href: '/loans/business' },
     { label: 'Government programs', href: '/programs' },
+    { label: 'Loan calculator', href: '/loan-calculator' },
   ],
 };
 
@@ -447,6 +451,7 @@ const PERSONAL_ET: DeepContent = {
     { label: 'Kodulaen Eestis', href: '/et/kodulaen' },
     { label: 'Autolaenud', href: '/loans/car' },
     { label: 'Ärirahastus', href: '/loans/business' },
+    { label: 'Laenukalkulaator', href: '/et/laenukalkulaator' },
   ],
 };
 
@@ -530,6 +535,7 @@ const PERSONAL_FI: DeepContent = {
     { label: 'Asuntolaina Suomessa', href: '/fi/asuntolaina' },
     { label: 'Autolainat', href: '/loans/car' },
     { label: 'Vertaile kaikkia lainoja', href: '/loans' },
+    { label: 'Lainalaskuri', href: '/fi/lainalaskuri' },
   ],
 };
 
