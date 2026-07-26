@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getPublishedPosts } from '@/lib/blog';
+import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
-  title: 'Blog — Loan & Insurance Guides for Nordic & Baltic Countries',
+  title: { absolute: 'Blog — Nordic & Baltic Loan Guides | NordicRate' },
   description:
     'Guides, rate analyses and how-tos on loans, mortgages and insurance across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia and Lithuania.',
   alternates: { canonical: 'https://nordicrate.com/blog' },
@@ -26,8 +27,25 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
   const locale = lang === 'fi' || lang === 'et' ? lang : 'en';
   const posts = await getPublishedPosts(50, locale);
 
+  // Blog + ItemList rich-result şeması (audit: /blog'da Blog JSON-LD yoktu)
+  const blogJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'NordicRate Blog',
+    url: 'https://nordicrate.com/blog',
+    publisher: { '@type': 'Organization', name: 'NordicRate', url: 'https://nordicrate.com' },
+    blogPost: posts.slice(0, 20).map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.title,
+      url: `https://nordicrate.com/blog/${p.slug}`,
+      datePublished: p.published_at,
+      inLanguage: locale,
+    })),
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <JsonLd data={blogJsonLd} />
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-900">NordicRate Blog</h1>
         <p className="text-slate-500 mt-2">

@@ -20,15 +20,30 @@ export default function LocalizedDeepPage({
   compareCta: string;
   compareHref: string;
 }) {
+  const pageUrl = breadcrumb[breadcrumb.length - 1]?.item;
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: breadcrumb.map((b, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: b.name,
-      item: b.item,
-    })),
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumb.map((b, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: b.name,
+          item: b.item,
+        })),
+      },
+      // EN ikizleriyle şema paritesi (audit) — oran bilinçli YOK, canlı kartlar gösterir
+      {
+        '@type': 'FinancialProduct',
+        name: content.h1,
+        description: content.metaDescription,
+        url: pageUrl,
+        provider: { '@type': 'Organization', name: 'NordicRate', url: 'https://nordicrate.com' },
+        currency: 'EUR',
+        inLanguage: content.locale,
+      },
+    ],
   };
 
   return (

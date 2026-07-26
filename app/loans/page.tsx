@@ -8,7 +8,7 @@ import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = {
   alternates: { canonical: 'https://nordicrate.com/loans' },
-  title: 'Personal Loans – NordicRate | Compare Nordic & Baltic Rates',
+  title: { absolute: 'Compare Personal Loans — Nordic & Baltic Banks | NordicRate' },
   description: 'Compare personal and consumer loan rates from banks and insurers across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };
 

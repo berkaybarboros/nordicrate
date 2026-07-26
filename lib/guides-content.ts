@@ -34,7 +34,7 @@ export const GUIDES: GuideEntry[] = [
       {
         h2: 'Who sets Euribor and how',
         body: [
-          'Euribor is administered by the European Money Markets Institute (EMMI) in Brussels. It is calculated from the rates at which a panel of European banks report they can borrow unsecured funds from other banks. It is published every business day for several maturities — the ones borrowers meet most often are the 3-month, 6-month and 12-month Euribor.',
+          'Euribor is administered by the [European Money Markets Institute (EMMI)](https://www.emmi-benchmarks.eu/) in Brussels. It is calculated from the rates at which a panel of European banks report they can borrow unsecured funds from other banks. It is published every business day for several maturities — the ones borrowers meet most often are the 3-month, 6-month and 12-month Euribor.',
           'Euribor broadly follows the European Central Bank’s monetary policy: when the ECB raises or cuts its key rates, Euribor tends to move in the same direction, often in anticipation. That is why eurozone borrowers watch ECB decisions — they flow through to loan payments within months.',
         ],
       },
@@ -55,7 +55,7 @@ export const GUIDES: GuideEntry[] = [
       {
         h2: 'Where to see current Euribor rates',
         body: [
-          'NordicRate shows current Euribor values — sourced from the European Central Bank data portal and updated daily — on our [homepage](/) and loan pages. Live bank offers marked with a LIVE badge already reflect the current Euribor in their effective rates.',
+          'NordicRate shows current Euribor values — sourced from the [European Central Bank data portal](https://data.ecb.europa.eu/) and updated daily — on our [homepage](/) and loan pages. Live bank offers marked with a LIVE badge already reflect the current Euribor in their effective rates.',
           'When comparing loans, remember the part you can influence is not Euribor itself but the margin the bank adds on top — that is where [comparing offers](/loans) pays off.',
         ],
       },
@@ -176,7 +176,7 @@ export const GUIDES: GuideEntry[] = [
       {
         h2: 'The Estonian macroprudential limits',
         body: [
-          'Eesti Pank, Estonia’s central bank, sets binding requirements for housing loans: a standard LTV cap of 85%, a maturity cap of 30 years, and a limit on monthly debt payments relative to income (see [DSTI](/guides/dsti)). Banks may exceed the LTV cap only within a small regulated share of new loans.',
+          '[Eesti Pank](https://www.eestipank.ee/en), Estonia’s central bank, sets binding requirements for housing loans: a standard LTV cap of 85%, a maturity cap of 30 years, and a limit on monthly debt payments relative to income (see [DSTI](/guides/dsti)). Banks may exceed the LTV cap only within a small regulated share of new loans.',
           'With a state-backed guarantee (widely known as the [KredEx guarantee](/guides/kredex)), eligible buyers — typically first-home buyers and young families — can borrow at a higher effective LTV, reducing the cash needed upfront. Similar caps exist across the region: Finland applies its own statutory loan cap (lainakatto) with a gentler limit for first-home buyers.',
         ],
       },
@@ -226,7 +226,7 @@ export const GUIDES: GuideEntry[] = [
     metaDescription:
       'Estonia’s state housing loan guarantee (KredEx) reduces the required down payment for eligible buyers. Who qualifies, what it costs, and what it does not do.',
     intro:
-      'The KredEx housing loan guarantee is an Estonian state-backed surety: the state guarantees part of your mortgage, so the bank can accept a smaller down payment than the standard 15%. It lowers the cash barrier to buying a home — it does not lower your interest rate.',
+      'The KredEx housing loan guarantee — today administered by [EIS, the Enterprise and Innovation Foundation (formerly KredEx)](https://eis.ee/en/) — is an Estonian state-backed surety: the state guarantees part of your mortgage, so the bank can accept a smaller down payment than the standard 15%. It lowers the cash barrier to buying a home — it does not lower your interest rate.',
     sections: [
       {
         h2: 'How the guarantee works',
@@ -238,7 +238,7 @@ export const GUIDES: GuideEntry[] = [
       {
         h2: 'Who is typically eligible',
         body: [
-          'The scheme has historically targeted groups such as first-home buyers, young families with children, young professionals, tenants of restituted housing, and buyers renovating energy-inefficient homes. Exact categories, income conditions and guarantee ceilings change over time — check the current criteria with your bank or the administering state fund before planning around it.',
+          'The scheme has historically targeted groups such as first-home buyers, young families with children, young professionals, tenants of restituted housing, and buyers renovating energy-inefficient homes. Exact categories, income conditions and guarantee ceilings change over time — check the current criteria with your bank or [EIS](https://eis.ee/en/), the administering state fund, before planning around it.',
           'The guarantee applies to a home you will live in, not investment property. Banks still run their full affordability assessment: the guarantee replaces deposit cash, not income requirements.',
         ],
       },
@@ -350,7 +350,7 @@ export const GUIDES: GuideEntry[] = [
     metaDescription:
       'EU consumer credit rules let you cancel a loan within 14 days of signing without penalty. What you repay, how to exercise the right, and what it does not cover.',
     intro:
-      'Under EU consumer credit rules, transposed across the Nordic and Baltic countries, you can withdraw from a consumer credit agreement within 14 days of signing — without giving a reason and without penalty. You repay the principal plus the interest accrued for the days you held the money, nothing more.',
+      'Under [EU consumer credit rules](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32008L0048), transposed across the Nordic and Baltic countries, you can withdraw from a consumer credit agreement within 14 days of signing — without giving a reason and without penalty. You repay the principal plus the interest accrued for the days you held the money, nothing more.',
     sections: [
       {
         h2: 'How the right works in practice',

@@ -9,13 +9,22 @@ import type { DeepContent } from '@/lib/deep-content';
 
 function InlineLinks({ text }: { text: string }) {
   const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  const cls = 'text-sky-700 font-semibold underline decoration-sky-300 underline-offset-2 hover:decoration-sky-600';
   return (
     <>
       {parts.map((part, i) => {
         const m = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(part);
         if (m) {
+          // Dış otorite kaynakları (EMMI, Eesti Pank, EIS…) yeni sekmede — E-E-A-T sinyali
+          if (m[2].startsWith('http')) {
+            return (
+              <a key={i} href={m[2]} target="_blank" rel="noopener noreferrer" className={cls}>
+                {m[1]}
+              </a>
+            );
+          }
           return (
-            <Link key={i} href={m[2]} className="text-sky-700 font-semibold underline decoration-sky-300 underline-offset-2 hover:decoration-sky-600">
+            <Link key={i} href={m[2]} className={cls}>
               {m[1]}
             </Link>
           );

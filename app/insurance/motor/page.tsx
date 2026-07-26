@@ -5,7 +5,7 @@ import MotorInsuranceContent from "./MotorInsuranceContent";
 export const metadata: Metadata = {
   title: "Motor Insurance Estonia | Compare Liikluskindlustus Prices",
   description:
-    "Compare mandatory motor insurance (liikluskindlustus) in Estonia from If, ERGO, Swedbank P&C, Gjensidige and LHV. Required by law. Save up to 30% by comparing online. Instant quotes.",
+    "Compare mandatory motor insurance (liikluskindlustus) in Estonia from If, ERGO, Swedbank P&C and LHV. Required by law — compare premiums before you renew.",
   keywords: [
     "motor insurance Estonia",
     "liikluskindlustus",
