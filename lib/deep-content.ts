@@ -244,6 +244,13 @@ const MORTGAGE_FI: DeepContent = {
       ],
     },
     {
+      h2: 'Asuntolainan kilpailutus — näin se toimii',
+      body: [
+        'Kilpailutus tarkoittaa, että pyydät tarjouksen samalla summalla, laina-ajalla ja omarahoitusosuudella useasta pankista — ja annat pankkien kilpailla marginaalista. Tarjouspyyntö ei sido sinua mihinkään, ja pankit tietävät kilpailevansa: jo kahden tai kolmen tarjouksen vertailu muuttaa neuvotteluasemasi.',
+        'Käytännössä: laske ensin realistinen kuukausierä [lainalaskurilla](/fi/lainalaskuri), pyydä lainalupaukset samoilla syötteillä ja vertaa tarjouksia marginaalin ja todellisen vuosikoron perusteella — älä pelkän mainoskoron. Parhaan tarjouksen voi usein viedä takaisin omaan pankkiin vastatarjousta varten.',
+      ],
+    },
+    {
       h2: 'Näin vertailet asuntolainoja oikein',
       body: [
         'Vertaa kokonaiskustannusta, älä pelkkää mainoskorkoa. Ratkaisevat luvut ovat marginaali ja todellinen vuosikorko, joka sisältää koron lisäksi pakolliset kulut ja tekee tarjouksista vertailukelpoisia.',
