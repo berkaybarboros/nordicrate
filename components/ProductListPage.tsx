@@ -186,6 +186,7 @@ export default function ProductListPage({
               </button>
             </div>
           ) : (
+            <>
             {/* Başlık hiyerarşisi: kart adları h3 — arada görünmez h2 (audit fix) */}
             <h2 className="sr-only">All loan offers</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -198,6 +199,7 @@ export default function ProductListPage({
                 );
               })}
             </div>
+            </>
           )}
         </div>
       </div>
