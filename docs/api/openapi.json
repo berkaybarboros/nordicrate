@@ -1,0 +1,132 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NordicRate Public API",
+    "version": "1.0.0",
+    "description": "Cloudflare API Shield Schema Validation icin. Uygulama katmaninda ayrica lib/security.ts validasyonu var; bu spec CF edge on-filtresi."
+  },
+  "servers": [{ "url": "https://nordicrate.com" }],
+  "paths": {
+    "/api/rates": { "get": { "responses": { "200": { "description": "Live EURIBOR + central bank rates" } } } },
+    "/api/deposits": { "get": { "responses": { "200": { "description": "Deposit catalog" } } } },
+    "/api/loans/{type}": {
+      "get": {
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string", "enum": ["personal", "mortgage", "car", "business"] } },
+          { "name": "amount", "in": "query", "schema": { "type": "integer", "minimum": 0, "maximum": 10000000 } },
+          { "name": "term", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 480 } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["rate", "monthly", "total"] } }
+        ],
+        "responses": { "200": { "description": "Loan offers" } }
+      }
+    },
+    "/api/insurance/{type}": {
+      "get": {
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string", "enum": ["motor", "casco", "home", "health", "travel", "life"] } }
+        ],
+        "responses": { "200": { "description": "Insurance offers" } }
+      }
+    },
+    "/api/chat": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["messages"],
+                "properties": {
+                  "messages": { "type": "array", "maxItems": 60, "items": { "type": "object", "required": ["role", "content"], "properties": { "role": { "type": "string", "enum": ["user", "assistant", "system"] }, "content": { "type": "string", "maxLength": 8000 } } } },
+                  "mode": { "type": "string", "enum": ["personal", "corporate"] },
+                  "onboardingProfile": { "type": "object" },
+                  "corporateProfile": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "SSE stream" } }
+      }
+    },
+    "/api/compare-chat": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "SSE stream" } }
+      }
+    },
+    "/api/profile": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["messages"], "properties": { "messages": { "type": "array", "maxItems": 60, "items": { "type": "object" } }, "mode": { "type": "string", "enum": ["personal", "corporate"] } } } } } },
+        "responses": { "200": { "description": "Extracted profile" } }
+      }
+    },
+    "/api/recommend": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Recommendations" } }
+      }
+    },
+    "/api/find-rate": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productType", "sessionId"],
+                "properties": {
+                  "productType": { "type": "string", "enum": ["personal", "mortgage", "car", "business", "motor", "casco", "home", "health", "deposit"] },
+                  "country": { "type": "string", "maxLength": 32 },
+                  "amount": { "type": "number", "minimum": 0, "maximum": 10000000 },
+                  "termMonths": { "type": "integer", "minimum": 1, "maximum": 480 },
+                  "monthlyIncome": { "type": "number", "minimum": 0 },
+                  "email": { "type": "string", "maxLength": 254 },
+                  "sessionId": { "type": "string", "maxLength": 64 }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "AI recommendations" } }
+      }
+    },
+    "/api/alerts": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["email"], "properties": { "email": { "type": "string", "maxLength": 254 }, "product": { "type": "string", "maxLength": 64 }, "targetRate": { "type": "number", "nullable": true } } } } } },
+        "responses": { "200": { "description": "Alert saved" } }
+      }
+    },
+    "/api/partners": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "Partner lead saved" } }
+      }
+    },
+    "/api/admin/login": {
+      "post": { "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } }, "responses": { "200": { "description": "Login" } } },
+      "delete": { "responses": { "200": { "description": "Logout" } } }
+    },
+    "/api/cron/sync-rates": { "get": { "responses": { "200": { "description": "Protected (x-cron-secret)" } } }, "post": { "responses": { "200": { "description": "Protected (x-cron-secret)" } } } },
+    "/api/cron/refresh-scores": { "get": { "responses": { "200": { "description": "Protected" } } }, "post": { "responses": { "200": { "description": "Protected" } } } },
+    "/api/cron/generate-embeddings": { "get": { "responses": { "200": { "description": "Protected" } } }, "post": { "responses": { "200": { "description": "Protected" } } } },
+    "/api/cron/publish-post": { "post": { "responses": { "200": { "description": "Protected" } } } },
+    "/api/cron/published-topics": { "get": { "responses": { "200": { "description": "Protected" } } } },
+    "/api/cron/outreach-targets": { "get": { "responses": { "200": { "description": "Protected" } } } },
+    "/api/cron/outreach-mark": { "post": { "responses": { "200": { "description": "Protected" } } } },
+    "/go": {
+      "get": {
+        "parameters": [
+          { "name": "u", "in": "query", "required": true, "schema": { "type": "string", "maxLength": 2000 } },
+          { "name": "i", "in": "query", "schema": { "type": "string", "maxLength": 64 } },
+          { "name": "pid", "in": "query", "schema": { "type": "string", "maxLength": 64 } },
+          { "name": "pt", "in": "query", "schema": { "type": "string", "maxLength": 32 } },
+          { "name": "sid", "in": "query", "schema": { "type": "string", "maxLength": 64 } }
+        ],
+        "responses": { "302": { "description": "Redirect to institution" } }
+      }
+    }
+  }
+}
