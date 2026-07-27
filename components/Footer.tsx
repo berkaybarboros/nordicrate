@@ -150,8 +150,18 @@ export default function Footer() {
               <li><Link href="/partners" className="hover:text-white transition-colors font-semibold text-sky-400">For Partners (B2B)</Link></li>
               <li><Link href="/guides" className="hover:text-white transition-colors">Borrowing Guides</Link></li>
               <li><Link href="/loan-calculator" className="hover:text-white transition-colors">Loan Calculator</Link></li>
-              <li><span className="cursor-default opacity-50">Privacy Policy</span></li>
-              <li><span className="cursor-default opacity-50">Terms of Use</span></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Use</Link></li>
+              <li><Link href="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+              <li><Link href="/imprint" className="hover:text-white transition-colors">Imprint &amp; Contact</Link></li>
+              <li>
+                <button
+                  onClick={() => window.dispatchEvent(new Event('nr-open-consent'))}
+                  className="hover:text-white transition-colors"
+                >
+                  Cookie settings
+                </button>
+              </li>
             </ul>
           </div>
         </div>

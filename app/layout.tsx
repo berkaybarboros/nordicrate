@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AIAssistant from '@/components/AIAssistant';
+import ConsentBanner from '@/components/ConsentBanner';
 import CompareBar from '@/components/compare/CompareBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompareProvider } from '@/contexts/CompareContext';
@@ -119,7 +120,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://flagcdn.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://flagcdn.com" />
         <link rel="dns-prefetch" href="https://logo.clearbit.com" />
-        {/* Google Tag Manager — head'de olabildiğince yukarıda */}
+        {/* Google Consent Mode v2 — GTM'den ÖNCE çalışmak ZORUNDA (ePrivacy/GDPR).
+            Varsayılan: tüm izinler denied. localStorage'da önceki onay varsa
+            senkron olarak update edilir — GA4 çerezleri ancak onaydan sonra düşer. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+try{if(localStorage.getItem('nr-consent')==='granted'){gtag('consent','update',{analytics_storage:'granted'});}}catch(e){}`,
+          }}
+        />
+        {/* Google Tag Manager — consent default'tan hemen sonra */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -155,6 +166,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <Footer />
             <AIAssistant />
             <CompareBar />
+            <ConsentBanner />
           </CompareProvider>
         </LanguageProvider>
       </body>

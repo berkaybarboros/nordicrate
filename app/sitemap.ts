@@ -40,6 +40,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/fi/lainalaskuri`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
   ];
 
+  // Hukuk sayfaları
+  const legalRoutes: MetadataRoute.Sitemap = ['privacy', 'terms', 'cookies', 'imprint'].map((s) => ({
+    url: `${BASE_URL}/${s}`,
+    lastModified: now,
+    changeFrequency: 'yearly' as const,
+    priority: 0.3,
+  }));
+
   // Entity/glossary rehberleri
   const guideRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
@@ -188,6 +196,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...localeRoutes,
+    ...legalRoutes,
     ...calculatorRoutes,
     ...guideRoutes,
     ...blogRoutes,
