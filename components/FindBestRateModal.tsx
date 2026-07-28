@@ -332,6 +332,11 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                   onChange={e => setEmail(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
                 />
+                {/* GDPR bilgilendirme — alan opsiyonel, doldurulursa onay anlamı taşır */}
+                <p className="text-[10px] text-gray-400 mt-1 leading-snug">
+                  Optional. If provided, we save your results and may email you about them —{' '}
+                  <a href="/privacy" className="underline" target="_blank" rel="noopener">Privacy Policy</a>.
+                </p>
               </div>
 
               <button

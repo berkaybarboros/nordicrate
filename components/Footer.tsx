@@ -22,10 +22,11 @@ function RateAlertStrip() {
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.includes('@') || loading) return;
+    if (!email.includes('@') || loading || !consent) return;
     setLoading(true);
     try {
       await fetch('/api/alerts', {
@@ -58,23 +59,39 @@ function RateAlertStrip() {
               You&apos;re on the list!
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full sm:w-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                className="flex-1 sm:w-56 bg-slate-800 border border-slate-700 focus:border-amber-400/60 focus:outline-none rounded-xl px-4 py-2 text-sm text-white placeholder-slate-500 transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-slate-900 font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
-              >
-                <Bell size={13} />
-                {loading ? 'Saving…' : 'Notify Me'}
-              </button>
+            <form onSubmit={handleSubmit} className="w-full sm:w-auto">
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="flex-1 sm:w-56 bg-slate-800 border border-slate-700 focus:border-amber-400/60 focus:outline-none rounded-xl px-4 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !consent}
+                  className="flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 text-slate-900 font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+                >
+                  <Bell size={13} />
+                  {loading ? 'Saving…' : 'Notify Me'}
+                </button>
+              </div>
+              {/* GDPR: açık onay — işaretlenmeden gönderilmez */}
+              <label className="flex items-start gap-2 mt-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={e => setConsent(e.target.checked)}
+                  className="mt-0.5 accent-amber-400"
+                />
+                <span className="text-[11px] text-slate-500 leading-snug">
+                  I agree to receive rate alert emails and accept the{' '}
+                  <Link href="/privacy" className="underline hover:text-slate-300">Privacy Policy</Link>.
+                  Unsubscribe anytime.
+                </span>
+              </label>
             </form>
           )}
         </div>
@@ -146,7 +163,9 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold text-sm mb-4">Information</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/programs" className="hover:text-white transition-colors">About NordicRate</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">About NordicRate</Link></li>
+              <li><Link href="/how-we-make-money" className="hover:text-white transition-colors">How We Make Money</Link></li>
+              <li><Link href="/methodology" className="hover:text-white transition-colors">Methodology</Link></li>
               <li><Link href="/partners" className="hover:text-white transition-colors font-semibold text-sky-400">For Partners (B2B)</Link></li>
               <li><Link href="/guides" className="hover:text-white transition-colors">Borrowing Guides</Link></li>
               <li><Link href="/loan-calculator" className="hover:text-white transition-colors">Loan Calculator</Link></li>

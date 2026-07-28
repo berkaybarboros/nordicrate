@@ -48,6 +48,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.3,
   }));
 
+  // Güven/PM sayfaları
+  const trustRoutes: MetadataRoute.Sitemap = ['about', 'how-we-make-money', 'methodology'].map((s) => ({
+    url: `${BASE_URL}/${s}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
   // Entity/glossary rehberleri
   const guideRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/guides`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
@@ -197,6 +205,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...localeRoutes,
     ...legalRoutes,
+    ...trustRoutes,
     ...calculatorRoutes,
     ...guideRoutes,
     ...blogRoutes,

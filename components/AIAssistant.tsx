@@ -671,22 +671,29 @@ export default function AIAssistant() {
                     <Bell size={11} className="text-violet-600" />
                     Save your results &amp; get rate alerts
                   </p>
-                  <form onSubmit={handleLeadSubmit} className="flex gap-2">
-                    <input
-                      type="email"
-                      value={leadEmail}
-                      onChange={e => setLeadEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      required
-                      className="flex-1 text-xs border border-violet-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-violet-400 min-w-0"
-                    />
-                    <button
-                      type="submit"
-                      disabled={leadSaving}
-                      className="text-xs bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-60 shrink-0"
-                    >
-                      {leadSaving ? '…' : 'Save →'}
-                    </button>
+                  <form onSubmit={handleLeadSubmit}>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        value={leadEmail}
+                        onChange={e => setLeadEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        required
+                        className="flex-1 text-xs border border-violet-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-violet-400 min-w-0"
+                      />
+                      <button
+                        type="submit"
+                        disabled={leadSaving}
+                        className="text-xs bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-60 shrink-0"
+                      >
+                        {leadSaving ? '…' : 'Save →'}
+                      </button>
+                    </div>
+                    {/* GDPR bilgilendirme — submit = onay (tek amaçlı form) */}
+                    <p className="text-[10px] text-violet-500/80 mt-1.5 leading-snug">
+                      By saving, you agree to receive rate alerts. See our{' '}
+                      <a href="/privacy" className="underline">Privacy Policy</a>. Unsubscribe anytime.
+                    </p>
                   </form>
                 </>
               )}
