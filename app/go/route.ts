@@ -74,6 +74,7 @@ export function GET(req: NextRequest) {
   const institutionId = clampString(sp.get('i'), 64);
   const productId     = clampString(sp.get('pid'), 64);
   const productType   = clampString(sp.get('pt'), 32);
+  const placement     = clampString(sp.get('pl'), 32);
   const sidRaw        = sp.get('sid');
   const sessionId     = isValidSessionId(sidRaw) ? sidRaw : null;
 
@@ -86,7 +87,12 @@ export function GET(req: NextRequest) {
     referer: req.headers.get('referer'),
   });
 
-  const finalUrl = buildUTMLink(dest, institutionId ?? 'unknown', productType ?? undefined);
+  // UTM rule set v1 (docs/marketing/utm-ruleset.md) — UTM'ler yalnız burada yazılır
+  const finalUrl = buildUTMLink(dest, {
+    campaign: productType ?? undefined,
+    content:  placement ?? undefined,
+    term:     productId ?? undefined,
+  });
   const res = NextResponse.redirect(finalUrl, 302);
   res.headers.set('X-Robots-Tag', 'noindex, nofollow'); // redirect endpoint'i indekslenmesin
   return res;

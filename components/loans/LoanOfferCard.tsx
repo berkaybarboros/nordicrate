@@ -37,7 +37,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
   const isEligible = amount >= offer.minAmount && amount <= offer.maxAmount &&
     termMonths >= offer.minTermMonths && termMonths <= offer.maxTermMonths;
 
-  const applyUrl = buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: offer.type });
+  const applyUrl = buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: offer.type, pl: 'loan-card' });
 
   return (
     <div className={`bg-white rounded-2xl border p-5 md:p-6 transition-all hover:shadow-lg ${!isEligible ? "opacity-60" : "border-gray-100 hover:border-[#1a3c6e]/20"}`}>

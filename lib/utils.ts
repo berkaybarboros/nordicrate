@@ -145,20 +145,22 @@ export function getProductsForPage(
  * If baseUrl is missing/undefined a "#" href is returned so the button is
  * still renderable without crashing.
  */
+/**
+ * UTM rule set v1 (docs/marketing/utm-ruleset.md) — YALNIZ /go route'u çağırır.
+ * source/medium sabit; campaign=ürün tipi, content=yerleşim, term=ürün id.
+ */
 export function buildUTMLink(
   baseUrl: string | undefined,
-  institutionId: string,
-  loanType?: string
+  opts: { campaign?: string; content?: string; term?: string } = {}
 ): string {
   if (!baseUrl) return '#';
   try {
     const url = new URL(baseUrl);
     url.searchParams.set('utm_source', 'nordicrate');
-    url.searchParams.set('utm_medium', 'comparison');
-    if (loanType) {
-      url.searchParams.set('utm_campaign', loanType.replace(/_/g, '-'));
-    }
-    url.searchParams.set('utm_content', institutionId);
+    url.searchParams.set('utm_medium', 'referral');
+    if (opts.campaign) url.searchParams.set('utm_campaign', opts.campaign.replace(/_/g, '-'));
+    if (opts.content) url.searchParams.set('utm_content', opts.content);
+    if (opts.term) url.searchParams.set('utm_term', opts.term);
     return url.toString();
   } catch {
     return baseUrl; // malformed URL — return as-is

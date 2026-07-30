@@ -39,6 +39,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
     inst: institution.id,
     pid: product.id,
     pt: product.type,
+    pl: 'ratecard',
   });
 
   return (

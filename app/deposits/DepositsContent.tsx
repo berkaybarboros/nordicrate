@@ -261,7 +261,7 @@ export default function DepositsContent() {
                   {/* CTA — <a> with real link */}
                   <div className="md:w-36 flex-shrink-0 space-y-1">
                     <a
-                      href={buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: 'deposit' })}
+                      href={buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: 'deposit', pl: 'deposits' })}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
                       onClick={() => trackApplyClick(offer.id, 'deposit')}

@@ -220,7 +220,7 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
       {/* Recommendation cards */}
       <div className="space-y-3">
         {recommendations.map((rec, i) => {
-          const utmUrl = buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: `${productType}-personalized-rank${rec.rank}` });
+          const utmUrl = buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: productType, pl: 'personalized' });
           return (
             <div
               key={rec.productId}

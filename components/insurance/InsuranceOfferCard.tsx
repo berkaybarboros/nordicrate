@@ -30,6 +30,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
     inst: offer.companyId,
     pid: offer.id,
     pt: `insurance-${offer.type}`,
+    pl: 'insurance-card',
   });
 
   return (

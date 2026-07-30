@@ -454,7 +454,7 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                       </div>
 
                       <a
-                        href={buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: productType ?? undefined })}
+                        href={buildGoLink(rec.applyUrl, { inst: rec.productId, pid: rec.productId, pt: productType ?? undefined, pl: 'find-rate' })}
                         target="_blank"
                         rel="noopener noreferrer sponsored"
                         onClick={() => {

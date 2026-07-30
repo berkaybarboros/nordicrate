@@ -3,7 +3,6 @@ import { createSupabaseServer } from '@/lib/supabase-server';
 import { enforceRateLimit, isValidEmail, isValidSessionId, clampNumber } from '@/lib/security';
 
 export const runtime = 'nodejs';
-import { buildUTMLink } from '@/lib/utils';
 import { logoFromBankId, monogram } from '@/lib/logos';
 
 // Product catalogs
@@ -157,7 +156,7 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             excess:        ins.excess,
             features:      ins.features.slice(0, 3),
             whyThis:       r.whyThis,
-            applyUrl:      buildUTMLink(ins.applyUrl, ins.companyId, `insurance-${ins.type}-findrate`),
+            applyUrl:      ins.applyUrl, // UTM'ler /go gateway'inde eklenir (rule set v1)
           };
         } else {
           const loan = p as typeof personalLoans[number];
@@ -172,7 +171,7 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             processingTime:    loan.processingTime,
             features:          loan.features.slice(0, 3),
             whyThis:           r.whyThis,
-            applyUrl:          buildUTMLink(loan.applyUrl, loan.bankId, `${loan.type}-findrate`),
+            applyUrl:          loan.applyUrl, // UTM'ler /go gateway'inde eklenir (rule set v1)
           };
         }
       });

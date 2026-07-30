@@ -14,12 +14,14 @@
 // ─── Client-safe link builder ────────────────────────────────────────────────
 
 export interface GoLinkMeta {
-  /** institution / bank id (utm_content + attribution) */
+  /** institution / bank id (server-side attribution logu) */
   inst?: string;
-  /** product id (analitik) */
+  /** product id → utm_term */
   pid?: string;
-  /** product/loan type (utm_campaign) */
+  /** ürün tipi (kanonik set) → utm_campaign */
   pt?: string;
+  /** yerleşim/placement (kanonik set, docs/marketing/utm-ruleset.md) → utm_content */
+  pl?: string;
 }
 
 /**
@@ -33,6 +35,7 @@ export function buildGoLink(dest: string | undefined, meta: GoLinkMeta = {}): st
   if (meta.inst) p.set('i', meta.inst);
   if (meta.pid) p.set('pid', meta.pid);
   if (meta.pt) p.set('pt', meta.pt);
+  if (meta.pl) p.set('pl', meta.pl);
   return `/go?${p.toString()}`;
 }
 
