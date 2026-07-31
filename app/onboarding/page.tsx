@@ -43,6 +43,9 @@ const INCOME_OPTIONS = [
 
 const STEP_LABELS = ['Loan type', 'Country', 'Amount', 'Income'];
 
+// Funnel analytics — adım adları (GA4 nr_onboarding_step + admin dashboard)
+const STEP_NAMES = ['loan_type', 'country', 'amount', 'income', 'results'] as const;
+
 // find-rate API ürün tipi + amortisman için varsayılan vade (ay)
 const FIND_RATE_TYPE: Record<LoanType, string> = {
   personal: 'personal', mortgage: 'mortgage', auto: 'car', business: 'business',
@@ -122,6 +125,13 @@ export default function OnboardingPage() {
       else setAuth(true);
     });
   }, [router]);
+
+  // Funnel: her adım görüntülenmesi bir event — drop-off admin dashboard'da
+  // adım başına distinct session sayısıyla ölçülür (Back tekrarları orada elenir)
+  useEffect(() => {
+    if (!authChecked) return;
+    track('onboarding_step', { step, step_name: STEP_NAMES[step - 1] });
+  }, [step, authChecked]);
 
   async function fetchRecommendations(type: LoanType, userEmail?: string) {
     setRecsLoading(true);

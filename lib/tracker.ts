@@ -22,6 +22,7 @@ export type EventType =
   | 'find_rate_apply'      // modal içinde apply tıklandı
   | 'recommendation_view'  // öneri gösterildi
   | 'recommendation_click' // öneri tıklandı
+  | 'onboarding_step'      // onboarding adımı görüntülendi (funnel)
   | 'onboarding_complete'; // onboarding sihirbazı tamamlandı
 
 interface TrackPayload {
@@ -60,11 +61,17 @@ export async function track(
   // GTM/GA4 köprüsü: her event dataLayer'a da düşer (event adı: nr_<tip>).
   // GTM'de "Custom Event: nr_apply_click" trigger'ı ile GA4'e conversion bağlanır.
   try {
+    // Metadata alanları (step, rank, source...) GA4'e de nr_ önekiyle geçsin —
+    // funnel raporları sadece Supabase'e değil GA4'e de düşer
+    const extras = Object.fromEntries(
+      Object.entries(rest).map(([k, v]) => [`nr_${k}`, v ?? null])
+    );
     window.dataLayer?.push({
       event: `nr_${eventType}`,
       nr_product_id: product_id ?? null,
       nr_product_type: product_type ?? null,
       nr_page: page ?? window.location.pathname,
+      ...extras,
     });
   } catch { /* analytics asla UI'yı bozmaz */ }
 

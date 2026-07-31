@@ -49,6 +49,11 @@ interface ScrapedRateRow {
   scraped_at: string;
 }
 
+interface OnboardingStepRow {
+  session_id: string | null;
+  metadata: { step?: number } | null;
+}
+
 const EMPTY_DATA = {
   usingServiceRole: false,
   leads: [] as LeadRow[],
@@ -57,6 +62,7 @@ const EMPTY_DATA = {
   eventsError: null as string | null,
   alertCount: 0,
   scrapedRates: [] as ScrapedRateRow[],
+  onboardingSteps: [] as OnboardingStepRow[],
 };
 
 async function loadData(): Promise<typeof EMPTY_DATA> {
@@ -74,7 +80,7 @@ async function loadDataInner() {
 
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes, scrapedRes] = await Promise.all([
+  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -92,6 +98,13 @@ async function loadDataInner() {
       .from('latest_scraped_rates')
       .select('bank_id, product_type, rate_min, aprc, raw_snippet, scraped_at')
       .order('bank_id'),
+    // Onboarding funnel — adım event'leri (dedup dashboard'da session bazlı yapılır)
+    client
+      .from('events')
+      .select('session_id, metadata')
+      .eq('event_type', 'onboarding_step')
+      .gte('created_at', since30d)
+      .limit(5000),
   ]);
 
   return {
@@ -102,6 +115,7 @@ async function loadDataInner() {
     eventsError: eventsRes.error?.message ?? null,
     alertCount: alertsRes.count ?? 0,
     scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
+    onboardingSteps: (onbRes.data ?? []) as OnboardingStepRow[],
   };
 }
 
@@ -122,7 +136,7 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, onboardingSteps } = await loadData();
 
   const eventCounts = new Map(countBy(events, (e) => e.event_type));
   const pageViews = eventCounts.get('page_view') ?? 0;
@@ -146,6 +160,24 @@ export default async function AdminDashboard() {
     { label: 'Find-rate modal opened', value: findRateOpens, rate: '—' },
     { label: 'Form submitted (lead)', value: findRateSubmits, rate: pct(findRateSubmits, findRateOpens) },
     { label: 'Recommendation clicked', value: recClicks, rate: pct(recClicks, findRateSubmits) },
+  ];
+
+  // Onboarding funnel: session başına ulaşılan en yüksek adım (Back/tekrarlar elenir),
+  // her satır = o adıma ULAŞAN session sayısı (kümülatif ≥ step)
+  const maxStepBySession = new Map<string, number>();
+  for (const row of onboardingSteps) {
+    const step = row.metadata?.step;
+    if (!row.session_id || typeof step !== 'number') continue;
+    maxStepBySession.set(row.session_id, Math.max(maxStepBySession.get(row.session_id) ?? 0, step));
+  }
+  const maxSteps = Array.from(maxStepBySession.values());
+  const reached = (n: number) => maxSteps.filter((s) => s >= n).length;
+  const onboardingFunnel = [
+    { label: 'Step 1 — Loan type', value: reached(1), rate: '—' },
+    { label: 'Step 2 — Country', value: reached(2), rate: pct(reached(2), reached(1)) },
+    { label: 'Step 3 — Amount', value: reached(3), rate: pct(reached(3), reached(2)) },
+    { label: 'Step 4 — Income', value: reached(4), rate: pct(reached(4), reached(3)) },
+    { label: 'Completed → Your matches', value: reached(5), rate: pct(reached(5), reached(4)) },
   ];
 
   return (
@@ -196,6 +228,7 @@ export default async function AdminDashboard() {
         {[
           { title: 'Browse → Apply Funnel', rows: funnel },
           { title: 'AI Find-Rate Funnel', rows: aiFunnel },
+          { title: 'Onboarding Funnel (sessions, 30d)', rows: onboardingFunnel },
         ].map(({ title, rows }) => (
           <div key={title} className="bg-white rounded-2xl border border-slate-200 p-6">
             <h2 className="font-extrabold text-slate-900 mb-4">{title}</h2>
