@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [confirm, setConfirm]   = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,17 +34,67 @@ export default function RegisterPage() {
       return;
     }
     setLoading(true);
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } },
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+      },
     });
     setLoading(false);
     if (authError) {
       setError(authError.message);
       return;
     }
+    // Email confirmation açıkken signUp session döndürmez — /onboarding auth
+    // guard'ı /register'a geri sekerdi (sessiz döngü). Onun yerine doğrulama ekranı.
+    if (!data.session) {
+      setConfirmSent(true);
+      return;
+    }
     router.push('/onboarding');
+  }
+
+  if (confirmSent) {
+    return (
+      <div className="min-h-[calc(100vh-130px)] flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-7">
+              <h1 className="text-xl font-bold text-white leading-tight">
+                Check your email
+              </h1>
+              <p className="text-slate-400 text-sm mt-1">
+                One more step to activate your account.
+              </p>
+            </div>
+            <div className="px-8 py-7 space-y-4">
+              <div className="w-12 h-12 rounded-full bg-sky-50 flex items-center justify-center text-2xl">
+                📬
+              </div>
+              <p className="text-sm text-slate-600">
+                We sent a confirmation link to{' '}
+                <span className="font-semibold text-slate-900">{email}</span>.
+                Click it to verify your address — you&apos;ll be taken straight to
+                a quick 4-step setup so we can personalize your rates.
+              </p>
+              <p className="text-xs text-slate-400">
+                Didn&apos;t get it? Check your spam folder, or{' '}
+                <button
+                  type="button"
+                  onClick={() => setConfirmSent(false)}
+                  className="text-sky-600 hover:text-sky-500 font-medium"
+                >
+                  try again
+                </button>
+                .
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

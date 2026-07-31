@@ -23,13 +23,20 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (authError) {
       setError(authError.message);
       return;
     }
-    router.push('/');
+    // Onboarding'i yarım bırakan (veya maili başka cihazda doğrulayan) kullanıcıyı
+    // setup'a geri götür — /auth/callback ile aynı kural
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('onboarding_completed')
+      .eq('user_id', data.user.id)
+      .single();
+    router.push(profile?.onboarding_completed ? '/' : '/onboarding');
     router.refresh();
   }
 
