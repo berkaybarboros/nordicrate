@@ -23,11 +23,11 @@ export default async function LiveRatesBanner() {
               />
               {isLive ? 'Live Market Rates' : 'Reference Rates'}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-400">
               via ECB Data Portal & Norges Bank API
             </span>
           </div>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-slate-400">
             Updated:{' '}
             {fetchedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}{' '}
             {fetchedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
@@ -47,7 +47,7 @@ export default async function LiveRatesBanner() {
               >
                 <div>
                   <p className="text-xs text-slate-400">{r.label}</p>
-                  <p className="text-xs text-slate-500">{r.period}</p>
+                  <p className="text-xs text-slate-400">{r.period}</p>
                 </div>
                 <p
                   className={`text-xl font-bold ${
@@ -88,7 +88,7 @@ export default async function LiveRatesBanner() {
                 >
                   {r.rate.toFixed(2)}%
                 </p>
-                <p className="text-xs text-slate-500">{r.currency}</p>
+                <p className="text-xs text-slate-400">{r.currency}</p>
               </div>
             ))}
           </div>

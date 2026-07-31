@@ -83,9 +83,10 @@ export default function LoanCalculator() {
           </div>
           <input type="range" min={1_000} max={config.maxAmount} step={loanType === 'mortgage' ? 5_000 : 500}
             value={amount} onChange={e => setAmount(Number(e.target.value))}
+            aria-label="Loan amount"
             className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#2563eb' }}
           />
-          <div className="flex justify-between text-xs text-slate-400 mt-0.5">
+          <div className="flex justify-between text-xs text-slate-500 mt-0.5">
             <span>€1K</span><span>€{(config.maxAmount / 1000).toFixed(0)}K</span>
           </div>
         </div>
@@ -98,9 +99,10 @@ export default function LoanCalculator() {
           </div>
           <input type="range" min={6} max={config.maxTerm} step={6}
             value={term} onChange={e => setTerm(Number(e.target.value))}
+            aria-label="Repayment period in months"
             className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#334155' }}
           />
-          <div className="flex justify-between text-xs text-slate-400 mt-0.5">
+          <div className="flex justify-between text-xs text-slate-500 mt-0.5">
             <span>6 mo</span>
             <span>{config.maxTerm >= 12 ? `${config.maxTerm / 12} yr${config.maxTerm / 12 > 1 ? 's' : ''}` : `${config.maxTerm} mo`}</span>
           </div>
@@ -128,9 +130,9 @@ export default function LoanCalculator() {
         >
           Compare {rateRange?.count ?? ''} {config.label.toLowerCase()} offers →
         </Link>
-        <p className="text-xs text-slate-400 mt-2.5 text-center">
+        <p className="text-xs text-slate-500 mt-2.5 text-center">
           {rateRange ? (
-            <>Rates from <strong className="text-slate-500">{rateRange.min}%</strong> APR · real market data · always verify with bank</>
+            <>Rates from <strong className="text-slate-600">{rateRange.min}%</strong> APR · real market data · always verify with bank</>
           ) : 'Indicative rates · always verify with bank'}
         </p>
       </div>

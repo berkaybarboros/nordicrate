@@ -48,11 +48,11 @@ export default function ConsentBanner() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-[90] p-3 sm:p-4">
       <div className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 sm:p-5">
+        {/* Kısa tutulmalı: banner client-side geç mount olur — uzun paragraf mobilde
+            LCP elementi olup skoru 5.8s'e çekiyordu (Lighthouse 2026-08-01) */}
         <p className="text-sm text-slate-700 leading-relaxed">
           <strong className="text-slate-900">Cookies on NordicRate.</strong>{' '}
-          We use one optional analytics cookie set (Google Analytics, loaded via Google Tag
-          Manager) to understand how the site is used. Nothing is set until you choose.
-          Strictly necessary storage (like this choice) always stays on.{' '}
+          One optional analytics cookie (Google Analytics) — nothing is set until you choose.{' '}
           <Link href="/cookies" className="text-sky-700 underline">Cookie Policy</Link>
           {' · '}
           <Link href="/privacy" className="text-sky-700 underline">Privacy Policy</Link>

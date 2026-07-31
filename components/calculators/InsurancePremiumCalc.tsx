@@ -178,6 +178,7 @@ export default function InsurancePremiumCalc({ kind }: Props) {
                 <span style={{ color: config[kind].color }} className="font-bold normal-case">{driverAge} yrs</span>
               </label>
               <input type="range" min={18} max={75} step={1} value={driverAge}
+          aria-label="Driver age"
                 onChange={e => setDriverAge(Number(e.target.value))}
                 className="w-full h-2 rounded-lg cursor-pointer"
                 style={{ accentColor: config[kind].color }}
@@ -202,6 +203,7 @@ export default function InsurancePremiumCalc({ kind }: Props) {
                 <span style={{ color: config[kind].color }} className="font-bold normal-case">€{vehicleValue.toLocaleString()}</span>
               </label>
               <input type="range" min={2_000} max={100_000} step={1_000} value={vehicleValue}
+          aria-label="Vehicle value"
                 onChange={e => setVehicleValue(Number(e.target.value))}
                 className="w-full h-2 rounded-lg cursor-pointer"
                 style={{ accentColor: config[kind].color }}
@@ -225,6 +227,7 @@ export default function InsurancePremiumCalc({ kind }: Props) {
               <span style={{ color: config[kind].color }} className="font-bold normal-case">€{homeValue.toLocaleString()}</span>
             </label>
             <input type="range" min={30_000} max={500_000} step={5_000} value={homeValue}
+          aria-label="Home value"
               onChange={e => setHomeValue(Number(e.target.value))}
               className="w-full h-2 rounded-lg cursor-pointer"
               style={{ accentColor: config[kind].color }}
@@ -240,6 +243,7 @@ export default function InsurancePremiumCalc({ kind }: Props) {
               <span style={{ color: config[kind].color }} className="font-bold normal-case">{healthAge} yrs</span>
             </label>
             <input type="range" min={18} max={75} step={1} value={healthAge}
+          aria-label="Age"
               onChange={e => setHealthAge(Number(e.target.value))}
               className="w-full h-2 rounded-lg cursor-pointer"
               style={{ accentColor: config[kind].color }}

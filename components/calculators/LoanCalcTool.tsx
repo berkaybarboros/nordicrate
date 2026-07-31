@@ -77,6 +77,7 @@ export default function LoanCalcTool({ dict }: { dict: CalcDict }) {
         </div>
         <input
           type="range" min={500} max={200_000} step={500} value={amount}
+          aria-label="Loan amount"
           onChange={(e) => setAmount(Number(e.target.value))}
           className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
           style={{ accentColor: '#2563eb' }}
@@ -92,6 +93,7 @@ export default function LoanCalcTool({ dict }: { dict: CalcDict }) {
         </div>
         <input
           type="range" min={1} max={30} step={1} value={years}
+          aria-label="Loan term in years"
           onChange={(e) => setYears(Number(e.target.value))}
           className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
           style={{ accentColor: '#334155' }}
@@ -107,6 +109,7 @@ export default function LoanCalcTool({ dict }: { dict: CalcDict }) {
         </div>
         <input
           type="range" min={1} max={25} step={0.1} value={rate}
+          aria-label="Interest rate percent"
           onChange={(e) => setRate(Number(e.target.value))}
           className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
           style={{ accentColor: '#059669' }}

@@ -164,6 +164,7 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
               min={0}
               max={200000}
               step={5000}
+              aria-label="Minimum loan amount"
               value={filters.amountMin}
               onChange={(e) => onChange({ ...filters, amountMin: Number(e.target.value) })}
               className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
@@ -181,6 +182,7 @@ export default function FilterSidebar({ filters, onChange, availableLoanTypes }:
               min={5000}
               max={1000000}
               step={5000}
+              aria-label="Maximum loan amount"
               value={filters.amountMax}
               onChange={(e) => onChange({ ...filters, amountMax: Number(e.target.value) })}
               className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"

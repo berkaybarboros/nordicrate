@@ -87,7 +87,12 @@
       "Bash(python -c ' *)",
       "Bash(grep -nA4 \"buildGoLink\\(\" components/RateCard.tsx components/insurance/InsuranceOfferCard.tsx)",
       "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__apply_migration",
-      "Bash(python -c \"import json,sys; print\\('id:', json.load\\(sys.stdin\\).get\\('id'\\)\\)\")"
+      "Bash(python -c \"import json,sys; print\\('id:', json.load\\(sys.stdin\\).get\\('id'\\)\\)\")",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_execution",
+      "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__init",
+      "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__lp_audit_lighthouse",
+      "Bash(python - /c/Users/berka/.claude/projects/C--Users-berka-OneDrive-Masa-st--Claude-Code-Project-HangiKredi-CLON--claude-worktrees-great-hugle-fdb449/69fc7faa-4ace-4754-b634-2c63dcf9eea6/tool-results/mcp-8b810167-a4af-4f5a-b033-1846bd5e26d2-lp_audit_lighthouse-1785536503341.txt)",
+      "Bash(curl -s -o /dev/null -D - \"https://nordicrate.com/_next/static/chunks/turbopack-347a2b646225f738.js\")"
     ]
   }
 }

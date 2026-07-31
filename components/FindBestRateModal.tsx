@@ -286,6 +286,7 @@ export default function FindBestRateModal({ open, onClose }: Props) {
                       min={productType === 'mortgage' ? 50_000 : 1_000}
                       max={productType === 'mortgage' ? 500_000 : 50_000}
                       step={productType === 'mortgage' ? 5_000 : 500}
+                      aria-label="Loan amount"
                       value={amount}
                       onChange={e => setAmount(Number(e.target.value))}
                       className="w-full h-2 rounded-lg cursor-pointer"
