@@ -55,7 +55,7 @@ export default function CountryCard({
           </div>
           <div className="flex-1 bg-slate-50 rounded-xl p-2">
             <p className="text-xs font-medium text-slate-700">{country.capital}</p>
-            <p className="text-xs text-slate-400">Capital</p>
+            <p className="text-xs text-slate-500">Capital</p>
           </div>
         </div>
 

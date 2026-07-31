@@ -79,7 +79,7 @@ export default function LocalizedHome({ dict }: { dict: HomeDict }) {
               ].map(({ value, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-extrabold text-white leading-none">{value}</p>
-                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                  <p className="text-xs text-slate-500 mt-1">{label}</p>
                 </div>
               ))}
             </div>

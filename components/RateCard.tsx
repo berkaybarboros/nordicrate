@@ -119,7 +119,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
           </p>
           <p className="text-xs text-slate-500 font-medium mt-1">APR from</p>
           {product.rateMax > product.rateMin && (
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               up to {formatRate(product.rateMax)}
             </p>
           )}
@@ -128,13 +128,13 @@ export default function RateCard({ product, institution, country }: RateCardProp
         {/* Key stats grid */}
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-slate-50 rounded-lg px-3 py-2">
-            <p className="text-xs text-slate-400 mb-0.5">Loan Range</p>
+            <p className="text-xs text-slate-500 mb-0.5">Loan Range</p>
             <p className="text-xs font-semibold text-slate-700">
               {formatAmount(product.limitMin, product.currency)} – {formatAmount(product.limitMax, product.currency)}
             </p>
           </div>
           <div className="bg-slate-50 rounded-lg px-3 py-2">
-            <p className="text-xs text-slate-400 mb-0.5">Term</p>
+            <p className="text-xs text-slate-500 mb-0.5">Term</p>
             <p className="text-xs font-semibold text-slate-700">
               {formatTerm(product.termMin)} – {formatTerm(product.termMax)}
             </p>
@@ -148,7 +148,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
             {formatAmount(repPrincipal, product.currency)} over {formatTerm(repMonths)} ={' '}
             <strong>€{Math.round(repMonthly)}/mo</strong> · Total: €{Math.round(repTotal).toLocaleString()}
           </p>
-          <p className="text-xs text-emerald-600 mt-1">at {formatRate(product.rateMin)} APR</p>
+          <p className="text-xs text-emerald-700 mt-1">at {formatRate(product.rateMin)} APR</p>
         </div>
 
         {/* Features */}
@@ -187,7 +187,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
             )}
             {/* Tarih chip'i sadece taze veride (90 gün) — bayat "19 Nov 25" görünümü güven zedeler */}
             {mountedAt - new Date(product.updatedAt).getTime() < 90 * 86400000 && (
-              <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
+              <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>

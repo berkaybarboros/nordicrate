@@ -46,7 +46,7 @@ export default function FaqSection() {
           ))}
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-8">
+        <p className="text-center text-xs text-slate-500 mt-8">
           Still have questions?{' '}
           <a href="mailto:hello@nordicrate.eu" className="text-sky-600 hover:underline">
             Contact us at hello@nordicrate.eu

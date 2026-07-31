@@ -86,7 +86,7 @@ function RateAlertStrip() {
                   onChange={e => setConsent(e.target.checked)}
                   className="mt-0.5 accent-amber-400"
                 />
-                <span className="text-[11px] text-slate-500 leading-snug">
+                <span className="text-[11px] text-slate-400 leading-snug">
                   I agree to receive rate alert emails and accept the{' '}
                   <Link href="/privacy" className="underline hover:text-slate-300">Privacy Policy</Link>.
                   Unsubscribe anytime.
@@ -189,12 +189,12 @@ export default function Footer() {
         <div className="border-t border-slate-800 pt-6 flex flex-col gap-3 text-xs">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p>© {CURRENT_YEAR} NordicRate. All rights reserved.</p>
-            <p className="text-center text-slate-500">
+            <p className="text-center text-slate-400">
               Rates are indicative only. Always verify directly with the institution before applying.
             </p>
           </div>
           {/* Veri kaynağı atıfları (ECB/Norges yeniden kullanım koşulları) + marka feragatnamesi */}
-          <p className="text-[11px] text-slate-600 leading-relaxed text-center sm:text-left">
+          <p className="text-[11px] text-slate-400 leading-relaxed text-center sm:text-left">
             Reference rates sourced from the European Central Bank (EURIBOR) and Norges Bank, updated daily.
             Bank rates marked &quot;live&quot; are captured from the institutions&apos; public websites with timestamps.
             All bank and institution names, logos and trademarks belong to their respective owners;
