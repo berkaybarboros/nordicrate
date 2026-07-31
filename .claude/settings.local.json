@@ -86,7 +86,8 @@
       "Bash(mkdir -p components/legal)",
       "Bash(python -c ' *)",
       "Bash(grep -nA4 \"buildGoLink\\(\" components/RateCard.tsx components/insurance/InsuranceOfferCard.tsx)",
-      "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__apply_migration"
+      "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__apply_migration",
+      "Bash(python -c \"import json,sys; print\\('id:', json.load\\(sys.stdin\\).get\\('id'\\)\\)\")"
     ]
   }
 }

@@ -5,6 +5,7 @@ import { getPostBySlug, getPublishedPosts } from '@/lib/blog';
 import { renderMarkdown } from '@/lib/markdown';
 import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import NewsletterCTA from '@/components/marketing/NewsletterCTA';
 
 export const revalidate = 600;
 
@@ -81,8 +82,13 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content_md) }}
       />
 
+      {/* Newsletter — acquisition döngüsü (P1-3) */}
+      <div className="mt-12">
+        <NewsletterCTA />
+      </div>
+
       {/* CTA */}
-      <div className="mt-12 bg-slate-950 rounded-2xl p-8 text-center">
+      <div className="mt-8 bg-slate-950 rounded-2xl p-8 text-center">
         <p className="text-white font-extrabold text-lg mb-2">Compare live rates across 8 countries</p>
         <p className="text-slate-400 text-sm mb-5">Free, independent, no impact on your credit score.</p>
         <Link

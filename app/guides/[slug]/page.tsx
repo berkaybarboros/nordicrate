@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { buildFaqJsonLd } from '@/lib/seo';
 import { GUIDES, getGuide } from '@/lib/guides-content';
+import NewsletterCTA from '@/components/marketing/NewsletterCTA';
 
 export const dynamicParams = false;
 
@@ -79,6 +80,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           />
         </div>
         <DeepContentBlock content={guide} showH1 />
+        <div className="max-w-3xl mx-auto px-4 pb-12">
+          <NewsletterCTA />
+        </div>
       </div>
     </>
   );

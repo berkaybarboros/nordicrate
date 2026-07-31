@@ -55,6 +55,11 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      {
+        // Gated rapor dosyaları — Google PDF'i indeksleyip /report gate'ini bypass etmesin
+        source: '/reports/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
     ];
   },
 };

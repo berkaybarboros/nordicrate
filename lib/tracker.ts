@@ -23,7 +23,8 @@ export type EventType =
   | 'recommendation_view'  // öneri gösterildi
   | 'recommendation_click' // öneri tıklandı
   | 'onboarding_step'      // onboarding adımı görüntülendi (funnel)
-  | 'onboarding_complete'; // onboarding sihirbazı tamamlandı
+  | 'onboarding_complete'  // onboarding sihirbazı tamamlandı
+  | 'lead_capture';        // e-posta yakalama (newsletter / rate report gate)
 
 interface TrackPayload {
   product_id?:   string;

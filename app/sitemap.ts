@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Güven/PM sayfaları
-  const trustRoutes: MetadataRoute.Sitemap = ['about', 'how-we-make-money', 'methodology'].map((s) => ({
+  const trustRoutes: MetadataRoute.Sitemap = ['about', 'how-we-make-money', 'methodology', 'report'].map((s) => ({
     url: `${BASE_URL}/${s}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
