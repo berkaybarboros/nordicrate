@@ -350,7 +350,7 @@ export default function OnboardingPage() {
                             <div>
                               <p className="text-[10px] text-slate-400 uppercase tracking-wide">Est. monthly*</p>
                               <p className="text-base font-extrabold text-slate-900">
-                                €{Math.round(monthly).toLocaleString()}
+                                €{Math.round(monthly).toLocaleString('en-US')}
                               </p>
                             </div>
                           )}
@@ -382,7 +382,7 @@ export default function OnboardingPage() {
               })}
               {amount && (
                 <p className="text-[11px] text-slate-400 text-center">
-                  *Estimated for €{amount.toLocaleString()} over {Math.round(termMonths / 12)} years at the
+                  *Estimated for €{amount.toLocaleString('en-US')} over {Math.round(termMonths / 12)} years at the
                   representative rate. Actual terms depend on the lender&apos;s assessment.
                 </p>
               )}

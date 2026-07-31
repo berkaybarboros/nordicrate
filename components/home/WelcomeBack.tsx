@@ -48,7 +48,7 @@ export default function WelcomeBack() {
               )}
               {profile.preferredAmount != null && (
                 <span className="inline-flex items-center bg-white/10 text-white/90 text-xs font-medium rounded-full px-2.5 py-1">
-                  ~€{profile.preferredAmount.toLocaleString()}
+                  ~€{profile.preferredAmount.toLocaleString('en-US')}
                 </span>
               )}
             </div>
