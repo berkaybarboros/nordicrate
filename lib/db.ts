@@ -106,6 +106,8 @@ export interface UserProfileInput {
   name?: string;
   country?: string;
   monthlyIncome?: number;
+  /** Onboarding'de seçilen kredi tutarı (EUR) — site geneli kişiselleştirme */
+  preferredAmount?: number;
   employmentType?: string;
   isResident?: boolean;
   businessStage?: string;
@@ -131,6 +133,7 @@ export async function upsertUserProfile(input: UserProfileInput): Promise<{ erro
         name:                 input.name,
         country:              input.country,
         monthly_income:       input.monthlyIncome,
+        preferred_amount:     input.preferredAmount,
         employment_type:      input.employmentType,
         is_resident:          input.isResident,
         business_stage:       input.businessStage,
@@ -166,6 +169,7 @@ export async function getUserProfile(userId: string): Promise<UserProfileInput |
     name:               row.name as string | undefined,
     country:            row.country as string | undefined,
     monthlyIncome:      row.monthly_income as number | undefined,
+    preferredAmount:    row.preferred_amount as number | undefined,
     employmentType:     row.employment_type as string | undefined,
     isResident:         row.is_resident as boolean | undefined,
     businessStage:      row.business_stage as string | undefined,

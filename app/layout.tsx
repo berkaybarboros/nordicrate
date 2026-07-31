@@ -8,6 +8,7 @@ import ConsentBanner from '@/components/ConsentBanner';
 import CompareBar from '@/components/compare/CompareBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompareProvider } from '@/contexts/CompareContext';
+import { UserProfileProvider } from '@/contexts/UserProfileContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -160,14 +161,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <LanguageProvider>
-          <CompareProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <AIAssistant />
-            <CompareBar />
-            <ConsentBanner />
-          </CompareProvider>
+          <UserProfileProvider>
+            <CompareProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <AIAssistant />
+              <CompareBar />
+              <ConsentBanner />
+            </CompareProvider>
+          </UserProfileProvider>
         </LanguageProvider>
       </body>
     </html>

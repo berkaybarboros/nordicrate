@@ -30,6 +30,7 @@ import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
 import HeroCta from '@/components/home/HeroCta';
+import WelcomeBack from '@/components/home/WelcomeBack';
 import InstitutionMarquee from '@/components/home/InstitutionMarquee';
 import { logoFromWebsite, monogram } from '@/lib/logos';
 import EditorialPicks from '@/components/EditorialPicks';
@@ -82,6 +83,9 @@ export default async function HomePage() {
   return (
     <div>
       <JsonLd data={buildFaqJsonLd(FAQS)} />
+
+      {/* Onboarding'li kullanıcıya kişisel şerit — anonimde null (statik sayfa korunur) */}
+      <WelcomeBack />
 
       {/* ========== HERO — kompakt, dengeli iki kolon (Lendo pattern) ========== */}
       <section className="relative bg-gradient-to-b from-sky-50 via-white to-white border-b border-slate-100 overflow-hidden">

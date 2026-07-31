@@ -8,6 +8,7 @@ import { upsertUserProfile } from '@/lib/db';
 import { COUNTRIES } from '@/lib/data';
 import { buildGoLink } from '@/lib/affiliate';
 import { calculateEligibility, type EligibilityResult } from '@/lib/profile';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 import { calculateMonthlyPayment } from '@/lib/utils';
 import { track, trackRecommendationClick } from '@/lib/tracker';
 
@@ -99,6 +100,7 @@ function RecLogo({ logo, mono }: { logo: string | null; mono: string }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { refresh: refreshProfile } = useUserProfile();
   const [step, setStep]           = useState<Step>(1);
   const [loanType, setLoanType]   = useState<LoanType | ''>('');
   const [country, setCountry]     = useState('');
@@ -171,11 +173,13 @@ export default function OnboardingPage() {
       preferredLoanTypes:  loanType ? [loanType] : [],
       preferredMode:       loanType === 'business' ? 'corporate' : 'personal',
       monthlyIncome:       income && income > 0 ? income : undefined,
+      preferredAmount:     amount ?? undefined,
       onboardingCompleted: true,
     });
 
     setSaving(false);
     if (dbError) { setError(dbError); return; }
+    refreshProfile(); // WelcomeBack + RateCard rozetleri reload'suz güncellensin
 
     const fullName = session.user.user_metadata?.full_name as string | undefined;
     setFirstName(fullName?.split(' ')[0] ?? '');

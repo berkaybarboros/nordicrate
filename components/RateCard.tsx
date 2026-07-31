@@ -16,8 +16,9 @@ import {
   calculateMonthlyPayment,
 } from '@/lib/utils';
 import { buildGoLink } from '@/lib/affiliate';
-import { Smartphone, Globe2, AlertTriangle } from 'lucide-react';
+import { Smartphone, Globe2, AlertTriangle, UserCheck } from 'lucide-react';
 import CountryFlag from './CountryFlag';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 interface RateCardProps {
   product: LoanProduct;
@@ -28,6 +29,16 @@ interface RateCardProps {
 export default function RateCard({ product, institution, country }: RateCardProps) {
   // Mount anı — render içinde Date.now() impure sayılır (react-compiler kuralı)
   const [mountedAt] = useState(() => Date.now());
+
+  // Onboarding profili eşleşmesi: tip + (varsa) ülke + (varsa) tutar limitleri.
+  // Profil client-side yüklenir; anonim/ilk render'da chip yok — SSR mismatch olmaz.
+  const { profile } = useUserProfile();
+  const fitsProfile =
+    !!profile?.onboardingCompleted &&
+    (profile.preferredLoanTypes ?? []).includes(product.type) &&
+    (!profile.country || institution.country === profile.country) &&
+    (profile.preferredAmount == null ||
+      (product.limitMin <= profile.preferredAmount && profile.preferredAmount <= product.limitMax));
   // Representative example: €10,000 over 60 months at product's min rate
   const repPrincipal = Math.min(10000, product.limitMax);
   const repMonths = Math.min(60, product.termMax);
@@ -169,6 +180,11 @@ export default function RateCard({ product, institution, country }: RateCardProp
             Apply Now →
           </a>
           <div className="flex items-center justify-center gap-2 flex-wrap">
+            {fitsProfile && (
+              <span className="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 font-semibold">
+                <UserCheck size={10} /> Fits your profile
+              </span>
+            )}
             {/* Tarih chip'i sadece taze veride (90 gün) — bayat "19 Nov 25" görünümü güven zedeler */}
             {mountedAt - new Date(product.updatedAt).getTime() < 90 * 86400000 && (
               <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">

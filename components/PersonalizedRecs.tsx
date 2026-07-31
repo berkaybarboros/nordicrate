@@ -17,6 +17,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Sparkles, TrendingDown, TrendingUp, ExternalLink, RefreshCw, Users } from 'lucide-react';
 import { buildGoLink } from '@/lib/affiliate';
 import { trackRecommendationClick } from '@/lib/tracker';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 interface Recommendation {
   rank: number;
@@ -79,6 +80,12 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
   const fetchCount = useRef(0);
   const isInsurance = INSURANCE_TYPES.has(productType);
 
+  // Onboarding profili — sayfa açıkça geçmemişse ülke/tutar fallback'i
+  const { profile } = useUserProfile();
+  const profileActive = !!profile?.onboardingCompleted && (!country || !amount);
+  const effCountry = country ?? (profile?.onboardingCompleted ? profile.country ?? undefined : undefined);
+  const effAmount  = amount  ?? (profile?.onboardingCompleted ? profile.preferredAmount ?? undefined : undefined);
+
   const fetchRecs = useCallback(async (triggeredBy?: string) => {
     setLoading(true);
     setError('');
@@ -91,8 +98,8 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
         body: JSON.stringify({
           sessionId: getSessionId(),
           productType,
-          country:    country || undefined,
-          amount:     amount || undefined,
+          country:    effCountry || undefined,
+          amount:     effAmount || undefined,
           termMonths: termMonths || undefined,
         }),
       });
@@ -104,7 +111,7 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
     } finally {
       setLoading(false);
     }
-  }, [productType, country, amount, termMonths]);
+  }, [productType, effCountry, effAmount, termMonths]);
 
   // İlk yükleme
   useEffect(() => {
@@ -162,6 +169,11 @@ export default function PersonalizedRecs({ productType, country, amount, termMon
             <Sparkles size={14} className="text-sky-500" />
           </div>
           <span className="font-extrabold text-sm text-slate-800">Recommended For You</span>
+          {profileActive && (
+            <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-semibold">
+              Tuned to your profile
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           {/* Live rate indicator */}
