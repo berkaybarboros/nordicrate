@@ -25,6 +25,7 @@ sadece meta parametreleri geçer. Bu dosya kanonik şemadır; yeni yüzey eklerk
 | `personalized` | PersonalizedRecs blokları |
 | `compare` | /compare — NOT: compare linkleri kaynağındaki kartın placement değerini taşır (CompareContext hazır linki saklar); ayrı compare placement gelecekte |
 | `deposits` | /deposits tablosu |
+| `onboarding` | Onboarding sonrası "Your matches" sonuç ekranı (AI top-3) |
 
 ## Kurallar
 

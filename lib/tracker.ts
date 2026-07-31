@@ -21,7 +21,8 @@ export type EventType =
   | 'find_rate_submit'     // form gönderildi
   | 'find_rate_apply'      // modal içinde apply tıklandı
   | 'recommendation_view'  // öneri gösterildi
-  | 'recommendation_click';// öneri tıklandı
+  | 'recommendation_click' // öneri tıklandı
+  | 'onboarding_complete'; // onboarding sihirbazı tamamlandı
 
 interface TrackPayload {
   product_id?:   string;
