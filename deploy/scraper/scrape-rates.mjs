@@ -83,6 +83,19 @@ const BANKS = [
       { productType: 'mortgage', url: 'https://www.bigbank.ee/kodulaen/', marginPlusEuribor: true, band: BAND_MARGIN, waitMs: 5000 },
     ],
   },
+  {
+    // Citadele LV (7. banka): robots.txt kredi sayfaları açık (2026-08-04 doğrulaması —
+    // sadece thanks/search/feedback vb. disallow). Katalog karşılığı: citadele-lv.
+    // consumer sayfası "Interest rate from 6.5% per year" (consumer loan bloğu);
+    // mortgage sayfası örnek marj "2.20% + 6-month EURIBOR" → marginPlusEuribor.
+    // Auto BİLİNÇLİ dışarıda: autocredit oranı yalnız fee'li örnek cümlede geçiyor
+    // (FEE filtresi doğru şekilde eler) + katalogda citadele auto ürünü yok.
+    bankId: 'citadele',
+    targets: [
+      { productType: 'personal', url: 'https://www.citadele.lv/en/private/consumer/', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'mortgage', url: 'https://www.citadele.lv/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, waitMs: 5000 },
+    ],
+  },
 ];
 
 const RATE_PATTERNS = [

@@ -43,6 +43,7 @@ const BANK_TO_INSTITUTION: Record<string, string> = {
   swedbank: 'swedbank-ee',
   inbank: 'inbank-ee',
   bigbank: 'bigbank-ee',
+  citadele: 'citadele-lv', // LV — ilk Estonya-dışı banka (7.)
 };
 
 // Banka bazlı güvenilir tipler — LHV auto public oran yayınlamıyor (yanlış-pozitif
@@ -57,6 +58,7 @@ const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   // mortgage dahil: katalogda henüz bigbank-ee mortgage ürünü yok (max limit
   // yayınlanmıyor), ürün doğrulanmış limitle eklenince scrape verisi hazır olacak
   bigbank: new Set(['personal', 'auto', 'mortgage']),
+  citadele: new Set(['personal', 'mortgage']), // auto: sayfada yalnız fee'li örnek oran var
 };
 const FRESHNESS_MS = 48 * 60 * 60 * 1000;
 
