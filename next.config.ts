@@ -60,6 +60,12 @@ const nextConfig: NextConfig = {
         source: '/reports/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
+      {
+        // Banka logoları (public/ hash'siz dosyalar Next'ten uzun cache almaz) —
+        // 7 gün + SWR: marquee/kartlar dönen ziyaretçide yeniden inmesin
+        source: '/logos/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+      },
     ];
   },
 };

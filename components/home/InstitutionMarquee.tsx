@@ -70,7 +70,7 @@ export default function InstitutionMarquee({ items, countryCount }: { items: Mar
             Banks, insurers &amp; lenders we compare
           </h2>
         </div>
-        <p className="text-[11px] text-slate-400 max-w-xs text-right hidden sm:block">
+        <p className="text-[11px] text-slate-500 max-w-xs text-right hidden sm:block">
           Independent comparison — trademarks belong to their respective owners.
         </p>
       </div>

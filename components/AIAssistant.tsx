@@ -481,7 +481,7 @@ export default function AIAssistant() {
         )}
         <button
           onClick={isOpen ? () => setIsOpen(false) : handleOpen}
-          aria-label="Open AI Assistant"
+          aria-label={isOpen ? 'Close AI assistant' : 'Ask NordicAI — open AI assistant'}
           className={`relative flex items-center gap-2.5 text-white font-bold shadow-2xl transition-all active:scale-95 select-none
             ${isOpen
               ? 'bg-slate-700 hover:bg-slate-600 rounded-full w-12 h-12 justify-center'
