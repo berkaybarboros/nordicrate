@@ -93,7 +93,8 @@ const BANKS = [
     bankId: 'citadele',
     targets: [
       { productType: 'personal', url: 'https://www.citadele.lv/en/private/consumer/', band: BAND_RATE, waitMs: 5000 },
-      { productType: 'mortgage', url: 'https://www.citadele.lv/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, waitMs: 5000 },
+      // aprcBand: sayfa altındaki kredi kartı örneği (APR 14.76%) mortgage APRC'si değil
+      { productType: 'mortgage', url: 'https://www.citadele.lv/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, aprcBand: [2, 9], waitMs: 5000 },
     ],
   },
 ];
@@ -193,7 +194,9 @@ async function main() {
         const text = await page.evaluate(() => document.body.innerText);
 
         const rate = extract(text, RATE_PATTERNS, target.band);
-        const aprc = extract(text, APRC_PATTERNS);
+        // aprcBand: sayfada başka ürünün APR örneği varsa (Citadele mortgage
+        // sayfasındaki kredi kartı %14.76'sı gibi) yanlış yakalamayı band keser
+        const aprc = extract(text, APRC_PATTERNS, target.aprcBand ?? [0.5, 35]);
         const parseOk = rate !== null;
 
         // Marj işareti: override katmanının /euribor/i tespiti için snippet'e eklenir.
