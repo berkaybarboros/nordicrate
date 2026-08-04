@@ -497,7 +497,7 @@ export default function AIAssistant() {
               {/* Tilki maskot — FAB avatarı */}
               <Image
                 src="/nordicai-fab.png"
-                alt="NordicAI"
+                alt=""
                 width={32}
                 height={32}
                 className="shrink-0 rounded-full bg-white ring-2 ring-white/60"
@@ -508,7 +508,7 @@ export default function AIAssistant() {
               {hasUnread ? (
                 <span className="w-2 h-2 bg-red-400 rounded-full shrink-0" />
               ) : (
-                <span className="hidden md:inline text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold shrink-0">AI</span>
+                <span aria-hidden="true" className="hidden md:inline text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold shrink-0">AI</span>
               )}
             </>
           )}
