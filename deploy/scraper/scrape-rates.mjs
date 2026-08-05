@@ -97,6 +97,20 @@ const BANKS = [
       { productType: 'mortgage', url: 'https://www.citadele.lv/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, aprcBand: [2, 9], waitMs: 5000 },
     ],
   },
+  {
+    // Citadele EE (8. banka): citadele.ee robots.txt kredi sayfaları açık
+    // (2026-08-05 doğrulaması). Katalog: citadele-ee (personal + auto; mortgage
+    // ürünü limitler yayınlanmadığı için katalogda yok — scrape hazır bekler).
+    // consumer/autocredit: "interest rate starting from 6.5%"; mortgage örneği
+    // "3.956% (margin 1.8% + six-month EURIBOR)" → 3.956 band dışı, MARGIN
+    // pattern'i 1.8'i yakalar.
+    bankId: 'citadele-ee',
+    targets: [
+      { productType: 'personal', url: 'https://www.citadele.ee/en/private/consumer/', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'auto',     url: 'https://www.citadele.ee/en/private/autocredit/', band: BAND_RATE, waitMs: 5000 },
+      { productType: 'mortgage', url: 'https://www.citadele.ee/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, aprcBand: [2, 9], waitMs: 5000 },
+    ],
+  },
 ];
 
 const RATE_PATTERNS = [
@@ -104,6 +118,10 @@ const RATE_PATTERNS = [
   /intress[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
   /(?:from|alates)\s+(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
 ];
+
+// SADECE marginPlusEuribor hedeflerinde eklenir: "(margin 1.8% + six-month EURIBOR)"
+// yapısında toplam örnek oran band dışı kalınca marjın kendisini yakalar (Citadele EE)
+const MARGIN_PATTERN = /margin(?:aal)?[^%\d]{0,40}?(\d{1,2}(?:[.,]\d{1,3})?)\s*%/i;
 
 const APRC_PATTERNS = [
   /(?:APRC|annual percentage rate(?: of charge)?)[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
@@ -193,7 +211,8 @@ async function main() {
         await page.waitForTimeout(target.waitMs ?? 3000);
         const text = await page.evaluate(() => document.body.innerText);
 
-        const rate = extract(text, RATE_PATTERNS, target.band);
+        const ratePatterns = target.marginPlusEuribor ? [...RATE_PATTERNS, MARGIN_PATTERN] : RATE_PATTERNS;
+        const rate = extract(text, ratePatterns, target.band);
         // aprcBand: sayfada başka ürünün APR örneği varsa (Citadele mortgage
         // sayfasındaki kredi kartı %14.76'sı gibi) yanlış yakalamayı band keser
         const aprc = extract(text, APRC_PATTERNS, target.aprcBand ?? [0.5, 35]);

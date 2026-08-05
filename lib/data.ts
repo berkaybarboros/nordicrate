@@ -68,6 +68,8 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'luminor-ee', name: 'Luminor Estonia', shortName: 'Luminor', type: 'bank', country: 'EE', description: 'Baltic banking group with pan-Baltic presence', founded: 2017, website: 'https://www.luminor.ee' },
   { id: 'bigbank-ee', name: 'Bigbank', shortName: 'Bigbank', type: 'bank', country: 'EE', description: 'Estonian consumer credit specialist operating in Baltics', founded: 1992, website: 'https://www.bigbank.ee' },
   { id: 'inbank-ee', name: 'Inbank', shortName: 'Inbank', type: 'bank', country: 'EE', description: 'Estonian digital consumer bank operating in EE, LV, LT, PL', founded: 2015, website: 'https://www.inbank.ee', isDigitalFriendly: true },
+  // citadele.ee sayfa doğrulaması 2026-08-05 (consumer + autocredit + mortgage)
+  { id: 'citadele-ee', name: 'Citadele Estonia', shortName: 'Citadele', type: 'bank', country: 'EE', description: 'Estonian branch of the Baltic Citadele group', founded: 2010, website: 'https://www.citadele.ee', isDigitalFriendly: true },
 
   // LATVIA
   { id: 'swedbank-lv', name: 'Swedbank Latvija', shortName: 'Swedbank', type: 'bank', country: 'LV', description: 'Leading bank in Latvia by deposits and loans', founded: 1992, website: 'https://www.swedbank.lv' },
@@ -244,6 +246,12 @@ export const PRODUCTS: LoanProduct[] = [
   // ==================== NEW: ESTONIA LOCAL ====================
   { id: 'inbank-ee-p1', institutionId: 'inbank-ee', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 8.9, rateMax: 28.9, limitMin: 500, limitMax: 20000, termMin: 3, termMax: 84, currency: 'EUR', features: ['Digital bank', 'Smart-ID', 'Operates in EE, LV, LT, PL'], collateralRequired: false, updatedAt: '2026-07-19' },
   { id: 'inbank-ee-a1', institutionId: 'inbank-ee', name: 'Auto Loan', type: 'auto', customerType: 'individual', rateMin: 8.9, rateMax: 21.9, limitMin: 1000, limitMax: 50000, termMin: 12, termMax: 72, currency: 'EUR', features: ['Baltic coverage', 'New and used vehicles', 'Fast approval'], collateralRequired: true, updatedAt: '2026-07-19' },
+  // Citadele EE — citadele.ee doğrulaması 2026-08-05. rateMax=rateMin: sayfa yalnız
+  // "from 6.5%" yayınlıyor, üst bant yayınlanmıyor (uydurmuyoruz). Mortgage ürünü
+  // BİLİNÇLİ yok: limitler yayınlanmıyor (75% LTV, 30y — tutar bandı belirsiz);
+  // scraper marjı topluyor, ürün doğrulanmış limitle eklendiği gün canlanır.
+  { id: 'citadele-ee-p1', institutionId: 'citadele-ee', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 6.5, rateMax: 6.5, limitMin: 1000, limitMax: 25000, termMin: 6, termMax: 84, currency: 'EUR', features: ['Fixed rate option', 'Apply online or via app', 'Baltic banking group'], collateralRequired: false, updatedAt: '2026-08-05' },
+  { id: 'citadele-ee-a1', institutionId: 'citadele-ee', name: 'Car Loan', type: 'auto', customerType: 'individual', rateMin: 6.5, rateMax: 6.5, limitMin: 1000, limitMax: 25000, termMin: 6, termMax: 84, currency: 'EUR', features: ['No CASCO or valuation required', 'Up to 7 years', 'Apply via app'], collateralRequired: false, updatedAt: '2026-08-05' },
 
   // ==================== NEW: LATVIA LOCAL ====================
   { id: 'bluor-lv-p1', institutionId: 'bluor-lv', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 13.9, rateMax: 29.9, limitMin: 500, limitMax: 15000, termMin: 6, termMax: 60, currency: 'EUR', features: ['Digital-first bank', 'Quick online approval', 'Transparent pricing'], collateralRequired: false, updatedAt: '2025-11-15' },
