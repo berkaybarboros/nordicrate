@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import DepositsContent from "./DepositsContent";
 
 export const metadata: Metadata = {
-  title: "Time Deposits Estonia | Compare Savings Rates up to 4.3% p.a.",
+  // SERP tur 2 (2026-08-05): sorgu dili "deposit rates estonia" — "Time Deposits"
+  // bankspeak'ti, sorguyla birebir hizalandı
+  title: "Deposit Rates Estonia — Compare Fixed-Term Savings up to 4.3% p.a.",
   description:
     "Compare term deposit rates in Estonia from Bigbank, LHV, Swedbank, SEB and Coop Pank. Earn up to 4.3% p.a. DGSD-protected up to €100,000. From 1 to 60 months. Updated daily.",
   keywords: [
+    "deposit rates Estonia",
     "term deposit Estonia",
     "tähtajaline hoius",
     "savings account Estonia",
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://nordicrate.com/deposits" },
   openGraph: {
-    title: "Time Deposits Estonia | Up to 4.3% p.a. | NordicRate",
+    title: "Deposit Rates Estonia — Up to 4.3% p.a. | NordicRate",
     description:
       "Compare term deposits from Bigbank, LHV, Swedbank, SEB, Coop. Earn up to 4.3% p.a. DGSD-protected.",
     url: "https://nordicrate.com/deposits",

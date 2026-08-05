@@ -31,7 +31,9 @@ export const CALCULATOR_ROUTES = {
 const EN: CalculatorPage = {
   locale: 'en',
   h1: 'Loan calculator: monthly payment, interest and total cost',
-  metaTitle: 'Loan Calculator — Monthly Payment & Total Cost',
+  // SERP tur 2 (2026-08-05): "loan calculator estonia" sorgusuna hizalandı —
+  // SERP zayıf (bryanestates/palgakulu sıralanıyor), coğrafya eklemek kazandırır
+  metaTitle: 'Loan Calculator Estonia — Monthly Payment & Total Cost',
   metaDescription:
     'Free loan calculator for Nordic & Baltic borrowers. Set the amount, term and interest rate — see your monthly annuity payment, total interest and year-by-year breakdown.',
   lead: 'Set the amount, term and rate — the calculator shows your monthly annuity payment, total interest and a year-by-year breakdown.',

@@ -8,7 +8,8 @@ export const revalidate = 1800; // 30 dk — canlı oran override'ları için IS
 
 export const metadata = {
   alternates: { canonical: 'https://nordicrate.com/mortgage' },
-  title: 'Mortgage Rates – NordicRate | Nordic & Baltic Home Loans',
+  // SERP tur 2 (2026-08-05): çift marka ("– NordicRate ... | NordicRate") temizlendi
+  title: 'Mortgage Rates — Compare Nordic & Baltic Home Loans',
   description: 'Compare mortgage and home loan rates from banks across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia, and Lithuania.',
 };
 
