@@ -9,6 +9,7 @@ import CompareBar from '@/components/compare/CompareBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompareProvider } from '@/contexts/CompareContext';
 import { UserProfileProvider } from '@/contexts/UserProfileContext';
+import PageViewTracker from '@/components/PageViewTracker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -169,6 +170,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               <AIAssistant />
               <CompareBar />
               <ConsentBanner />
+              <PageViewTracker />
             </CompareProvider>
           </UserProfileProvider>
         </LanguageProvider>
