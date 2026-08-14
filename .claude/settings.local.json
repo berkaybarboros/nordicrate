@@ -102,7 +102,12 @@
       "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__serp_results",
       "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__research_find_keywords",
       "Skill(firecrawl-search)",
-      "Skill(firecrawl-search:*)"
+      "Skill(firecrawl-search:*)",
+      "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__google_analytics_list_account_summaries",
+      "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__google_analytics_run_realtime_report",
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__search_threads",
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__get_thread",
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__create_label"
     ]
   }
 }
