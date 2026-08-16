@@ -8,6 +8,34 @@
 // cookie'siz düz client yeterli (db.ts ile aynı desen).
 import { supabase } from '@/lib/supabase';
 
+/**
+ * Markdown gövdesindeki "## FAQ" bölümünü yapılandırılmış soru/cevaba çevirir.
+ * Blog otomasyonu FAQ'ları ### başlık + paragraf olarak yazıyor; bu parse
+ * olmadan FAQPage schema üretilemiyordu (rich result kaybı, SEO tur 2 bulgusu).
+ */
+export function extractFaqs(md: string): { q: string; a: string }[] {
+  const start = md.search(/^##\s+FAQ\s*$/im);
+  if (start === -1) return [];
+  // FAQ bölümünden sonraki ilk "## " (başka bir H2) bölümü sonlandırır
+  const rest = md.slice(start);
+  const nextH2 = rest.slice(3).search(/^##\s+(?!#)/m);
+  const block = nextH2 === -1 ? rest : rest.slice(0, nextH2 + 3);
+
+  const out: { q: string; a: string }[] = [];
+  const re = /^###\s+(.+?)\s*$([\s\S]*?)(?=^###\s|\Z)/gm;
+  for (const m of block.matchAll(re)) {
+    const q = m[1].trim();
+    const a = m[2]
+      .replace(/^\s*[\r\n]+/, '')
+      .replace(/[*_`>#]/g, '')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // link metnini koru, URL'i at
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (q.length > 5 && a.length > 20) out.push({ q, a: a.slice(0, 500) });
+  }
+  return out.slice(0, 10);
+}
+
 export interface BlogPost {
   slug: string;
   title: string;

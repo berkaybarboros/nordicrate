@@ -107,7 +107,11 @@
       "mcp__8b810167-a4af-4f5a-b033-1846bd5e26d2__google_analytics_run_realtime_report",
       "mcp__8719da2e-f804-403f-afc1-4006407e6950__search_threads",
       "mcp__8719da2e-f804-403f-afc1-4006407e6950__get_thread",
-      "mcp__8719da2e-f804-403f-afc1-4006407e6950__create_label"
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__create_label",
+      "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__get_file_metadata",
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__list_drafts",
+      "Bash(python -c \"import openpyxl; print\\('openpyxl', openpyxl.__version__\\)\")",
+      "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__create_file"
     ]
   }
 }

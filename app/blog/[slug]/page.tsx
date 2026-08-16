@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPostBySlug, getPublishedPosts } from '@/lib/blog';
+import { getPostBySlug, getPublishedPosts, extractFaqs } from '@/lib/blog';
+import { buildFaqJsonLd } from '@/lib/seo';
 import { renderMarkdown } from '@/lib/markdown';
 import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
@@ -41,14 +42,25 @@ export default async function BlogPostPage({ params }: PageProps) {
     headline: post.title,
     description: post.description,
     datePublished: post.published_at,
+    dateModified: post.published_at,
+    inLanguage: post.locale,
     author: { '@type': 'Organization', name: post.author },
-    publisher: { '@type': 'Organization', name: 'NordicRate', url: 'https://nordicrate.com' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'NordicRate',
+      url: 'https://nordicrate.com',
+      logo: { '@type': 'ImageObject', url: 'https://nordicrate.com/og-image.png' },
+    },
     mainEntityOfPage: `https://nordicrate.com/blog/${post.slug}`,
   };
+
+  // FAQ bölümü varsa FAQPage schema — rich result için
+  const faqs = extractFaqs(post.content_md);
 
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <JsonLd data={articleJsonLd} />
+      {faqs.length >= 2 && <JsonLd data={buildFaqJsonLd(faqs)} />}
 
       <div className="mb-6">
         <Breadcrumbs items={[
