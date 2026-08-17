@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Bell, CheckCircle } from 'lucide-react';
 import CountryFlag from './CountryFlag';
@@ -108,13 +109,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                N
-              </div>
-              <span className="text-white font-bold text-lg">
-                Nordic<span className="text-sky-400">Rate</span>
-              </span>
+            {/* Koyu zeminde beyaz lockup (brandbook §2 — onayli monokrom varyant) */}
+            <div className="mb-3">
+              <Image
+                src="/brand/nordicrate-lockup-white.webp"
+                alt="NordicRate"
+                width={480}
+                height={120}
+                className="h-8 w-auto"
+              />
             </div>
             <p className="text-sm leading-relaxed">
               The leading credit comparison platform for Nordic &amp; Baltic markets.

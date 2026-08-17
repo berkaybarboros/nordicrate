@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -84,13 +85,17 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:bg-sky-500 transition-colors">
-              N
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">
-              Nordic<span className="text-sky-600">Rate</span>
-            </span>
+          {/* Marka lockup — brandbook §2: yatay lockup birincil, wordmark asla
+              baska bir fontla yeniden dizilmez, bu yuzden tek gorsel varlik */}
+          <Link href="/" className="flex items-center group" aria-label="NordicRate — home">
+            <Image
+              src="/brand/nordicrate-lockup-black.webp"
+              alt="NordicRate"
+              width={480}
+              height={120}
+              priority
+              className="h-8 w-auto group-hover:opacity-80 transition-opacity"
+            />
           </Link>
 
           {/* Desktop Nav — kategori dropdown'ları hover + focus-within (klavye) ile açılır */}
