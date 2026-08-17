@@ -16,7 +16,7 @@ import { nextTopic, BLOG_TOPICS } from '@/lib/blog-topics';
 
 export const runtime = 'nodejs';
 
-function buildBrief(t: NonNullable<ReturnType<typeof nextTopic>>): string {
+function buildBrief(t: NonNullable<ReturnType<typeof nextTopic>>, today: string): string {
   return [
     'Write a NordicRate blog post in ENGLISH. NordicRate compares live loan, deposit and',
     'insurance rates across 8 Nordic & Baltic countries; our edge is daily-scraped bank data',
@@ -41,7 +41,13 @@ function buildBrief(t: NonNullable<ReturnType<typeof nextTopic>>): string {
     'HARD RULES:',
     '- Never invent rates, fees or statistics. If you state a number, it must be one you were given',
     '  in the LIVE DATA block below, or an official rule (e.g. EU deposit guarantee 100,000 EUR).',
-    '- Prefer "as of <month year>" wording over "currently" so the piece ages honestly.',
+    `- TODAY IS ${today}. Any "as of ..." wording must use this date. NEVER date the piece from your`,
+    '  training data — a stale date destroys the credibility of our live-rate claim.',
+    '- Do NOT state specific fee percentages or amounts (notary, state registration, origination,',
+    '  contract fee) unless they appear in the LIVE DATA block. Write "varies by bank — ask for it',
+    '  in writing before signing" instead. Made-up fees are the fastest way to lose trust.',
+    '- KredEx merged into Enterprise Estonia; the current entity is EIS (Ettevõtluse ja Innovatsiooni SA).',
+    '  Write "KredEx (now EIS)" — do not call it EAS.',
     '- No hype words, no "revolutionary", no financial advice ("you should borrow").',
     '- Neutral comparison-site voice: data first, interpretation second.',
     '- Mention that advertised "from X%" rates are best-case and depend on the applicant.',
@@ -82,10 +88,18 @@ export async function GET(req: NextRequest) {
   }
 
   // Canlı veri bloğu: LLM uydurmasın diye gerçek oranları brief'e gömüyoruz
-  const { data: rates } = await admin
-    .from('latest_scraped_rates')
-    .select('bank_id, product_type, rate_min')
-    .order('rate_min', { ascending: true });
+  const [{ data: rates }, { data: euriborSnap }] = await Promise.all([
+    admin
+      .from('latest_scraped_rates')
+      .select('bank_id, product_type, rate_min')
+      .order('rate_min', { ascending: true }),
+    admin
+      .from('rate_snapshots')
+      .select('rate')
+      .eq('key', 'euribor6m')
+      .order('fetched_at', { ascending: false })
+      .limit(1),
+  ]);
 
   const liveLines = (rates ?? [])
     .filter((r) => (r as { rate_min: number | null }).rate_min != null)
@@ -94,10 +108,17 @@ export async function GET(req: NextRequest) {
       return `${row.bank_id} ${row.product_type}: from ${row.rate_min}%`;
     });
 
+  const euribor = euriborSnap?.[0] ? Number((euriborSnap[0] as { rate: number | string }).rate) : null;
+
   const liveBlock = liveLines.length
     ? '\n\nLIVE DATA (verified from bank websites today — use these, do not invent others):\n' +
       liveLines.join('\n') +
-      '\nNote: mortgage figures are margins; the customer rate is margin + 6-month EURIBOR.'
+      '\nNote: mortgage figures are MARGINS; the customer rate is margin + 6-month EURIBOR.' +
+      (euribor != null && Number.isFinite(euribor)
+        ? `\n6-month EURIBOR today: ${euribor}% — so an SEB-style 1.35% margin means roughly ` +
+          `${Math.round((1.35 + euribor) * 100) / 100}% for the customer. Show this arithmetic once so ` +
+          'the reader can compute their own rate.'
+        : '')
     : '';
 
   return NextResponse.json({
@@ -108,7 +129,9 @@ export async function GET(req: NextRequest) {
       internalLink: topic.internalLink,
       priority: topic.priority,
     },
-    brief: buildBrief(topic) + liveBlock,
+    brief:
+      buildBrief(topic, new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })) +
+      liveBlock,
     remaining: BLOG_TOPICS.length - publishedSlugs.filter((s) =>
       BLOG_TOPICS.some((t) => t.slug === s)
     ).length,
