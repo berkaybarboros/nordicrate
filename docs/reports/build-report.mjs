@@ -42,7 +42,8 @@ for (const [name, vals] of Object.entries(SERIES)) {
   chart += `<text x="${(x(vals.length - 1) + 10).toFixed(1)}" y="${(y(last) + 4).toFixed(1)}" font-size="12" font-weight="700" fill="${COLORS[name]}">${name} ${last.toFixed(2)}%</text>`;
 }
 
-const foxB64 = fs.readFileSync(path.join(__dirname, '../../public/nordicai-fab.png')).toString('base64');
+// Brandbook 2B: B2B/kurumsal materyalde marka yildizi kullanilir, maskot (Revi) degil
+const logoB64 = fs.readFileSync(path.join(__dirname, '../../public/brand/nordicrate-lockup-black.webp')).toString('base64');
 
 const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -73,7 +74,7 @@ const html = `<!DOCTYPE html>
   .footnote { font-size:11.5px; color:#8A97AC; margin-top:8px; }
   .footer { position:absolute; bottom:12mm; left:20mm; right:20mm; display:flex; justify-content:space-between; font-family:'Space Mono',monospace; font-size:11px; color:#8A97AC; border-top:1px solid #E6E9F2; padding-top:8px; }
   .cover { display:flex; flex-direction:column; justify-content:center; }
-  .cover .fox { width:88px; height:88px; border-radius:50%; border:3px solid #E6E9F2; margin-bottom:26px; }
+  .cover .brandmark { width:250px; height:auto; margin-bottom:30px; }
   .brand { font-weight:700; font-size:20px; } .brand .b { color:#2563EB; }
   .cta { background:#0E1525; color:#fff; border-radius:16px; padding:24px 26px; margin-top:26px; }
   .cta h3 { color:#fff; margin-top:0; } .cta p { color:#94A3B8; font-size:14px; }
@@ -83,7 +84,7 @@ const html = `<!DOCTYPE html>
 
 <!-- SAYFA 1 — KAPAK -->
 <div class="page cover">
-  <img class="fox" src="data:image/png;base64,${foxB64}" alt="">
+  <img class="brandmark" src="data:image/webp;base64,${logoB64}" alt="NordicRate">
   <div class="kicker">Quarterly Market Data · Q3 2026 Edition</div>
   <h1>Nordic &amp; Baltic<br>Rate Report</h1>
   <div class="rule"></div>
