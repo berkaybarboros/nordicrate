@@ -116,7 +116,9 @@
       "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__download_file_content",
       "Bash(scp -i ~/.ssh/id_deploy docs/reports/rate-report-2026-q3.html root@46.62.166.105:/tmp/render/rate-report.html)",
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_sdk_reference",
-      "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__get_advisors"
+      "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__get_advisors",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__list_credentials",
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__trash_message"
     ]
   }
 }

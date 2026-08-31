@@ -14,6 +14,12 @@
  * contacted_at'i tazeler ama notes'a zincir gecmisi yazilir.
  *
  * Guvenlik: x-cron-secret (timing-safe).
+ *
+ * DIKKAT: buradaki durum isimleri partner_targets.status uzerindeki CHECK kisiti ile
+ * senkron olmali. Ilk surumde degildi — followup1/followup2/closed_no_reply/skipped
+ * DB'de yasakti, bu yuzden Gmail taslagi olusuyor ama durum ilerlemiyordu (500) ve
+ * her hafta ayni hedefe tekrar taslak uretilecekti. Kisit 2026-08-18 migration'inda
+ * genisletildi (partner_targets_followup_statuses). Yeni durum eklerken kisiti da guncelle.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
