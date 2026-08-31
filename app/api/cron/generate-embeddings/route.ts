@@ -14,7 +14,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { safeCompareSecret } from '@/lib/security';
-import { createSupabaseServer } from '@/lib/supabase-server';
+// RLS denetimi 2026-08-18: bu cron anon key ile yaziyordu, bu yuzden tablolarda
+// 'FOR ALL TO public' politikalari acik kalmisti. Artik service_role (RLS bypass).
+import { createSupabaseAdmin } from '@/lib/supabase-admin';
 
 export const runtime = 'nodejs';
 
@@ -58,7 +60,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 503 });
   }
 
-  const supabase = await createSupabaseServer();
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return NextResponse.json({ error: 'Service role not configured' }, { status: 503 });
 
   // Pending job'ları çek
   const { data: jobs, error: jobsErr } = await supabase
@@ -147,7 +150,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   // Kuyruk durumunu göster
-  const supabase = await createSupabaseServer();
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return NextResponse.json({ error: 'Service role not configured' }, { status: 503 });
   const { data } = await supabase
     .from('embedding_jobs')
     .select('status')

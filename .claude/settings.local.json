@@ -114,7 +114,8 @@
       "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__create_file",
       "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__search_files",
       "mcp__059f79b9-7898-4718-ba25-1ecd41bbe0e0__download_file_content",
-      "Bash(scp -i ~/.ssh/id_deploy docs/reports/rate-report-2026-q3.html root@46.62.166.105:/tmp/render/rate-report.html)"
+      "Bash(scp -i ~/.ssh/id_deploy docs/reports/rate-report-2026-q3.html root@46.62.166.105:/tmp/render/rate-report.html)",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_sdk_reference"
     ]
   }
 }

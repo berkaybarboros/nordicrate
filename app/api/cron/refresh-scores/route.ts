@@ -6,7 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { safeCompareSecret } from '@/lib/security';
-import { createSupabaseServer } from '@/lib/supabase-server';
+// RLS denetimi 2026-08-18: bu cron anon key ile yaziyordu, bu yuzden tablolarda
+// 'FOR ALL TO public' politikalari acik kalmisti. Artik service_role (RLS bypass).
+import { createSupabaseAdmin } from '@/lib/supabase-admin';
 
 export const runtime = 'nodejs';
 
@@ -17,7 +19,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const supabase = await createSupabaseServer();
+    const supabase = createSupabaseAdmin();
+  if (!supabase) return NextResponse.json({ error: 'Service role not configured' }, { status: 503 });
     const { data, error } = await supabase.rpc('refresh_collaborative_scores');
     if (error) throw error;
 
