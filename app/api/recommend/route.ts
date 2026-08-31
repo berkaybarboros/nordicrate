@@ -14,6 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { enforceRateLimit, isValidSessionId, clampNumber } from '@/lib/security';
 
 // Product catalogs (static data — gerçek banka verileri)
@@ -82,7 +83,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid country' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServer();
+    // RLS denetimi 2026-08-18: kimlik icin cookie'li client, RPC'ler icin service_role.
+    // Boylece oneri fonksiyonlarindan anon EXECUTE yetkisi kaldirilabildi — aksi halde
+    // get_vector_recommendations(p_user_id) REST uzerinden baskasinin id'siyle cagrilabiliyordu.
+    const authClient = await createSupabaseServer();
+    const supabase = createSupabaseAdmin() ?? authClient;
     const isInsurance = INSURANCE_TYPES.has(productType);
 
     // ── Step 1: Collaborative recommendations from DB ────────────────────────
@@ -110,7 +115,7 @@ export async function POST(req: NextRequest) {
     const euriborDelta = rateMap.get('euribor3m')?.delta ?? null;
 
     // ── Step 3: Get user_id for vector layer ────────────────────────────────
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await authClient.auth.getUser();
     const userId = user?.id ?? null;
 
     // ── Step 3b: Vector similarity recommendations (4th layer) ──────────────
