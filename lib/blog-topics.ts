@@ -64,7 +64,11 @@ export const BLOG_TOPICS: BlogTopic[] = [
       'Is an e-Residency card enough to get a personal loan?',
       'What income documents do banks ask from foreigners?',
     ],
-    priority: 1,
+    // 2026-08-31: bu konu Gemini'yi 5 sutunlu tablo uretirken tekrar dongusune
+    // sokuyordu (once yuzlerce '-', sonra 170k bosluk) ve 12 gun boyunca TUM
+    // yayin hattini tikadi — nextTopic her calismada ayni konuyu donduruyor.
+    // Priority dusuruldu: once sorunsuz konular yayinlansin, bu en sonda denensin.
+    priority: 9,
     serpWeakness: 3,
   },
   {

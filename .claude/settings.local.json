@@ -118,7 +118,19 @@
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_sdk_reference",
       "mcp__fd5bd1f7-ef58-46e8-96d4-320b54eec115__get_advisors",
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__list_credentials",
-      "mcp__8719da2e-f804-403f-afc1-4006407e6950__trash_message"
+      "mcp__8719da2e-f804-403f-afc1-4006407e6950__trash_message",
+      "Bash(curl -s -o /tmp/r.txt -w \"%{http_code}\\\\n\" https://nordicrate.com/robots.txt)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /tmp/s.xml -w \"%{http_code}\\\\n\" https://nordicrate.com/sitemap.xml)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -A \"Mozilla/5.0 \\(compatible; Googlebot/2.1; +http://www.google.com/bot.html\\)\" https://nordicrate.com/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://nordicrate.com/)",
+      "Bash(curl -sI https://nordicrate.com/)",
+      "Bash(curl -s https://nordicrate.com/)",
+      "Bash(curl -s https://nordicrate.com/blog)",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__search_workflows",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__search_executions",
+      "Bash(python - C:/Users/berka/.claude/projects/C--Users-berka-OneDrive-Masa-st--Claude-Code-Project-HangiKredi-CLON--claude-worktrees-great-hugle-fdb449/69fc7faa-4ace-4754-b634-2c63dcf9eea6/tool-results/mcp-6be522ca-86b5-4e80-8d21-b464f91c9e09-get_execution-1788169502704.txt)",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_workflow_details"
     ]
   }
 }
