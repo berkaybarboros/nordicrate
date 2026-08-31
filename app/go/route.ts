@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAllowedApplyUrl } from '@/lib/affiliate';
 import { buildUTMLink } from '@/lib/utils';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
-import { enforceRateLimit, isValidSessionId, clampString } from '@/lib/security';
+import { enforceRateLimit, isValidSessionId, clampString, isLikelyBot } from '@/lib/security';
 
 export const runtime = 'nodejs';
 
@@ -78,14 +78,27 @@ export function GET(req: NextRequest) {
   const sidRaw        = sp.get('sid');
   const sessionId     = isValidSessionId(sidRaw) ? sidRaw : null;
 
-  logClick({
-    sessionId,
-    institutionId,
-    productId,
-    productType,
-    dest,
-    referer: req.headers.get('referer'),
-  });
+  // Bot taramalarını LOGLAMA (yönlendirme yine çalışır — amaç engellemek değil,
+  // analitiği temiz tutmak). 2026-08-31 denetimi: 949 apply_click kaydının tamamı
+  // crawler'dı; admin funnel'ı gerçek dışı bir tıklama oranı gösteriyordu ve bu
+  // rakamlar affiliate başvurularında kullanılacaktı.
+  // Gerçek ziyaretçi iki iz bırakır: tracker'ın sid'i VEYA kendi sayfamızdan referer.
+  const referer = req.headers.get('referer');
+  let fromOurSite = false;
+  try {
+    fromOurSite = !!referer && new URL(referer).hostname === new URL(BASE).hostname;
+  } catch { /* bozuk referer → insan kanıtı sayma */ }
+
+  if (!isLikelyBot(req) && (sessionId !== null || fromOurSite)) {
+    logClick({
+      sessionId,
+      institutionId,
+      productId,
+      productType,
+      dest,
+      referer,
+    });
+  }
 
   // UTM rule set v1 (docs/marketing/utm-ruleset.md) — UTM'ler yalnız burada yazılır
   const finalUrl = buildUTMLink(dest, {

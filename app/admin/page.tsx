@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { isAdminAuthed } from '@/lib/admin-auth';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
+import { isBotSessionId } from '@/lib/security';
 import { createSupabaseServer } from '@/lib/supabase-server';
 import LogoutButton from '@/components/admin/LogoutButton';
 
@@ -25,6 +26,8 @@ interface EventRow {
   page: string | null;
   product_type: string | null;
   created_at: string;
+  /** Bot ayrimi icin: /go gateway sid gelmediginde 'go-<ts>' uretiyordu */
+  session_id: string | null;
 }
 
 interface LeadRow {
@@ -88,7 +91,7 @@ async function loadDataInner() {
       .limit(200),
     client
       .from('events')
-      .select('event_type, page, product_type, created_at')
+      .select('event_type, page, product_type, created_at, session_id')
       .gte('created_at', since30d)
       .order('created_at', { ascending: false })
       .limit(2000),
@@ -141,7 +144,12 @@ export default async function AdminDashboard() {
   const eventCounts = new Map(countBy(events, (e) => e.event_type));
   const pageViews = eventCounts.get('page_view') ?? 0;
   const productViews = eventCounts.get('product_view') ?? 0;
-  const applyClicks = eventCounts.get('apply_click') ?? 0;
+  // 2026-08-31: apply_click kayitlarinin tamami crawler'di ve funnel gercek disi
+  // bir oran gosteriyordu. Yeni bot tiklamalari artik hic loglanmiyor (/go route);
+  // burasi GECMIS kayitlari ayirir, boylece tarihsel funnel da durust kalir.
+  const applyClickRows = events.filter((e) => e.event_type === 'apply_click');
+  const applyClicks = applyClickRows.filter((e) => !isBotSessionId(e.session_id)).length;
+  const applyClicksBot = applyClickRows.length - applyClicks;
   const findRateOpens = eventCounts.get('find_rate_open') ?? 0;
   const findRateSubmits = eventCounts.get('find_rate_submit') ?? 0;
   const recClicks = eventCounts.get('recommendation_click') ?? 0;
@@ -154,6 +162,9 @@ export default async function AdminDashboard() {
     { label: 'Page views (30d)', value: pageViews, rate: '—' },
     { label: 'Product views', value: productViews, rate: pct(productViews, pageViews) },
     { label: 'Apply clicks', value: applyClicks, rate: pct(applyClicks, productViews) },
+    ...(applyClicksBot > 0
+      ? [{ label: '↳ bot taramasi (haric tutuldu)', value: applyClicksBot, rate: '—' }]
+      : []),
   ];
 
   const aiFunnel = [

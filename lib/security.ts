@@ -173,3 +173,31 @@ export function sanitizeChatMessages(input: unknown): SafeChatMessage[] | null {
 export function isValidSessionId(value: unknown): value is string {
   return typeof value === 'string' && value.length >= 4 && value.length <= 64 && /^[\w-]+$/.test(value);
 }
+
+/**
+ * Bilinen crawler/otomasyon user-agent'ları.
+ * 2026-08-31 analitik denetimi: `apply_click` kayıtlarının %100'ü (949/949) bot
+ * taramasıydı — admin funnel'ı "1861% tıklama oranı" gösteriyordu. Affiliate
+ * görüşmelerinde bu rakamları kullanmak itibar kaybı olurdu.
+ */
+const BOT_UA_PATTERN =
+  /bot\b|crawl|spider|slurp|scrap|headless|phantom|puppeteer|playwright|curl\/|wget|python-requests|go-http|okhttp|java\/|axios|semrush|ahrefs|mj12|dotbot|petalbot|bingpreview|facebookexternalhit|whatsapp|telegram|preview|monitor|uptime|pingdom|lighthouse/i;
+
+/**
+ * Otomatik istemci mi? Kesin değil — amaç mükemmel tespit değil, analitiği
+ * kirletecek aşikâr taramaları elemek. Şüphede kalırsa "insan" der (false).
+ */
+export function isLikelyBot(req: Request): boolean {
+  const ua = req.headers.get('user-agent');
+  if (!ua || ua.length < 15) return true; // UA yok ya da anlamsız kısa → tarayıcı değil
+  return BOT_UA_PATTERN.test(ua);
+}
+
+/**
+ * Geçmiş `events` kayıtlarında bot ayrımı. `/go` gateway'i sid gelmediğinde
+ * `go-<timestamp>` üretiyordu; gerçek ziyaretçi her zaman tracker'ın sid'ini taşır.
+ * Yeni kayıtlar zaten loglanmıyor — bu yalnızca eski veriyi funnel'dan ayırmak için.
+ */
+export function isBotSessionId(sessionId: string | null | undefined): boolean {
+  return !sessionId || sessionId.startsWith('go-');
+}
