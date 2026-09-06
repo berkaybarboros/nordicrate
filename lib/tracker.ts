@@ -100,6 +100,83 @@ export const trackApplyClick = (productId: string, productType: string, extra?: 
 export const trackProductView = (productId: string, productType: string) =>
   track('product_view', { product_id: productId, product_type: productType });
 
+/* ─────────────────────────────────────────────────────────────────────────
+ * product_view batch kuyruğu
+ *
+ * 2026-08-31: `trackProductView` tanımlıydı ama HİÇBİR yerden çağrılmıyordu —
+ * admin funnel'ında "Product views: 0" görünmesinin sebebi buydu, yani
+ * page_view → product_view → apply_click zincirinin orta adımı hiç ölçülmedi.
+ *
+ * Neden ayrı kuyruk: bir liste sayfasında 20+ kart görünür. Her biri için
+ * `track()` çağırmak 20 × (auth.getUser + insert) = 40 ağ işlemi demek.
+ * Görüntülenmeler tek insert'te toplanır; tıklama gibi kritik event'ler
+ * eskisi gibi anında gider.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+interface QueuedView { product_id: string; product_type: string; page: string }
+
+const viewQueue: QueuedView[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let flushBound = false;
+
+async function flushProductViews(): Promise<void> {
+  if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; }
+  if (viewQueue.length === 0) return;
+
+  const batch = viewQueue.splice(0, viewQueue.length);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const sid = getSessionId();
+    await supabase.from('events').insert(
+      batch.map((v) => ({
+        session_id:   sid,
+        user_id:      user?.id ?? null,
+        event_type:   'product_view' as const,
+        page:         v.page,
+        product_id:   v.product_id,
+        product_type: v.product_type,
+        metadata:     {},
+      }))
+    );
+  } catch {
+    // Tracking hataları UI'yı bozmamalı — kayıp görüntülenme kabul edilebilir
+  }
+}
+
+/**
+ * Bir ürün kartının gerçekten görüldüğünü kuyruğa alır (bkz. useProductViewed).
+ * GA4'e anında, Supabase'e toplu gider.
+ */
+export function queueProductView(productId: string, productType: string): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.dataLayer?.push({
+      event: 'nr_product_view',
+      nr_product_id: productId,
+      nr_product_type: productType,
+      nr_page: window.location.pathname,
+    });
+  } catch { /* analytics asla UI'yı bozmaz */ }
+
+  viewQueue.push({
+    product_id: productId,
+    product_type: productType,
+    page: window.location.pathname,
+  });
+
+  // Sekme kapanırken/gizlenirken kuyrukta kalanı kaybetme
+  if (!flushBound) {
+    flushBound = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') void flushProductViews();
+    });
+  }
+
+  if (viewQueue.length >= 12) { void flushProductViews(); return; } // kuyruk şişmesin
+  if (!flushTimer) flushTimer = setTimeout(() => void flushProductViews(), 2500);
+}
+
 export const trackCompareAdd = (productId: string, productType: string) =>
   track('compare_add', { product_id: productId, product_type: productType });
 

@@ -8,6 +8,7 @@ import { buildGoLink } from "@/lib/affiliate";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
+import { useProductViewed } from "@/lib/use-product-viewed";
 
 interface Props {
   offer: LoanOffer;
@@ -39,8 +40,11 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
 
   const applyUrl = buildGoLink(offer.applyUrl, { inst: offer.bankId, pid: offer.id, pt: offer.type, pl: 'loan-card' });
 
+  // Kartın yarısı 1 sn ekranda kalırsa `product_view` üretir (funnel orta adımı)
+  const viewRef = useProductViewed<HTMLDivElement>(offer.id, offer.type);
+
   return (
-    <div className={`bg-white rounded-2xl border p-5 md:p-6 transition-all hover:shadow-lg ${!isEligible ? "opacity-60" : "border-gray-100 hover:border-[#1a3c6e]/20"}`}>
+    <div ref={viewRef} className={`bg-white rounded-2xl border p-5 md:p-6 transition-all hover:shadow-lg ${!isEligible ? "opacity-60" : "border-gray-100 hover:border-[#1a3c6e]/20"}`}>
       <div className="flex flex-col md:flex-row md:items-center gap-4">
         {/* Bank Info */}
         <div className="flex items-center gap-4 md:w-44 flex-shrink-0">

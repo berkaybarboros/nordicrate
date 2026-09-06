@@ -7,6 +7,7 @@ import { buildGoLink } from "@/lib/affiliate";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
+import { ProductViewed } from "@/lib/use-product-viewed";
 
 interface DepositOffer {
   id: string;
@@ -205,8 +206,10 @@ export default function DepositsContent() {
 
           {!loading &&
             offers.map((offer, idx) => (
-              <div
+              <ProductViewed
                 key={offer.id}
+                productId={offer.id}
+                productType="deposit"
                 className={`bg-white rounded-2xl border p-5 md:p-6 hover:shadow-lg transition-all ${
                   idx === 0 ? "border-amber-200 ring-1 ring-amber-200" : "border-gray-100"
                 }`}
@@ -335,7 +338,7 @@ export default function DepositsContent() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </ProductViewed>
             ))}
 
           {!loading && offers.length === 0 && (

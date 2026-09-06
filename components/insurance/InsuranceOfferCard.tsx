@@ -7,6 +7,7 @@ import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { buildGoLink } from "@/lib/affiliate";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
+import { useProductViewed } from "@/lib/use-product-viewed";
 
 interface Props {
   offer: InsuranceOffer;
@@ -33,8 +34,11 @@ export default function InsuranceOfferCard({ offer }: Props) {
     pl: 'insurance-card',
   });
 
+  // Kartın yarısı 1 sn ekranda kalırsa `product_view` üretir (funnel orta adımı)
+  const viewRef = useProductViewed<HTMLDivElement>(offer.id, `insurance-${offer.type}`);
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 hover:shadow-lg hover:border-[#1a3c6e]/20 transition-all">
+    <div ref={viewRef} className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 hover:shadow-lg hover:border-[#1a3c6e]/20 transition-all">
       <div className="flex flex-col md:flex-row md:items-start gap-4">
         {/* Company Info */}
         <div className="flex items-center gap-4 md:w-48 flex-shrink-0">

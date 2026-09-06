@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { LoanProduct, Institution, CountryInfo } from '@/lib/types';
 import { trackApplyClick } from '@/lib/tracker';
+import { useProductViewed } from '@/lib/use-product-viewed';
 import {
   formatAmount,
   formatRate,
@@ -30,6 +31,9 @@ export default function RateCard({ product, institution, country }: RateCardProp
   // Mount anı — render içinde Date.now() impure sayılır (react-compiler kuralı)
   const [mountedAt] = useState(() => Date.now());
 
+  // Kartın yarısı 1 sn ekranda kalırsa `product_view` üretir (funnel orta adımı)
+  const viewRef = useProductViewed<HTMLDivElement>(product.id, product.type);
+
   // Onboarding profili eşleşmesi: tip + (varsa) ülke + (varsa) tutar limitleri.
   // Profil client-side yüklenir; anonim/ilk render'da chip yok — SSR mismatch olmaz.
   const { profile } = useUserProfile();
@@ -55,6 +59,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
 
   return (
     <div
+      ref={viewRef}
       className={`bg-white rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col ${
         product.isPromoted
           ? 'border-sky-300 ring-2 ring-sky-100'
