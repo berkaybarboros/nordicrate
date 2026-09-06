@@ -61,6 +61,22 @@ export async function GET(req: NextRequest) {
   }
 
   const now = Date.now();
+
+  // 2026-09-06: contacted_at'i olmayan kayitlar SESSIZCE atlaniyordu. LHV Pank
+  // 19.07'de elle maillenmis, durumu elle 'contacted' yapilmis ama tarih damgasi
+  // konmamisti — motor onu 49 gun boyunca hic gormedi ve kimse fark etmedi.
+  // Endpoint uzerinden gecen her degisiklik damgalanir (outreach-status), ama elle
+  // duzenleme her zaman mumkun; bu yuzden yetim kayitlar artik yanitta raporlanir.
+  const orphans = (data ?? [])
+    .filter((t) => {
+      const row = t as { status: string; contacted_at: string | null };
+      return !row.contacted_at && row.status !== 'drafted';
+    })
+    .map((t) => {
+      const row = t as { id: string; institution: string; status: string };
+      return { id: row.id, institution: row.institution, status: row.status };
+    });
+
   const due = (data ?? [])
     .filter((t) => {
       const row = t as { status: string; contacted_at: string | null };
@@ -90,5 +106,11 @@ export async function GET(req: NextRequest) {
       };
     });
 
-  return NextResponse.json({ count: due.length, followups: due });
+  return NextResponse.json({
+    count: due.length,
+    followups: due,
+    // Tarih damgasi olmadigi icin takip edilemeyen kayitlar — bos kalmasi beklenir.
+    // Doluysa: contacted_at elle set edilmeli, yoksa bu partnerler kuyrukta gorunmez.
+    ...(orphans.length > 0 ? { needsAttention: orphans } : {}),
+  });
 }
