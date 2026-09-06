@@ -953,6 +953,86 @@ const INSURANCE_HUB_EN: DeepContent = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// COUNTRIES HUB — Nordic & Baltic (EN)
+// Bu sayfa bir navigasyon tablosuydu. Aci: "ayni basvuran neden ulkeden ulkeye
+// farkli cevap aliyor" — currency/reference rate, uygunluk kurallari, yerel
+// kimlik/kredi kaydi. Alt sayfalara ve urun sayfalarina dagitir.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const COUNTRIES_HUB_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Borrowing across the Nordics and Baltics: how the eight markets differ',
+  metaTitle: 'Nordic & Baltic Lending: Country Comparison',
+  metaDescription:
+    'How lending differs across Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia and Lithuania: currencies, reference rates, affordability rules and residency requirements.',
+  intro:
+    'Eight countries, two monetary systems. Estonia, Latvia, Lithuania and Finland use the euro and price variable loans off Euribor. Denmark, Norway, Sweden and Iceland run their own currencies and central bank rates. That split, plus national affordability rules and local credit history, explains why the same applicant gets different answers in each market.',
+  sections: [
+    {
+      h2: 'Two monetary blocks, two pricing logics',
+      body: [
+        'The euro-area members — Estonia, Latvia, Lithuania and Finland — price variable-rate lending as a reference rate plus a bank margin, and that reference is Euribor. Because the reference is shared, banks compete on margin. When Euribor moves, borrowers across all four countries feel it at their next reset.',
+        'Denmark, Norway, Sweden and Iceland set monetary policy independently, so their loan pricing follows their own central bank rates rather than Euribor. Denmark maintains a fixed-rate policy against the euro, which keeps its rates broadly aligned in practice, while Norway, Sweden and Iceland can and do diverge.',
+        'For a borrower this matters in one concrete way: a rate comparison across the whole region is not comparing like with like. Comparing an Estonian margin to a Norwegian headline rate tells you very little. Compare within a currency zone, or compare total cost on identical amounts and terms.',
+      ],
+    },
+    {
+      h2: 'What every market checks, and what differs',
+      body: [
+        'The common core is the same everywhere: verifiable income, existing debt obligations, and your record in the national credit register. Every country applies caps limiting how much of net income can go to debt service, and lenders stress-test affordability against a rate higher than today.',
+        'What differs is how strict those caps are, how long a payment default stays on record, and how much weight lenders give to employment type. A permanent contract is treated more favourably than a fixed-term one in every market, but the size of that gap varies. Self-employment is handled very differently between, say, Estonia and Sweden.',
+        'Collateral practice differs too. Mortgage loan-to-value limits are set nationally by each central bank or financial supervisor, and state-backed guarantee schemes exist in several countries to help first-time buyers over the deposit hurdle. The names and conditions change; the structure — a public guarantee reducing the deposit rather than the rate — recurs across the region.',
+      ],
+    },
+    {
+      h2: 'The residency question, which decides most newcomer applications',
+      body: [
+        'For someone who has just moved, the binding constraint is rarely income. It is the absence of a local file. Lenders lean on a national personal identity code, a domestic bank account receiving salary, and credit history in that country. A strong earner in month two often cannot borrow, while a modest earner in year three can.',
+        'Residence permit duration adds a second constraint. Where a permit expires before a loan would be repaid, lenders typically shorten the term to fit rather than refuse outright — which raises the monthly payment and can make the loan unworkable. Long-term borrowing generally requires permanent residency or citizenship, or a permit comfortably outlasting the term.',
+        'The practical sequence for newcomers is the same in every one of these markets: get the personal identity code, register your address, have salary paid into a local account, and let a few months of record accumulate before applying for anything significant. Applying too early and being refused also leaves a mark.',
+      ],
+    },
+    {
+      h2: 'Where to look next',
+      body: [
+        'If you know the product you need, start there: [personal loans](/loans/personal) for unsecured borrowing, [mortgages](/loans/mortgage) for property, [car finance](/loans/car) for vehicles and [business loans](/loans/business) for companies. Each page covers the eligibility rules in more depth than a country overview can.',
+        'If you are saving rather than borrowing, [deposit rates](/deposits) shows what banks are paying, and the EU deposit guarantee protects you to the same 100,000 EUR ceiling in every country listed here.',
+        'Founders and companies should also check [government and EU programmes](/programs), which lists national instruments and startup funding across all eight markets — several of the most useful routes for new companies are public guarantees rather than commercial loans.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'Which Nordic and Baltic countries use the euro?',
+      a: 'Estonia, Latvia, Lithuania and Finland. They price variable-rate loans off Euribor plus a bank margin, so banks compete mainly on margin. Denmark, Norway, Sweden and Iceland keep their own currencies and central bank rates, so their lending prices move independently.',
+    },
+    {
+      q: 'Can I borrow in one country while living in another?',
+      a: 'It is difficult. Lenders assess local income, a national identity code and domestic credit history, so cross-border applications usually fail on the file rather than the finances. An existing relationship with a bank present in both markets is the most realistic route.',
+    },
+    {
+      q: 'Why can I not get a loan in my first months after moving?',
+      a: 'Because you have no local record yet. Lenders rely on a national identity code, salary arriving in a domestic account and credit history in that country. Income alone rarely compensates. A few months of documented local activity changes most applications materially.',
+    },
+    {
+      q: 'Does my residence permit length affect the loan term?',
+      a: 'Yes. Where a permit expires before the loan would be repaid, lenders typically shorten the term so repayment finishes first. That raises the monthly payment and can make larger loans unworkable. Long-term borrowing usually needs permanent residency or a permit outlasting the term.',
+    },
+    {
+      q: 'Is my deposit protected in every country listed here?',
+      a: 'Yes, to the same 100,000 EUR ceiling per depositor per bank under the EU deposit guarantee framework. The paying scheme is the one in the bank home country, which matters when a foreign bank operates as a branch rather than a local subsidiary.',
+    },
+  ],
+  related: [
+    { label: 'Compare all loans', href: '/loans' },
+    { label: 'Mortgages', href: '/loans/mortgage' },
+    { label: 'Deposit rates', href: '/deposits' },
+    { label: 'Government and EU programmes', href: '/programs' },
+    { label: 'Our methodology', href: '/methodology' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const DEEP_CONTENT = {
   mortgage: { en: MORTGAGE_EN, et: MORTGAGE_ET, fi: MORTGAGE_FI },
@@ -964,6 +1044,7 @@ export const DEEP_CONTENT = {
   business: { en: BUSINESS_EN },
   loansHub: { en: LOANS_HUB_EN },
   insuranceHub: { en: INSURANCE_HUB_EN },
+  countriesHub: { en: COUNTRIES_HUB_EN },
 } as const;
 
 /** hreflang eşleme — her içerik setinin dil-URL haritası */
@@ -994,5 +1075,8 @@ export const DEEP_CONTENT_ROUTES = {
   },
   insuranceHub: {
     en: 'https://nordicrate.com/insurance',
+  },
+  countriesHub: {
+    en: 'https://nordicrate.com/countries',
   },
 } as const;

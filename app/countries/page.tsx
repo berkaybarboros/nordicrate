@@ -6,6 +6,14 @@ import { getCountryStats } from '@/lib/utils';
 import CountryCard from '@/components/CountryCard';
 import CountryFlag from '@/components/CountryFlag';
 import type { Region } from '@/lib/types';
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT } from "@/lib/deep-content";
+
+// Sayfa bir navigasyon tablosuydu; aci: ayni basvuran neden ulkeden ulkeye
+// farkli cevap aliyor (para birimi, referans oran, yerel kredi kaydi).
+const deep = DEEP_CONTENT.countriesHub.en;
 
 export default function CountriesPage() {
   const [region, setRegion] = useState<Region | 'all'>('all');
@@ -155,6 +163,8 @@ export default function CountriesPage() {
           </table>
         </div>
       </div>
+      <DeepContentBlock content={deep} />
+      <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </div>
   );
 }
