@@ -5,6 +5,13 @@ import type { CountryCode } from '@/lib/types';
 import { buildProductsItemList } from '@/lib/seo';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 import JsonLd from '@/components/seo/JsonLd';
+import DeepContentBlock from '@/components/seo/DeepContentBlock';
+import { buildFaqJsonLd } from '@/lib/seo';
+import { DEEP_CONTENT } from '@/lib/deep-content';
+
+// Hub icerigi ALT kategorilerle ayni sorguyu hedeflemez (kannibalizasyon):
+// /loans/personal "personal loan estonia" alir, burasi karsilastirmali aci.
+const deep = DEEP_CONTENT.loansHub.en;
 
 export const metadata = {
   alternates: { canonical: 'https://nordicrate.com/loans' },
@@ -38,6 +45,8 @@ export default async function LoansPage({ searchParams }: PageProps) {
       defaultFilters={defaultFilters}
       alertProduct="personal-loan"
     />
+    <DeepContentBlock content={deep} />
+    <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </>
   );
 }

@@ -794,6 +794,165 @@ const BUSINESS_EN: DeepContent = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// LOANS HUB — Nordic & Baltic (EN)
+// Hub sayfasi ALT kategorilerle ayni sorguyu hedeflememeli (kannibalizasyon).
+// /loans/personal "personal loan estonia" alir; burasi KARSILASTIRMALI aci:
+// hangi kredi turu hangi durumda, ulkeler arasi fark, hangi alt sayfaya gitmeli.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LOANS_HUB_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Borrowing in the Nordics and Baltics: which loan type fits',
+  metaTitle: 'Compare Loan Types: Nordic & Baltic Guide',
+  metaDescription:
+    'Which loan type fits your situation across the Nordics and Baltics: unsecured consumer credit, secured car finance, mortgages and refinancing compared.',
+  intro:
+    'The right loan is decided by what secures it. Unsecured consumer credit is fast and flexible but costs more; secured borrowing against a car or property costs less and takes longer to arrange. Rates, affordability rules and lender mix differ by country, so the same borrower gets different answers in Tallinn and Helsinki.',
+  sections: [
+    {
+      h2: 'Secured or unsecured: the choice that sets your rate',
+      body: [
+        'Every consumer loan sits on one side of a line. Unsecured credit — a personal loan, an overdraft, a credit card — is backed only by your promise to repay, so the lender prices in the risk of getting nothing back. Secured credit is backed by an asset the lender can take: the property in a mortgage, the vehicle in car finance. That security is why a mortgage costs a fraction of what a personal loan costs.',
+        'The practical consequence is that the cheapest route depends on what you own, not only on what you earn. Someone with property may find that borrowing against it beats an unsecured loan for a large renovation. Someone without collateral is comparing unsecured offers, and there the spread between lenders is wide enough that comparison does most of the work.',
+        'Term length pulls in the opposite direction to monthly affordability. Stretching a loan reduces the monthly payment and increases the total cost, sometimes substantially. When you compare, hold the term constant — otherwise you are comparing two different products wearing the same name.',
+      ],
+    },
+    {
+      h2: 'Which product for which purpose',
+      body: [
+        'For a home purchase the answer is a mortgage, and the number that matters is the bank margin rather than the headline rate, because the reference rate is the same for everyone. We cover how Euribor and margin interact in [mortgages](/loans/mortgage).',
+        'For a car, you are choosing between a loan, leasing and hire purchase — and the difference is who owns the vehicle rather than the interest rate. That choice also decides who carries depreciation and whether comprehensive insurance becomes contractually compulsory. See [car finance](/loans/car).',
+        'For consolidating existing debts, renovating without touching a mortgage, or covering a one-off cost, unsecured [personal loans](/loans/personal) are the usual route. For a company, the assessment shifts from your income to the business cash flow entirely — that is [business finance](/loans/business).',
+        'One case deserves its own mention: refinancing. If you took credit when your circumstances were weaker, the rate you were given reflects that. Consumer credit in the EU carries a right to repay early, so moving a loan is a real option — worth checking whenever your income, employment stability or credit record has improved.',
+      ],
+    },
+    {
+      h2: 'Why the same borrower gets different answers by country',
+      body: [
+        'The Baltics and the euro-area Nordics price variable loans off Euribor, so the reference rate is shared. What differs is the margin, the fee structure and how conservative each market lender is. Denmark, Norway, Sweden and Iceland run their own currencies and central bank rates, which is why their loan pricing moves independently of the euro area.',
+        'Affordability rules differ too. Each country applies its own caps on how much of your net income can go to debt service, and lenders stress-test against a higher rate than today. Two people with identical salaries can therefore be approved for different amounts depending on which side of a border they are applying from.',
+        'Residency is the third variable and often the decisive one for newcomers. Lenders lean heavily on a local personal identity code, a domestic bank account receiving salary, and a credit history in that country. This is why an experienced professional can be refused in their first year despite strong income — the file lacks local record, not creditworthiness. Country-by-country detail is in our [country pages](/countries).',
+      ],
+    },
+    {
+      h2: 'How to compare without being misled',
+      body: [
+        'Compare on APRC, not the nominal rate. APRC includes the contract fee and the payment schedule, which is why two loans advertising the same interest rate can cost noticeably different amounts. Rates written as from a given percentage are best-case figures offered to the strongest applicants — your personal offer follows a credit assessment.',
+        'Check the fees that never appear in the headline: contract or arrangement fees, collateral registration costs on secured loans, and any charge for early settlement. Ask for the total cost in writing before signing. A lender that will not put it in writing has told you something useful.',
+        'Our comparison reads published rates from lender sources and refreshes them daily, so what you see reflects what banks are advertising now rather than a number written into an article months ago. Use the [loan calculator](/loan-calculator) to test how term length changes both the monthly payment and the total repayable before you apply anywhere.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'What is the difference between a secured and an unsecured loan?',
+      a: 'A secured loan is backed by an asset the lender can claim — property in a mortgage, the vehicle in car finance — which lowers the lender risk and therefore the rate. Unsecured credit is backed only by your promise to repay, so it is faster to arrange but costs more.',
+    },
+    {
+      q: 'Should I compare on the interest rate or the APRC?',
+      a: 'APRC. It folds in the contract fee and the payment schedule, so it reflects what the loan actually costs. Two offers with the same nominal rate can have different APRC because of fees. Compare over the same amount and the same term, or you are comparing different products.',
+    },
+    {
+      q: 'Why do loan rates differ between Nordic and Baltic countries?',
+      a: 'The Baltics and euro-area Nordics price variable loans off Euribor, so the reference is shared and banks compete on margin. Denmark, Norway, Sweden and Iceland use their own currencies and central bank rates, so their pricing moves independently. Affordability rules also differ by country.',
+    },
+    {
+      q: 'Can I refinance an existing loan?',
+      a: 'Yes. Consumer credit in the EU carries a right to early repayment, though the lender may charge compensation within limits set by law. Refinancing is most worthwhile when your income, employment stability or credit record has improved since you first borrowed.',
+    },
+    {
+      q: 'Why was I refused despite a good salary?',
+      a: 'Usually a thin local file rather than weak finances. Lenders lean on a domestic personal identity code, a local account receiving your salary, and credit history in that country. Newcomers often need a period of local record before applications succeed, even with strong income.',
+    },
+  ],
+  related: [
+    { label: 'Personal loans', href: '/loans/personal' },
+    { label: 'Car finance', href: '/loans/car' },
+    { label: 'Mortgages', href: '/loans/mortgage' },
+    { label: 'Business loans', href: '/loans/business' },
+    { label: 'Loan calculator', href: '/loan-calculator' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSURANCE HUB — Estonia (EN)
+// Alt sigorta sayfalari CategorySeoBlock ile kendi icerigine sahip; hub burada
+// "hangisi zorunlu, hangisi degil, hangi durumda hangisi" acisini alir.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const INSURANCE_HUB_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Insurance in Estonia: what is compulsory and what is worth buying',
+  metaTitle: 'Insurance Estonia: Compulsory vs Optional Cover',
+  metaDescription:
+    'Which insurance is legally required in Estonia, which your bank or landlord requires, and which is genuinely optional — motor, home, health, travel and life compared.',
+  intro:
+    'Only two kinds of cover are effectively unavoidable in Estonia: motor liability insurance for any registered vehicle, and whatever your mortgage or lease contract obliges you to hold. Everything else — Casco, home contents, private health, travel and life cover — is a judgement about which risks you could not absorb yourself.',
+  sections: [
+    {
+      h2: 'Compulsory, contractual and optional',
+      body: [
+        'It helps to separate three different kinds of obligation. Legally compulsory means the state requires it: in Estonia that is motor liability insurance (liikluskindlustus) for every registered vehicle, which covers harm you cause to others and never repairs your own car.',
+        'Contractually required means someone you signed with demands it. A mortgage lender requires property insurance for the building; a car lender or leasing company requires comprehensive Casco cover; some landlords require tenant liability cover. These are not legal duties, but the consequence of breaching them is losing the contract, so treat them as fixed costs.',
+        'Everything else is genuinely optional and should be judged by one question: could you absorb this loss without insurance? A cracked phone screen is an annoyance; a liability claim after a serious accident, or six months unable to work, is a different order of magnitude. Insurance is most valuable exactly where the loss would be unrecoverable, which is often not where people feel most anxious.',
+      ],
+    },
+    {
+      h2: 'Vehicle cover: two separate layers',
+      body: [
+        'Motor liability insurance is mandatory, tied to the vehicle registration rather than the driver, and pays for damage you cause to other people and their property. Driving without it is an offence, and the policy follows the car when it changes hands.',
+        'Casco is the voluntary layer that covers your own vehicle: collision damage regardless of fault, theft, fire, vandalism, glass and natural events. Scope is not standardised between insurers, so two policies with the same name can differ on excess, glass cover and how a total loss is valued. If the car is financed, your lender almost certainly requires it — the detail is in [Casco insurance](/insurance/casco) and the finance side in [car loans](/loans/car).',
+      ],
+    },
+    {
+      h2: 'Health, home and travel for people who moved here',
+      body: [
+        'Estonian state health insurance follows employment rather than residency, which surprises people who assume registering an address is enough. Employees are generally covered through contributions; freelancers, people between jobs and e-residents without local employment often are not. Private cover fills that gap, and the right answer depends on your exact status — see [health insurance](/insurance/health).',
+        'For housing, the split is between the building and what is inside it. A mortgage lender requires building cover; that policy does not replace your belongings, and a tenant is generally not covered by the landlord policy at all. Renters typically need contents and liability rather than building cover — the distinction is covered in [home insurance](/insurance/home).',
+        'Travel cover matters more for non-EU residents. The European Health Insurance Card gives EU citizens access to state healthcare in other member states but does not cover repatriation, private treatment or trip cancellation. If you hold a residence permit rather than EU citizenship, check what your card actually entitles you to before assuming a trip is covered. See [travel insurance](/insurance/travel).',
+      ],
+    },
+    {
+      h2: 'Comparing policies rather than prices',
+      body: [
+        'The excess (omavastutus) is the lever that moves the premium most. Raising it lowers what you pay monthly and raises what you pay when you claim. That is a genuine trade, and the right level is the largest amount you could pay without difficulty at the moment of a claim — not the largest number that makes the quote look cheap.',
+        'Read the exclusions before the cover list. Territorial limits, use of the vehicle or property for commercial purposes, unreported modifications and pre-existing conditions are where claims are refused. A policy that costs less because it excludes something you actually do is not cheaper.',
+        'Finally, check the claims process before you need it: how a claim is filed, how a loss is valued, and whether an approved repair network limits your choices. Our [insurance comparison](/insurance) lists what Estonian insurers publish across all lines, and [life cover](/insurance/life) is worth a separate look if anyone depends on your income.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'Which insurance is legally compulsory in Estonia?',
+      a: 'Motor liability insurance (liikluskindlustus) for every registered vehicle. It covers harm you cause to others and never repairs your own car. Other cover people treat as compulsory — Casco, property insurance — is usually required by a lender or landlord contract rather than by law.',
+    },
+    {
+      q: 'Am I covered by Estonian state health insurance as a foreigner?',
+      a: 'It follows employment, not residency. Employees are generally covered through contributions, while freelancers, people between jobs and e-residents without local employment often are not. Registering an address does not by itself provide cover, which is a common and expensive misunderstanding.',
+    },
+    {
+      q: 'Does my landlord insurance cover my belongings?',
+      a: 'Generally no. A landlord policy covers the building and the owner interest in it, not a tenant possessions or a tenant liability. Renters usually need contents and liability cover of their own — the two policies protect different people against different losses.',
+    },
+    {
+      q: 'Is a higher excess worth it to lower the premium?',
+      a: 'Only up to what you could comfortably pay when claiming. A higher excess (omavastutus) genuinely reduces the premium, but it reduces the payout by the same logic. A policy with an excess you could not afford at claim time is cheaper on paper and less useful in practice.',
+    },
+    {
+      q: 'Does the European Health Insurance Card replace travel insurance?',
+      a: 'No. The card gives access to state healthcare in other EU member states but does not cover repatriation, private treatment or trip cancellation. Non-EU residents holding an Estonian residence permit should check what their card actually entitles them to before travelling.',
+    },
+  ],
+  related: [
+    { label: 'Motor and Casco', href: '/insurance/casco' },
+    { label: 'Health insurance', href: '/insurance/health' },
+    { label: 'Home insurance', href: '/insurance/home' },
+    { label: 'Travel insurance', href: '/insurance/travel' },
+    { label: 'Life insurance', href: '/insurance/life' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const DEEP_CONTENT = {
   mortgage: { en: MORTGAGE_EN, et: MORTGAGE_ET, fi: MORTGAGE_FI },
@@ -803,6 +962,8 @@ export const DEEP_CONTENT = {
   deposits: { en: DEPOSITS_EN },
   car: { en: CAR_EN },
   business: { en: BUSINESS_EN },
+  loansHub: { en: LOANS_HUB_EN },
+  insuranceHub: { en: INSURANCE_HUB_EN },
 } as const;
 
 /** hreflang eşleme — her içerik setinin dil-URL haritası */
@@ -827,5 +988,11 @@ export const DEEP_CONTENT_ROUTES = {
   },
   business: {
     en: 'https://nordicrate.com/loans/business',
+  },
+  loansHub: {
+    en: 'https://nordicrate.com/loans',
+  },
+  insuranceHub: {
+    en: 'https://nordicrate.com/insurance',
   },
 } as const;

@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT } from "@/lib/deep-content";
+
+// Alt sigorta sayfalari CategorySeoBlock ile kendi icerigine sahip;
+// hub burada "hangisi zorunlu, hangisi degil" acisini alir.
+const deep = DEEP_CONTENT.insuranceHub.en;
 
 export const metadata: Metadata = {
   title: "Insurance Estonia | Compare All Types — Motor, CASCO, Home, Health, Travel, Life",
@@ -213,6 +221,8 @@ export default function InsurancePage() {
           </div>
         </div>
       </div>
+      <DeepContentBlock content={deep} />
+      <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </div>
   );
 }
