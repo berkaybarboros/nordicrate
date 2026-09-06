@@ -547,10 +547,101 @@ const PERSONAL_FI: DeepContent = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// DEPOSITS — Estonia (EN)
+// 2026-09-06: /deposits sayfasinin derin icerigi yoktu — sayfa yalnizca filtre +
+// kart listesiydi. 89 sayfa indeksli ama trafik yok; sorun indeksleme degil
+// siralama, yani ince icerik. Blog tarafinda 'deposit-guarantee-estonia-explained'
+// konusu kuyrukta — ikisi birbirine baglanacak (topical authority).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const DEPOSITS_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Term deposits in Estonia: how rates, tax and the guarantee work',
+  metaTitle: 'Term Deposits Estonia: Rates, Tax & Guarantee',
+  metaDescription:
+    'How Estonian term deposits work: the EU 100,000 EUR guarantee, the 20% tax on interest, non-resident access, and what to check before locking money in.',
+  intro:
+    'A term deposit in Estonia (tähtajaline hoius) locks a fixed sum with a bank for an agreed period at an agreed rate. Deposits are protected up to 100,000 EUR per depositor per bank under the EU guarantee scheme, and interest paid to Estonian tax residents is subject to income tax. The rate is only part of the comparison.',
+  sections: [
+    {
+      h2: 'What protects your money: the 100,000 EUR guarantee',
+      body: [
+        'Every credit institution licensed in Estonia belongs to the EU deposit guarantee scheme. If the bank fails, deposits are compensated up to 100,000 EUR — and the limit applies per depositor per bank, not per account. Holding three accounts at the same bank does not triple the cover; splitting the same money across two separate banks does double it.',
+        'The distinction that catches people out is branch versus subsidiary. A foreign bank operating in Estonia as a subsidiary is a separate Estonian legal entity and sits under the Estonian scheme. A branch of a foreign bank is covered by its home country scheme instead. Both are EU-level protections at the same 100,000 EUR ceiling, but the paying institution differs — worth knowing before you assume which national scheme stands behind your money.',
+        'Nationality and residency do not change the cover. A non-resident, an e-resident and an Estonian citizen holding the same deposit at the same bank have the same protection. What can differ is whether the bank will open the account in the first place.',
+      ],
+    },
+    {
+      h2: 'Tax: why the advertised rate is not what you keep',
+      body: [
+        'Interest income is taxable in Estonia, and banks withhold income tax on interest paid to Estonian tax residents at source. A deposit advertised at a given gross rate therefore returns less in hand, and comparisons between banks are only fair when you compare on the same basis — gross against gross.',
+        'If you are tax resident in another country, your position depends on the double taxation treaty between that country and Estonia, and you may need to declare the income at home. This is where a comparison site stops and a tax adviser starts: the treaty treatment of interest varies, and getting it wrong is expensive. What we can say plainly is that the headline rate on any comparison table, including ours, is a gross figure.',
+      ],
+    },
+    {
+      h2: 'Can non-residents and e-residents open a deposit?',
+      body: [
+        'This is the most common question we get and the honest answer is: it depends on the bank, not on the product. A term deposit is a low-risk product for the bank, but opening any account triggers full know-your-customer and anti-money-laundering checks. Those checks are where non-residents are refused, not at the deposit itself.',
+        'Banks generally want to see a connection to Estonia — residence, employment, a registered company with real activity, or property. e-Residency on its own establishes a digital identity for dealing with the state; it is not evidence of economic substance, and several banks say so openly. Founders who incorporate an Estonian company and then discover they cannot open a bank account are running into this exact gap.',
+        'Practical route for most newcomers: get the personal ID code and address registration first, then apply. If you are running a company, be ready to document what it actually does and where its revenue comes from. If you already bank with a group present in several Nordic or Baltic markets, ask them first — an existing relationship is the single strongest lever.',
+      ],
+    },
+    {
+      h2: 'Choosing a term: what changes when you lock money away',
+      body: [
+        'Longer terms usually pay more, but the trade is liquidity. Estonian term deposits are, by design, not accessible on demand. Breaking a deposit early is typically possible only on the terms written into your contract, and the usual consequence is losing some or all of the accrued interest — occasionally with a separate fee. Read that clause before you sign, not when you need the money.',
+        'One structure worth understanding is laddering: instead of placing one sum for one long term, split it into several deposits maturing at different dates. Part of the money becomes available at regular intervals while the rest keeps earning the longer-term rate. It is not a trick to get a better rate, it is a way to stop a rate decision from also being a liquidity decision.',
+        'Also check how the deposit behaves at maturity. Some contracts roll over automatically into a new term at the rate prevailing that day unless you instruct otherwise. Automatic renewal is convenient, but it can quietly move your money into a term you did not choose at a rate you did not compare.',
+      ],
+    },
+    {
+      h2: 'What to compare beyond the rate',
+      body: [
+        'Minimum deposit differs sharply between banks and decides whether an offer is even available to you. So does whether the bank requires an existing current account, whether the application is fully online, and whether the bank serves customers who are not Estonian residents.',
+        'Interest payment timing matters more than it looks. Interest paid monthly and interest paid at maturity are not equivalent even at the same nominal rate, because money in your hands earlier can be used earlier. Where banks state an effective annual rate, that figure already accounts for compounding and is the fairer basis for comparison.',
+        'Our [deposit comparison](/deposits) reads rates directly from bank sources and updates them daily, so the table reflects what banks are publishing rather than a figure written into an article months ago. If you are weighing a deposit against paying down debt instead, the arithmetic on the other side is in our [loan comparison](/loans).',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'How much of my deposit is guaranteed in Estonia?',
+      a: 'Up to 100,000 EUR per depositor per bank under the EU deposit guarantee scheme. The ceiling applies to your total holdings at that bank, not to each account separately. Spreading the same amount across two independent banks gives you two separate 100,000 EUR ceilings.',
+    },
+    {
+      q: 'Does the guarantee apply to non-residents and e-residents?',
+      a: 'Yes. Deposit protection follows the bank, not your nationality or residency, so a non-resident has the same 100,000 EUR cover as an Estonian citizen at the same institution. The harder step for non-residents is passing the bank onboarding checks, not the protection itself.',
+    },
+    {
+      q: 'Is interest on Estonian deposits taxed?',
+      a: 'Interest is taxable income in Estonia and banks withhold income tax at source for Estonian tax residents, so the amount you keep is below the advertised gross rate. If you are tax resident elsewhere, the applicable double taxation treaty decides the treatment and you may need to declare it at home.',
+    },
+    {
+      q: 'Can I withdraw a term deposit early?',
+      a: 'Only on the terms in your contract. Early withdrawal is normally possible but usually costs you some or all of the accrued interest, and sometimes a fee. Check that clause before signing — it is the main practical difference between a term deposit and a savings account.',
+    },
+    {
+      q: 'Does a longer term always pay more?',
+      a: 'Usually but not always, because rate curves shift. The reliable trade-off is liquidity rather than yield: a longer term means your money is committed for longer. Laddering several shorter deposits with staggered maturity dates keeps part of the money reachable while the rest earns the longer rate.',
+    },
+  ],
+  related: [
+    { label: 'Compare deposit rates', href: '/deposits' },
+    { label: 'Personal loans in Estonia', href: '/loans/personal' },
+    { label: 'Compare all loans', href: '/loans' },
+    { label: 'How we make money', href: '/how-we-make-money' },
+    { label: 'Our methodology', href: '/methodology' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const DEEP_CONTENT = {
   mortgage: { en: MORTGAGE_EN, et: MORTGAGE_ET, fi: MORTGAGE_FI },
   personal: { en: PERSONAL_EN, et: PERSONAL_ET, fi: PERSONAL_FI },
+  // 2026-09-06: kategori sayfalarinin cogu 'ince icerik'ti (sadece filtre + kart).
+  // 89 sayfa indeksli ama trafik yok -> sorun indeksleme degil siralama.
+  deposits: { en: DEPOSITS_EN },
 } as const;
 
 /** hreflang eşleme — her içerik setinin dil-URL haritası */
@@ -564,5 +655,10 @@ export const DEEP_CONTENT_ROUTES = {
     en: 'https://nordicrate.com/loans/personal',
     et: 'https://nordicrate.com/et/tarbimislaen',
     fi: 'https://nordicrate.com/fi/kulutusluotto',
+  },
+  // Henuz yalnizca EN — ET/FI lokalizasyonu (ceviri degil, pazar-dogru adaptasyon)
+  // sonraki turda; hreflang eksik dille yanlis eslesme yapmasin diye tek dil.
+  deposits: {
+    en: 'https://nordicrate.com/deposits',
   },
 } as const;

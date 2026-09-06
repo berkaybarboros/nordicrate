@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import DepositsContent from "./DepositsContent";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT } from "@/lib/deep-content";
+
+const deep = DEEP_CONTENT.deposits.en;
 
 export const metadata: Metadata = {
   // SERP tur 2 (2026-08-05): sorgu dili "deposit rates estonia" — "Time Deposits"
@@ -104,6 +110,11 @@ export default function DepositsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <DepositsContent />
+      {/* 2026-09-06: sayfa yalnizca filtre + kart listesiydi (ince icerik).
+          89 sayfa indeksli ama organik trafik yok — sorun indeksleme degil
+          siralama. Semantik govde + FAQ eklendi; FAQPage JSON-LD ayrica basiliyor. */}
+      <DeepContentBlock content={deep} />
+      <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </>
   );
 }

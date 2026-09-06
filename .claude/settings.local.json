@@ -131,7 +131,11 @@
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__search_executions",
       "Bash(python - C:/Users/berka/.claude/projects/C--Users-berka-OneDrive-Masa-st--Claude-Code-Project-HangiKredi-CLON--claude-worktrees-great-hugle-fdb449/69fc7faa-4ace-4754-b634-2c63dcf9eea6/tool-results/mcp-6be522ca-86b5-4e80-8d21-b464f91c9e09-get_execution-1788169502704.txt)",
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_workflow_details",
-      "Bash(awk 'NR>=206 && NR<=300' app/deposits/DepositsContent.tsx)"
+      "Bash(awk 'NR>=206 && NR<=300' app/deposits/DepositsContent.tsx)",
+      "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_node_types",
+      "mcp__848d0c6f-8f91-43cc-9da6-ef7327f24b06__match-prospects",
+      "Bash(sort -t' ' -k2 -rn)",
+      "Bash(curl -s \"https://nordicrate.com/api/deposits\")"
     ]
   }
 }
