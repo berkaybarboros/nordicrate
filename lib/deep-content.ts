@@ -635,6 +635,165 @@ const DEPOSITS_EN: DeepContent = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// CAR LOANS — Estonia (EN)
+// Blog tarafinda 'car-loan-vs-leasing-estonia' yayinlandi; bu sayfa onun
+// kategori ebeveyni. Ayrica /insurance/casco ile capraz baglanir — krediyi
+// zorunlu Casco'ya baglayan sey kredi sozlesmesinin kendisi.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CAR_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Car finance in Estonia: loan, leasing and hire purchase compared',
+  metaTitle: 'Car Loans Estonia: Loan vs Leasing Compared',
+  metaDescription:
+    'Car loan, leasing or hire purchase in Estonia: who owns the car, what the lender requires, why Casco becomes compulsory, and how to compare the real cost.',
+  intro:
+    'Estonian lenders offer three ways to finance a car: a car loan secured against the vehicle, leasing (kapitalirent or kasutusrent), and hire purchase. The practical difference is ownership and what happens at the end of the term. All three normally require comprehensive Casco insurance for as long as the finance runs.',
+  sections: [
+    {
+      h2: 'Loan, leasing or hire purchase — what actually differs',
+      body: [
+        'With a car loan you are the owner from day one and the vehicle serves as security for the debt. With finance leasing (kapitalirent) the leasing company owns the car during the term and ownership transfers to you with the final payment. With operating leasing (kasutusrent) you never own it: you pay for use over an agreed period and mileage, then return the car or buy it at a pre-agreed residual value.',
+        'That ownership question decides almost everything else. Who registers as owner, who carries the depreciation risk, whether you can sell the car mid-term, and what happens if you want out early all follow from it. Operating leasing tends to show the lowest monthly figure precisely because you are not buying the asset — you are renting the part of it you consume.',
+        'For a business, the choice also has tax consequences in Estonia, including how VAT is treated and whether the car is used privately as well. That is genuinely accountant territory rather than comparison-site territory, and the right answer differs between a sole proprietor and a company with several vehicles. What we can flag is that the cheapest headline monthly payment is rarely the cheapest total.',
+      ],
+    },
+    {
+      h2: 'What lenders check before approving car finance',
+      body: [
+        'The vehicle matters as much as the borrower. Lenders set limits on how old a car may be at the start and, more importantly, at the end of the finance term — a term that would leave you owning a fifteen-year-old car is often refused regardless of your income. Mileage, make and whether the car comes from a dealer or a private seller all affect both approval and rate.',
+        'On the borrower side the checks mirror any consumer credit: verifiable income, existing debt obligations, and your record in the credit register. Estonia applies affordability rules that cap total monthly repayments against net income, and lenders stress-test against a higher rate than today. A payment default in the register is usually decisive rather than merely negative.',
+        'Foreign applicants run into the same pattern as elsewhere in Estonian lending: the product is not the obstacle, the file is. A personal ID code, an Estonian bank account into which salary arrives, and a residence permit valid well beyond the finance term make the difference. If the permit expires before the loan does, expect the term to be cut to fit — the same constraint we cover in [personal loans](/loans/personal).',
+      ],
+    },
+    {
+      h2: 'Why Casco insurance is part of the deal',
+      body: [
+        'A financed car is the lender security, so virtually every car loan and lease contract requires comprehensive Casco cover for the full term. This is a contractual obligation, not a legal one — mandatory liability insurance (liikluskindlustus) is what the law requires, and it never repairs your own vehicle.',
+        'Read what the contract actually demands. Some agreements specify a maximum excess, forbid certain policy exclusions, or require the lender to be named as beneficiary in a total-loss claim. Buying the cheapest Casco you can find and then discovering it does not satisfy the finance contract is a common and avoidable problem.',
+        'Budget for it as part of the monthly cost rather than as an extra. An offer that looks cheaper on interest can lose that advantage once a higher required insurance level is priced in. We compare motor policies separately at [Casco insurance](/insurance/casco).',
+      ],
+    },
+    {
+      h2: 'Comparing the real cost',
+      body: [
+        'Compare on APRC rather than the nominal interest rate. APRC folds in the contract fee, any arrangement charge and the payment schedule, which is why two offers with the same advertised rate can differ in what they actually cost. Advertised rates presented as from a certain percentage are best-case outcomes offered to the strongest applicants.',
+        'Then look at the down payment and, for leasing, the residual value. A large residual keeps the monthly payment low and concentrates the cost at the end, where you either pay it, refinance it, or hand the car back. Neither structure is a trick — but comparing a loan against a lease purely on monthly payment compares two different things.',
+        'Finally check the exit terms before you need them: early settlement rights, whether you can sell the car and clear the debt mid-term, and what an early lease termination costs. Our [car loan comparison](/loans/car) shows what Estonian lenders publish today, and the [loan calculator](/loan-calculator) lets you test how term length changes both the monthly figure and the total.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'Is a car loan or leasing cheaper in Estonia?',
+      a: 'Leasing usually shows a lower monthly payment, but that is because you are financing less of the car — with operating leasing you never own it. Compare total cost over the full term including any residual value, not the monthly figure. For a business the tax treatment can change the answer entirely.',
+    },
+    {
+      q: 'Do I need Casco insurance for a financed car?',
+      a: 'In practice yes. Mandatory liability insurance is the legal minimum, but lenders and leasing companies require comprehensive Casco for as long as the finance runs, because the vehicle is their security. Check the contract for required cover levels and maximum excess before buying a policy.',
+    },
+    {
+      q: 'Can I get car finance in Estonia as a foreigner?',
+      a: 'Yes, if your file supports it: an Estonian personal ID code, verifiable local income, a bank account here, and a residence permit valid beyond the finance term. If the permit expires first, lenders typically shorten the term to fit rather than refuse outright.',
+    },
+    {
+      q: 'Does the age of the car affect approval?',
+      a: 'Significantly. Lenders limit how old the vehicle may be both at the start and at the end of the term, so an older car often forces a shorter term or a refusal regardless of your income. Mileage and whether you buy from a dealer or privately also affect the offer.',
+    },
+    {
+      q: 'Can I repay car finance early?',
+      a: 'Consumer credit in Estonia carries a right to early repayment, though the lender may charge compensation within limits set by law. Leasing is contractual and early termination terms vary more widely — check that clause before signing, since it decides how easily you can change car mid-term.',
+    },
+  ],
+  related: [
+    { label: 'Compare car loans', href: '/loans/car' },
+    { label: 'Casco insurance', href: '/insurance/casco' },
+    { label: 'Personal loans', href: '/loans/personal' },
+    { label: 'Loan calculator', href: '/loan-calculator' },
+    { label: 'Our methodology', href: '/methodology' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUSINESS LOANS — Estonia (EN)
+// e-resident acisi burada en degerli: sirket kurmak kolay, KREDI almak degil.
+// Blog kuyrugunda 'business-loan-e-resident-company' var — capraz baglanir.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BUSINESS_EN: DeepContent = {
+  locale: 'en',
+  h1: 'Business loans in Estonia: what lenders fund and what they require',
+  metaTitle: 'Business Loans Estonia: Requirements & Options',
+  metaDescription:
+    'Business finance in Estonia: working capital, investment loans, leasing and factoring, what banks require from an OU, and where e-resident companies hit limits.',
+  intro:
+    'Estonian companies finance themselves through bank loans, leasing, factoring and state-backed instruments. Banks lend against demonstrable cash flow and a real connection to Estonia, which is why incorporating an OU is straightforward while getting credit for it is not. What you can borrow depends less on the legal form than on substance.',
+  sections: [
+    {
+      h2: 'The main forms of business finance',
+      body: [
+        'A working capital loan or overdraft bridges the gap between paying suppliers and being paid by customers. It is sized against turnover and is the most common first facility for a trading company. An investment loan funds a specific asset over a longer term and is usually secured against that asset or against property.',
+        'Leasing finances equipment and vehicles without tying up cash, with the lessor owning the asset during the term. Factoring is different in kind: you sell your outstanding invoices to release the cash early. For a company whose problem is late-paying customers rather than profitability, factoring often fits better than a loan, because it scales with your invoicing rather than adding fixed debt.',
+        'Alongside commercial lending, Estonia runs state-backed support through KredEx, now part of EIS (Ettevõtluse ja Innovatsiooni SA). These instruments typically work as a guarantee that reduces the collateral a bank needs rather than as cheap money handed out directly. They widen who qualifies rather than replacing the bank.',
+      ],
+    },
+    {
+      h2: 'What banks actually require from an OU',
+      body: [
+        'The first thing a bank looks for is trading history. A company with several years of filed annual reports and steady bank turnover is assessed on those numbers. A newly registered company has none of that, so the assessment shifts onto the owners — personal guarantees, personal assets, and their track record become the deciding factors.',
+        'Second is substance in Estonia: where management actually sits, whether there are employees here, whether revenue passes through an Estonian account, and whether the business has real operations rather than a registered address. Banks are explicit that a registered address and a director abroad is a thin file, largely because anti-money-laundering obligations put the burden of proof on them.',
+        'Third is collateral. Unsecured business lending exists but is limited and priced accordingly; most meaningful facilities are secured against property, equipment, receivables or a personal guarantee. This is where an EIS guarantee can change the outcome — not by lowering the rate but by covering part of the collateral gap that would otherwise end the conversation.',
+      ],
+    },
+    {
+      h2: 'Where e-resident companies hit the wall',
+      body: [
+        'e-Residency gives you a digital identity to run an Estonian company remotely. It does not give you residency, and it does not give you banking. Founders regularly discover this order of operations only after incorporating, which is why the gap deserves stating plainly: company formation is easy, credit is not.',
+        'For an e-resident OU with no local director, no employees here and revenue billed abroad, traditional bank credit is realistically out of reach. That is not a policy against e-residents; it is the same substance test applied consistently. Many such companies operate through fintech payment accounts rather than a traditional bank, and those providers generally offer payments rather than lending.',
+        'The routes that do work tend to be revenue-based: factoring against invoices to creditworthy customers, equipment leasing where the asset itself is the security, or fintech credit priced on transaction history. If bank credit matters to your plan, the practical path is building substance first — a local director or employee, an Estonian account with genuine flow, filed reports — and then applying. Our [business loan comparison](/loans/business) shows what is currently on offer.',
+      ],
+    },
+    {
+      h2: 'Preparing an application that survives review',
+      body: [
+        'Have the numbers ready before you approach anyone: recent annual reports, current year figures, bank statements showing turnover, your order book or contracts, and a clear statement of what the money is for and how it will be repaid. Vague purposes get vague answers.',
+        'Be precise about the amount and the term. Asking for more than the cash flow supports invites refusal; asking for a term that outlives the asset you are buying invites the same. Lenders are matching repayment capacity to a schedule, and an application that has already done that arithmetic is easier to say yes to.',
+        'Approach more than one lender. Banks differ in sector appetite, and a refusal from one is not a verdict from the market — smaller banks and specialist financiers often take on files that larger ones decline. Also ask each lender to put the full cost in writing, including arrangement fees and any collateral registration costs, so you are comparing complete numbers rather than headline rates.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'Can an e-resident company get a bank loan in Estonia?',
+      a: 'Rarely without local substance. Banks assess where management sits, whether there are employees in Estonia, and whether revenue flows through an Estonian account. e-Residency provides a digital identity, not residency or banking access. Revenue-based options such as factoring or equipment leasing are more realistic starting points.',
+    },
+    {
+      q: 'What does a bank require from a newly registered OU?',
+      a: 'With no trading history, the assessment moves to the owners: personal guarantees, personal assets and their track record. Expect to provide a business plan, evidence of contracts or orders, and to secure the facility. Several years of filed reports and steady turnover change this picture substantially.',
+    },
+    {
+      q: 'Does KredEx still exist?',
+      a: 'KredEx merged into Enterprise Estonia and the current entity is EIS (Ettevotluse ja Innovatsiooni SA). Its instruments generally work as guarantees that reduce the collateral a bank requires, widening who qualifies, rather than as direct cheap lending. Check current eligibility with EIS before assuming you qualify.',
+    },
+    {
+      q: 'Is factoring better than a loan?',
+      a: 'It depends on the problem. If your company is profitable but waiting on late-paying customers, factoring releases cash tied up in invoices and scales with your invoicing. If you need to fund an asset or bridge a longer gap, a loan or lease fits better. Factoring costs are tied to invoice value and payment terms.',
+    },
+    {
+      q: 'Do I need collateral for a business loan?',
+      a: 'For most meaningful facilities, yes — property, equipment, receivables or a personal guarantee. Unsecured business lending exists but is limited in size and priced for the risk. An EIS guarantee can cover part of a collateral gap, which is often what makes an otherwise viable application workable.',
+    },
+  ],
+  related: [
+    { label: 'Compare business loans', href: '/loans/business' },
+    { label: 'Startup programs and grants', href: '/programs' },
+    { label: 'Business banking overview', href: '/business' },
+    { label: 'Personal loans', href: '/loans/personal' },
+    { label: 'Our methodology', href: '/methodology' },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const DEEP_CONTENT = {
   mortgage: { en: MORTGAGE_EN, et: MORTGAGE_ET, fi: MORTGAGE_FI },
@@ -642,6 +801,8 @@ export const DEEP_CONTENT = {
   // 2026-09-06: kategori sayfalarinin cogu 'ince icerik'ti (sadece filtre + kart).
   // 89 sayfa indeksli ama trafik yok -> sorun indeksleme degil siralama.
   deposits: { en: DEPOSITS_EN },
+  car: { en: CAR_EN },
+  business: { en: BUSINESS_EN },
 } as const;
 
 /** hreflang eşleme — her içerik setinin dil-URL haritası */
@@ -660,5 +821,11 @@ export const DEEP_CONTENT_ROUTES = {
   // sonraki turda; hreflang eksik dille yanlis eslesme yapmasin diye tek dil.
   deposits: {
     en: 'https://nordicrate.com/deposits',
+  },
+  car: {
+    en: 'https://nordicrate.com/loans/car',
+  },
+  business: {
+    en: 'https://nordicrate.com/loans/business',
   },
 } as const;

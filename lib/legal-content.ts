@@ -52,7 +52,7 @@ We collect only the data described below. We do not require an account for core 
 ### d) Partner / B2B contact form
 
 - **Data:** name, business email, company details, message content.
-- **Purpose:** responding to partnership enquiries (contact: partners@nordicrate.com).
+- **Purpose:** responding to partnership enquiries (contact: info@nordicrate.com).
 - **Legal basis:** legitimate interest / pre-contractual steps (Art. 6(1)(b) and (f)).
 
 ### e) Outbound affiliate link clicks (/go redirects)
@@ -170,7 +170,7 @@ We may update these Terms at any time; the current version is always available o
 
 ## 11. Contact
 
-General: info@nordicrate.com — Partnerships: partners@nordicrate.com`;
+General and partnerships: info@nordicrate.com`;
 
 const COOKIES = String.raw`# Cookie Policy
 
@@ -224,8 +224,7 @@ Last updated: 27 July 2026
 
 **Contact:**
 
-- General enquiries and privacy requests: info@nordicrate.com
-- Partnerships and B2B: partners@nordicrate.com
+- General enquiries, partnerships and privacy requests: info@nordicrate.com
 
 **Responsible for content:** Berkay Barboros
 

@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import CarLoansContent from "./CarLoansContent";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT } from "@/lib/deep-content";
+
+const deep = DEEP_CONTENT.car.en;
 
 export const metadata: Metadata = {
   title: "Car Loans Estonia | Finance New & Used Vehicles from 8.9%",
@@ -62,6 +68,11 @@ export default function CarLoanPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <CarLoansContent />
+      {/* 2026-09-06: sayfa yalnizca filtre + kart listesiydi (ince icerik).
+          GSC'de 89 sayfa indeksli ama organik trafik yok — sorun indeksleme
+          degil siralama. Semantik govde + FAQ + FAQPage JSON-LD eklendi. */}
+      <DeepContentBlock content={deep} />
+      <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </>
   );
 }

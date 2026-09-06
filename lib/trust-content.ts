@@ -37,8 +37,7 @@ NordicRate was founded in 2026 by **Berkay Barboros**, a growth and performance-
 
 ## Contact
 
-- General: **info@nordicrate.com**
-- Partnerships and B2B: **partners@nordicrate.com**`;
+- General and partnerships: **info@nordicrate.com**`;
 
 const HOW_WE_MAKE_MONEY = String.raw`# How We Make Money
 

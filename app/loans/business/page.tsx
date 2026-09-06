@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import BusinessLoansContent from "./BusinessLoansContent";
+import DeepContentBlock from "@/components/seo/DeepContentBlock";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildFaqJsonLd } from "@/lib/seo";
+import { DEEP_CONTENT } from "@/lib/deep-content";
+
+const deep = DEEP_CONTENT.business.en;
 
 export const metadata: Metadata = {
   title: "Business Loans Estonia | SME Financing | NordicRate",
@@ -47,6 +53,11 @@ export default function BusinessLoansPage() {
       <Suspense>
         <BusinessLoansContent />
       </Suspense>
+      {/* 2026-09-06: sayfa yalnizca filtre + kart listesiydi (ince icerik).
+          GSC'de 89 sayfa indeksli ama organik trafik yok — sorun indeksleme
+          degil siralama. Semantik govde + FAQ + FAQPage JSON-LD eklendi. */}
+      <DeepContentBlock content={deep} />
+      <JsonLd data={buildFaqJsonLd(deep.faqs)} />
     </>
   );
 }
