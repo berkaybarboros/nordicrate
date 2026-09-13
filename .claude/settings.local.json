@@ -137,7 +137,8 @@
       "Bash(sort -t' ' -k2 -rn)",
       "Bash(curl -s \"https://nordicrate.com/api/deposits\")",
       "mcp__b51c80ae-cc92-4595-bad3-2b97295af4d6__subscription-info-limits-and-usage",
-      "mcp__b51c80ae-cc92-4595-bad3-2b97295af4d6__public-domain-rating-free"
+      "mcp__b51c80ae-cc92-4595-bad3-2b97295af4d6__public-domain-rating-free",
+      "mcp__GA4__get_property_schema"
     ]
   }
 }

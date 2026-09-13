@@ -107,6 +107,26 @@ export default async function CountryLoansPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Derin bolumler — 2026-09-13. Analitik trafigin kategori sayfalarina degil
+          ULKE sayfalarina geldigini gosterdi, ama burada yalnizca ~200 kelime metin
+          vardi. Her ulkenin kendine ozgu sistemi (Izlanda'da endeksli krediler,
+          Danimarka'da realkredit, Isvec'te amorteringskrav, Finlandiya'da pozitif
+          kredi kaydi) hicbir jenerik karsilastirma sayfasinda anlatilmiyor. */}
+      {landing.sections && landing.sections.length > 0 && (
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+          {landing.sections.map((sec) => (
+            <div key={sec.h2} className="mb-9">
+              <h2 className="text-xl font-extrabold text-slate-900 mb-3">{sec.h2}</h2>
+              <div className="space-y-3">
+                {sec.body.map((p, i) => (
+                  <p key={i} className="text-slate-600 leading-relaxed text-[15px]">{p}</p>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
       {/* Products */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <h2 className="text-2xl font-extrabold text-slate-900 mb-6">
