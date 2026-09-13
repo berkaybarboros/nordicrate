@@ -51,6 +51,83 @@ declare global {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+ * Trafik kaynağı (attribution)
+ *
+ * 2026-09-13: Kaynak HİÇ kaydedilmiyordu. 6 Eylül'de 6 kategori sayfasına derin
+ * içerik ekledik ve etkisini ölçmek istediğimizde ölçemedik — bir ziyaretçinin
+ * Google'dan mı, doğrudan mı, LinkedIn'den mi geldiğini bilmiyorduk. SEO ve
+ * dağıtım çalışmasının karşılığını görmek buna bağlı.
+ *
+ * İlk-dokunuş modeli: oturumun ilk sayfasındaki referrer/UTM saklanır ve o
+ * oturumun tüm event'lerine yazılır. Site içi gezinme kaynağı ezmez.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+type TrafficSource = 'organic' | 'social' | 'referral' | 'paid' | 'direct';
+
+interface Attribution {
+  source: TrafficSource;
+  /** Yönlendiren host ya da utm_source — 'google', 'linkedin.com', 'direct' */
+  origin: string;
+  campaign?: string;
+  medium?: string;
+}
+
+const SEARCH_HOSTS = /(^|\.)(google|bing|duckduckgo|yahoo|yandex|ecosia|brave|baidu|neeva)\./i;
+const SOCIAL_HOSTS = /(^|\.)(linkedin|lnkd|x|twitter|t|facebook|fb|instagram|reddit|news\.ycombinator|t\.me|telegram|whatsapp|youtube)\./i;
+
+function classify(): Attribution {
+  const params = new URLSearchParams(window.location.search);
+  const utmSource = params.get('utm_source');
+  const utmMedium = params.get('utm_medium');
+  const campaign = params.get('utm_campaign') ?? undefined;
+
+  // UTM her zaman referrer'ı ezer — kampanya linki kasıtlı etiketlenmiştir
+  if (utmSource) {
+    const medium = (utmMedium ?? '').toLowerCase();
+    const paid = /cpc|ppc|paid|ads?$/.test(medium);
+    const social = /social|linkedin|twitter|facebook|reddit/.test(medium + utmSource.toLowerCase());
+    return {
+      source: paid ? 'paid' : social ? 'social' : medium === 'organic' ? 'organic' : 'referral',
+      origin: utmSource.toLowerCase().slice(0, 60),
+      campaign,
+      medium: medium || undefined,
+    };
+  }
+
+  const ref = document.referrer;
+  if (!ref) return { source: 'direct', origin: 'direct' };
+
+  let host = '';
+  try {
+    host = new URL(ref).hostname.toLowerCase();
+  } catch {
+    return { source: 'direct', origin: 'direct' };
+  }
+
+  // Kendi sitemizden gelen gezinme kaynak değildir
+  if (host === window.location.hostname) return { source: 'direct', origin: 'internal' };
+
+  if (SEARCH_HOSTS.test(host)) return { source: 'organic', origin: host };
+  if (SOCIAL_HOSTS.test(host)) return { source: 'social', origin: host };
+  return { source: 'referral', origin: host };
+}
+
+/** Oturumun ilk kaynağı — sonraki event'lerde yeniden hesaplanmaz */
+function getAttribution(): Attribution | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = sessionStorage.getItem('nr_attr');
+    if (cached) return JSON.parse(cached) as Attribution;
+    const attr = classify();
+    sessionStorage.setItem('nr_attr', JSON.stringify(attr));
+    return attr;
+  } catch {
+    // sessionStorage kapalı olabilir (gizli sekme, katı gizlilik ayarı)
+    try { return classify(); } catch { return null; }
+  }
+}
+
 export async function track(
   eventType: EventType,
   payload: TrackPayload = {}
@@ -67,11 +144,14 @@ export async function track(
     const extras = Object.fromEntries(
       Object.entries(rest).map(([k, v]) => [`nr_${k}`, v ?? null])
     );
+    const attr = getAttribution();
     window.dataLayer?.push({
       event: `nr_${eventType}`,
       nr_product_id: product_id ?? null,
       nr_product_type: product_type ?? null,
       nr_page: page ?? window.location.pathname,
+      nr_source: attr?.source ?? null,
+      nr_origin: attr?.origin ?? null,
       ...extras,
     });
   } catch { /* analytics asla UI'yı bozmaz */ }
@@ -86,7 +166,8 @@ export async function track(
       page:         page ?? (typeof window !== 'undefined' ? window.location.pathname : null),
       product_id:   product_id ?? null,
       product_type: product_type ?? null,
-      metadata:     Object.keys(rest).length > 0 ? rest : {},
+      // Kaynak her event'e yazilir ki funnel adimlarini kanala gore kirabilelim
+      metadata:     { ...rest, ...(getAttribution() ?? {}) },
     });
   } catch {
     // Tracking hataları UI'yı bozmamalı — sessizce geç
@@ -127,6 +208,7 @@ async function flushProductViews(): Promise<void> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     const sid = getSessionId();
+    const attr = getAttribution();
     await supabase.from('events').insert(
       batch.map((v) => ({
         session_id:   sid,
@@ -135,7 +217,7 @@ async function flushProductViews(): Promise<void> {
         page:         v.page,
         product_id:   v.product_id,
         product_type: v.product_type,
-        metadata:     {},
+        metadata:     attr ?? {},
       }))
     );
   } catch {

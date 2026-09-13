@@ -28,6 +28,8 @@ interface EventRow {
   created_at: string;
   /** Bot ayrimi icin: /go gateway sid gelmediginde 'go-<ts>' uretiyordu */
   session_id: string | null;
+  /** 2026-09-13'ten beri trafik kaynagi burada: { source, origin, campaign } */
+  metadata: { source?: string; origin?: string; campaign?: string } | null;
 }
 
 interface LeadRow {
@@ -91,7 +93,7 @@ async function loadDataInner() {
       .limit(200),
     client
       .from('events')
-      .select('event_type, page, product_type, created_at, session_id')
+      .select('event_type, page, product_type, created_at, session_id, metadata')
       .gte('created_at', since30d)
       .order('created_at', { ascending: false })
       .limit(2000),
@@ -150,6 +152,25 @@ export default async function AdminDashboard() {
   const applyClickRows = events.filter((e) => e.event_type === 'apply_click');
   const applyClicks = applyClickRows.filter((e) => !isBotSessionId(e.session_id)).length;
   const applyClicksBot = applyClickRows.length - applyClicks;
+
+  // 2026-09-13: Trafik kaynagi eklendi. Oncesinde bir ziyaretcinin Google'dan mi
+  // dogrudan mi geldigini bilmiyorduk, dolayisiyla SEO ve dagitim calismasinin
+  // karsiligini olcemiyorduk. Oturum bazinda sayilir (event bazinda degil) —
+  // cok sayfa gezen bir ziyaretci kanali sismesin.
+  const humanEvents = events.filter((e) => !isBotSessionId(e.session_id));
+  const sessionSource = new Map<string, { source: string; origin: string }>();
+  for (const e of humanEvents) {
+    if (!e.session_id || sessionSource.has(e.session_id)) continue;
+    const m = e.metadata;
+    if (m?.source) sessionSource.set(e.session_id, { source: m.source, origin: m.origin ?? '-' });
+  }
+  const sourceBreakdown = countBy(Array.from(sessionSource.values()), (v) => v.source);
+  const originBreakdown = countBy(
+    Array.from(sessionSource.values()).filter((v) => v.source !== 'direct'),
+    (v) => v.origin
+  ).slice(0, 8);
+  const attributedSessions = sessionSource.size;
+  const totalSessions = new Set(humanEvents.map((e) => e.session_id).filter(Boolean)).size;
   const findRateOpens = eventCounts.get('find_rate_open') ?? 0;
   const findRateSubmits = eventCounts.get('find_rate_submit') ?? 0;
   const recClicks = eventCounts.get('recommendation_click') ?? 0;
@@ -232,6 +253,64 @@ export default async function AdminDashboard() {
             <p className="text-xs text-slate-500 mt-1">{label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Trafik kaynagi — 2026-09-13'te eklendi. Oncesinde organik/dogrudan
+          ayrimi yapilamiyordu, dolayisiyla SEO calismasinin karsiligi olculemiyordu.
+          Oturum bazinda sayilir; kaynak yalnizca oturumun ILK sayfasindan alinir. */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="font-extrabold text-slate-900 mb-1">Traffic Source (30d)</h2>
+          <p className="text-xs text-slate-500 mb-4">
+            {attributedSessions} / {totalSessions} oturum etiketli
+            {attributedSessions < totalSessions && ' — etiketsizler 13 Eyl öncesinden'}
+          </p>
+          {sourceBreakdown.length === 0 ? (
+            <p className="text-sm text-slate-400">Henüz kaynak verisi yok.</p>
+          ) : (
+            <div className="space-y-3">
+              {sourceBreakdown.map(([src, n]) => {
+                const max = Math.max(...sourceBreakdown.map(([, v]) => v), 1);
+                return (
+                  <div key={src}>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-slate-600 capitalize">{src}</span>
+                      <span className="font-bold text-slate-900">
+                        {n}
+                        <span className="text-xs text-sky-600 ml-2">
+                          ({pct(n, attributedSessions)})
+                        </span>
+                      </span>
+                    </div>
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${src === 'organic' ? 'bg-emerald-500' : src === 'social' ? 'bg-violet-500' : 'bg-sky-500'}`}
+                        style={{ width: `${Math.max(2, (n / max) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="font-extrabold text-slate-900 mb-1">Top Referrers (30d)</h2>
+          <p className="text-xs text-slate-500 mb-4">Doğrudan trafik hariç</p>
+          {originBreakdown.length === 0 ? (
+            <p className="text-sm text-slate-400">Henüz yönlendiren yok.</p>
+          ) : (
+            <ul className="space-y-2">
+              {originBreakdown.map(([origin, n]) => (
+                <li key={origin} className="flex items-center justify-between text-sm">
+                  <span className="text-slate-600 truncate">{origin}</span>
+                  <span className="font-bold text-slate-900">{n}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       {/* Funnels */}
