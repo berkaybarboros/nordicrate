@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = (await req.json().catch(() => null)) as
-    | { id?: string; status?: string; note?: string }
+    | { id?: string; status?: string; note?: string; threadId?: string }
     | null;
   const id = body?.id;
   const next = body?.status;
@@ -85,6 +85,12 @@ export async function POST(req: NextRequest) {
   const patch: Record<string, unknown> = { status: next, notes, updated_at: stamp };
   // Takip beklemesi SON temastan sayilir; replied/closed damgayi tazelemez
   if (['contacted', 'followup1', 'followup2'].includes(next)) patch.contacted_at = stamp;
+
+  // Gonderim tespiti gonderdigimiz mailin thread id'sini iletir. Yanit kontrolu
+  // YALNIZCA bu thread uzerinden yapilir — domain bazli arama 2026-09-10'da
+  // LHV'nin borsa bultenini "yanit" sanip gercek bir partneri kaybettirmisti.
+  const threadId = clampString(body?.threadId ?? null, 120);
+  if (threadId) patch.outreach_thread_id = threadId;
 
   const { error } = await admin
     .from('partner_targets')

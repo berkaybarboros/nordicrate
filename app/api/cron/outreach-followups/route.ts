@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await admin
     .from('partner_targets')
-    .select('id, institution, country, email, email_type, status, draft_subject, contacted_at, notes')
+    .select('id, institution, country, email, email_type, status, draft_subject, contacted_at, notes, outreach_thread_id')
     .in('status', ['contacted', 'followup1'])
     .not('email', 'is', null)
     .order('priority', { ascending: true })
@@ -89,15 +89,25 @@ export async function GET(req: NextRequest) {
       const row = t as {
         id: string; institution: string; country: string; email: string;
         status: string; draft_subject: string | null; contacted_at: string;
+        outreach_thread_id: string | null;
       };
-      const emailDomain = row.email.split('@')[1] ?? '';
       return {
         id: row.id,
         institution: row.institution,
         country: row.country,
         email: row.email,
-        // n8n once bu domainden yanit var mi diye Gmail'de arar; varsa takip ETMEZ
-        replySearchQuery: `from:${emailDomain} newer_than:60d`,
+        // 2026-09-13: Onceki surum `from:<domain>` ile ariyordu. LHV Pank ile
+        // musteri iliskisi oldugu icin bankadan gelen gunluk borsa bulteni
+        // "yanit" sanildi, hedef replied isaretlendi ve takip KALICI bastirildi.
+        // Bir bankayla hesabi olan herkes o domainden mail alir; domain bazli
+        // arama bu is icin yapisal olarak yanlis.
+        //
+        // Tek guvenilir sinyal: bizim gonderdigimiz mailin thread'ine gelen cevap.
+        // threadId yoksa (elle gonderilmis eski kayitlar) yanit kontrolu ATLANIR
+        // ve hedef takip edilir — yanlis pozitif riski sifir, en kotu ihtimalle
+        // yanit vermis birine bir takip maili daha gider.
+        replyThreadId: row.outreach_thread_id,
+        checkReplies: Boolean(row.outreach_thread_id),
         currentStatus: row.status,
         nextStatus: NEXT_STATUS[row.status],
         originalSubject: row.draft_subject ?? `Partnership inquiry: ${row.institution} and NordicRate`,
