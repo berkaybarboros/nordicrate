@@ -113,6 +113,147 @@ const BANKS = [
   },
 ];
 
+/* ─────────────────────────────────────────────────────────────────────────
+ * MEVDUAT (2026-09-13)
+ *
+ * Neden: mevduat oranlari bu scraper'in kapsaminda degildi ve statik katalog
+ * gercegin ~2 kati cikti (LHV 12 ay sitede 4.1% / bankada 2.20%; Bigbank'in
+ * vadeli mevduat urunu hic yokken "4.3% Highest Rate" gosteriliyordu).
+ *
+ * Kredinin aksine mevduat VADE yapili — tek "from X%" yetmez. Tum hedef
+ * sayfalar 2026-09-13'te Firecrawl ile incelendi; tablo bicimleri farkli:
+ *   LHV       "12 months  2.20%  1.50%"      (EUR ilk sutun, USD ikinci)
+ *   Coop      "12-17months  2,25%"           (aralik, virgul ondalik)
+ *   SEB       "1 year2.20%22.30 EUR..."      (hesaplayici satiri, JS render)
+ *   Inbank    "12 months  2.50 %"            (% oncesi bosluk)
+ *   Swedbank  "12 months  2.20"              (% ISARETI YOK; ilk tablo EUR)
+ *   Citadele  "1.5 y.  2,20 %  2,50 %"       (yil kisaltmasi, ondalik yil)
+ * Hepsini tek satir ayristirici karsilar: satir BASINDA vade etiketi, ardindan
+ * ilk ondalik sayi. Ilk eslesme kazanir -> EUR tablosu / vade sonu faiz tablosu
+ * (her iki sayfada da ilk sirada) otomatik secilir.
+ *
+ * Elenenler: Bigbank (web'de vadeli mevduat urunu yok — urun katalogu yalnizca
+ * cari hesap listeliyor), Luminor (Cloudflare tum otomasyonu blokluyor, asmayiz).
+ * ───────────────────────────────────────────────────────────────────────── */
+
+const DEPOSIT_TERMS = [1, 3, 6, 9, 12, 18, 24, 36, 48, 60];
+const DEPOSIT_BAND = [0.5, 6]; // < 0.5 genelde "< 1 month 0.10" / USD 0.00 satirlari
+
+const DEPOSIT_BANKS = [
+  { bankId: 'lhv',         url: 'https://www.lhv.ee/en/fixed-term-deposit', waitMs: 3000 },
+  { bankId: 'coop',        url: 'https://www.cooppank.ee/en/private/growing-funds/deposit-interests', waitMs: 3000 },
+  // SEB hesaplayicisi oranlari DOM'a degil bir CSV'den okuyor ("gun; oran" satirlari);
+  // headless tarayicida hesaplayici render olmuyor (innerText bos). Sayfanin kendi
+  // kullandigi dosyayi okuyoruz. robots.txt: /sites/default/files/ icin hem Disallow
+  // hem Allow var — RFC 9309'a gore esit uzunlukta cakismada Allow kazanir (izinli).
+  // 2026-09-13 dogrulamasi: CSV degerleri sayfadaki hesaplayici tablosuyla birebir.
+  { bankId: 'seb',         url: 'https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit',
+    csvUrl: 'https://www.seb.ee/sites/default/files/calc/intress/eur-privi.csv' },
+  { bankId: 'inbank',      url: 'https://www.inbank.ee/en/deposit', waitMs: 5000 },
+  // SPA; ilk tablo EUR, ardindan USD/GBP/SEK/NOK/CAD — ilk-eslesme-kazanir bunu cozer
+  { bankId: 'swedbank',    url: 'https://www.swedbank.ee/private/home/more/pricesrates/interests?language=ENG', waitMs: 8000 },
+  // Ilk tablo vade-sonu faiz; ikinci tablo aylik odeme (daha dusuk) — ilk kazanir
+  { bankId: 'citadele-ee', url: 'https://www.citadele.ee/en/private/savings/rates/', waitMs: 4000 },
+];
+
+// Satir basinda vade etiketi: "12 months", "12-17months", "60-months", "1 y.", "1.5 y.", "3 kuud"
+const TERM_LINE = /^\s*(\d{1,3}(?:[.,]5)?)\.?\s*(?:[-–]\s*(\d{1,3}))?\s*-?\s*(months?|mo\.?|m\.|kuud?|kuu|years?|y\.|aastat?)(?![a-z])/i;
+// Yatay tablo baslik hucresi: "1 m." / "9. m." / "1.5 y." / "12 months"
+const TERM_CELL = /^(\d{1,3}(?:[.,]5)?)\.?\s*(months?|m\.|kuud?|years?|y\.|aastat?)$/i;
+
+function cellToMonths(cell) {
+  const m = TERM_CELL.exec(cell.trim());
+  if (!m) return null;
+  const n = parseFloat(m[1].replace(',', '.'));
+  return Math.round(/^(y|year|aasta)/i.test(m[2]) ? n * 12 : n);
+}
+const FIRST_DECIMAL = /(\d{1,2}[.,]\d{1,3})\s*%?/;
+
+/** Sayfa metninden vade->oran haritasi. Bulunamazsa bos obje. */
+function extractDepositRates(text) {
+  const rates = {};
+  const used = [];
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.replace(/\s+/g, ' ').trim();
+    if (!line || line.includes('<')) continue; // "< 1 month 0.10" gecelik/kisa vade satiri
+    const m = TERM_LINE.exec(line);
+    if (!m) continue;
+
+    const a = parseFloat(m[1].replace(',', '.'));
+    const b = m[2] ? parseFloat(m[2]) : null;
+    const isYear = /^(y|year|aasta)/i.test(m[3]);
+    const from = Math.round(isYear ? a * 12 : a);
+    const to = b != null ? Math.round(isYear ? b * 12 : b) : from;
+
+    const rest = line.slice(m[0].length);
+    const r = FIRST_DECIMAL.exec(rest);
+    if (!r) continue;
+    const value = parseFloat(r[1].replace(',', '.'));
+    if (!Number.isFinite(value) || value < DEPOSIT_BAND[0] || value > DEPOSIT_BAND[1]) continue;
+
+    let hit = false;
+    for (const t of DEPOSIT_TERMS) {
+      if (t >= from && t <= to && rates[t] == null) {
+        rates[t] = value;
+        hit = true;
+      }
+    }
+    if (hit) used.push(line.slice(0, 60));
+  }
+
+  // YATAY TABLO (Citadele): baslik satirinda vadeler, alttaki "100 EUR" satirinda oranlar.
+  // Masaustunde dikey kopya gizli oldugu icin innerText yalnizca yatayi goruyor.
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const cells = lines[i].split('\t');
+    if (cells.length < 4) continue;
+    const terms = cells.map((c) => cellToMonths(c));
+    if (terms.filter((t) => t != null).length < 3) continue;
+    // Baslik bulundu — ilk EUR satirini ara (en fazla 3 satir asagida)
+    for (let j = i + 1; j <= i + 3 && j < lines.length; j++) {
+      const vals = lines[j].split('\t');
+      if (vals.length !== cells.length || !/EUR/i.test(vals[0])) continue;
+      for (let k = 0; k < cells.length; k++) {
+        const t = terms[k];
+        if (t == null || !DEPOSIT_TERMS.includes(t) || rates[t] != null) continue;
+        const r = FIRST_DECIMAL.exec(vals[k]);
+        if (!r) continue;
+        const v = parseFloat(r[1].replace(',', '.'));
+        if (v >= DEPOSIT_BAND[0] && v <= DEPOSIT_BAND[1]) rates[t] = v;
+      }
+      used.push(lines[j].replace(/\s+/g, ' ').slice(0, 80));
+      break;
+    }
+    if (Object.keys(rates).length >= 4) break; // ilk (vade-sonu) tablo yeterli
+  }
+
+  return { rates, snippet: used.slice(0, 12).join(' | ') };
+}
+
+/** SEB tipi "gun; oran" CSV. Yalnizca standart gun sayilari kanonik vadeye eslenir. */
+const DAYS_TO_TERM = { 30: 1, 90: 3, 180: 6, 270: 9, 365: 12, 545: 18, 548: 18, 730: 24, 1095: 36, 1460: 48, 1825: 60 };
+function parseDaysCsv(body) {
+  const rates = {};
+  const used = [];
+  for (const line of body.split(/\r?\n/)) {
+    const m = /^\s*(\d{1,4})\s*;\s*(\d{1,2}[.,]\d{1,3})\s*$/.exec(line);
+    if (!m) continue;
+    const term = DAYS_TO_TERM[Number(m[1])];
+    const v = parseFloat(m[2].replace(',', '.'));
+    if (!term || v < DEPOSIT_BAND[0] || v > DEPOSIT_BAND[1] || rates[term] != null) continue;
+    rates[term] = v;
+    used.push(line.trim());
+  }
+  return { rates, snippet: used.join(' | ') };
+}
+
+/** 12 ay dahil en az 4 vade yoksa sayfa yanlis/degismis kabul edilir */
+function depositParseOk(rates) {
+  return Object.keys(rates).length >= 4 && rates[12] != null;
+}
+
+const MIN_AMOUNT = /minimum(?:\s+(?:term\s+)?deposit)?(?:\s+amount)?(?:\s+is)?[^\d€]{0,20}(?:€\s*)?(\d{2,6})\s*(?:€|EUR|eur)/i;
+
 const RATE_PATTERNS = [
   /interest(?:\s+rate)?[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
   /intress[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
@@ -186,6 +327,82 @@ async function insertRow(url, key, row) {
   }
 }
 
+async function insertDepositRow(url, key, row) {
+  const res = await fetch(`${url}/rest/v1/scraped_deposit_rates`, {
+    method: 'POST',
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(row),
+  });
+  if (!res.ok) {
+    throw new Error(`Supabase deposit insert: HTTP ${res.status} — ${await res.text()}`);
+  }
+}
+
+async function scrapeDeposits(page, url, key, dryRun) {
+  let ok = 0;
+  for (const bank of DEPOSIT_BANKS) {
+    try {
+      console.log(`[scraper] deposit/${bank.bankId} → ${bank.csvUrl ?? bank.url}`);
+      let text;
+      let parsed;
+      if (bank.csvUrl) {
+        // Dogrudan cekim her yoldan kesiliyor: Node fetch "fetch failed",
+        // page.request "ECONNRESET" (WAF tarayici disi TLS'i reddediyor), goto ise
+        // dosyayi indirme olarak aciyor. Calisan tek yol: urun sayfasini acmak ve
+        // SAYFANIN KENDI yaptigi CSV istegini dinlemek — bir ziyaretcinin
+        // tarayicisinin yuklediginden fazlasini istemiyoruz.
+        const csvName = bank.csvUrl.split('/').pop();
+        const csvResponse = page.waitForResponse(
+          (r) => r.url().includes(csvName) && r.status() < 400,
+          { timeout: 45_000 },
+        );
+        await page.goto(bank.url, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+        const resp = await csvResponse;
+        text = await resp.text();
+        parsed = parseDaysCsv(text);
+      } else {
+        const resp = await page.goto(bank.url, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+        if (resp && resp.status() >= 400) throw new Error(`HTTP ${resp.status()} — URL degismis olabilir`);
+        await page.waitForTimeout(bank.waitMs ?? 3000);
+        text = await page.evaluate(() => document.body.innerText);
+        parsed = extractDepositRates(text);
+      }
+
+      const { rates, snippet } = parsed;
+      const parseOk = depositParseOk(rates);
+      const minM = bank.csvUrl ? null : MIN_AMOUNT.exec(text);
+      const minAmount = minM ? Number(minM[1]) : null;
+
+      if (!dryRun) {
+        await insertDepositRow(url, key, {
+          bank_id: bank.bankId,
+          rates,
+          min_amount: minAmount,
+          source_url: bank.url,
+          raw_snippet: parseOk ? snippet : text.slice(0, 400),
+          parse_ok: parseOk,
+        });
+      }
+
+      if (parseOk) {
+        ok++;
+        console.log(`[scraper] OK — ${JSON.stringify(rates)}${minAmount ? ` (min ${minAmount} EUR)` : ''}`);
+      } else {
+        console.warn(`[scraper] DEPOSIT PARSE FAILED — ${Object.keys(rates).length} vade bulundu, 12 ay: ${rates[12] ?? 'yok'}`);
+      }
+    } catch (err) {
+      console.error(`[scraper] ERROR deposit/${bank.bankId}:`, err instanceof Error ? err.message : err);
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  return { ok, total: DEPOSIT_BANKS.length };
+}
+
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -199,7 +416,10 @@ async function main() {
   let total = 0;
   let failures = 0;
 
-  for (const bank of BANKS) {
+  // --deposits-only: yalnizca mevduat (manuel test / ayri calistirma icin)
+  const depositsOnly = process.argv.includes('--deposits-only');
+
+  for (const bank of depositsOnly ? [] : BANKS) {
     for (const target of bank.targets) {
       total++;
       try {
@@ -251,9 +471,12 @@ async function main() {
     }
   }
 
+  const dep = await scrapeDeposits(page, url, key, dryRun);
+
   await browser.close();
-  console.log(`[scraper] Done — ${total - failures}/${total} targets OK`);
-  process.exit(failures === total ? 1 : 0);
+  console.log(`[scraper] Done — loans ${total - failures}/${total} OK, deposits ${dep.ok}/${dep.total} OK`);
+  // Tamamen basarisiz kosu = altyapi sorunu (tarayici/ag) -> cron log'da exit 1
+  process.exit((total > 0 && failures === total) || dep.ok === 0 ? 1 : 0);
 }
 
 main();
