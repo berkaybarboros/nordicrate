@@ -135,7 +135,9 @@
       "mcp__6be522ca-86b5-4e80-8d21-b464f91c9e09__get_node_types",
       "mcp__848d0c6f-8f91-43cc-9da6-ef7327f24b06__match-prospects",
       "Bash(sort -t' ' -k2 -rn)",
-      "Bash(curl -s \"https://nordicrate.com/api/deposits\")"
+      "Bash(curl -s \"https://nordicrate.com/api/deposits\")",
+      "mcp__b51c80ae-cc92-4595-bad3-2b97295af4d6__subscription-info-limits-and-usage",
+      "mcp__b51c80ae-cc92-4595-bad3-2b97295af4d6__public-domain-rating-free"
     ]
   }
 }

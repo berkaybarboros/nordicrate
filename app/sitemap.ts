@@ -99,8 +99,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    // 2026-09-13: /deposits SITEMAP'TE HIC YOKTU. Sayfa canli, indekslenebilir
+    // (robots index,follow) ve 6 Eylul'de ~1200 kelime derin icerik eklendi, ama
+    // Google onu kesfedemedigi icin indekslenmemis: "term deposit rates estonia"
+    // aramasinda ilk 10'da yokuz, site: sorgusunda da gorunmuyor.
+    // Derin icerik yazmak, sayfa sitemap disindaysa hicbir ise yaramiyor.
+    {
+      url: `${BASE_URL}/deposits`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
     {
       url: `${BASE_URL}/programs`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    // /startup da eksikti — programs ile ayni aileden, startup fon basvurulari
+    {
+      url: `${BASE_URL}/startup`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.7,
