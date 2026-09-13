@@ -29,6 +29,17 @@ const TYPE_MAP: Record<LoanOffer['type'], string | null> = {
   business: null,
 };
 
+/** "https://www.seb.lt/..." → "seb.lt" (ülke TLD'si dahil kayıtlı alan adı) */
+function registrableDomain(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const labels = new URL(url).hostname.toLowerCase().split('.');
+    return labels.slice(-2).join('.');
+  } catch {
+    return null;
+  }
+}
+
 export async function withLiveRates(offers: LoanOffer[]): Promise<LiveLoanOffer[]> {
   let live: Awaited<ReturnType<typeof getLiveLoanRates>>;
   try {
@@ -41,8 +52,18 @@ export async function withLiveRates(offers: LoanOffer[]): Promise<LiveLoanOffer[
     const productType = TYPE_MAP[offer.type];
     const o = productType ? live.get(`${offer.bankId}:${productType}`) : undefined;
 
+    // ÜLKE KORUMASI (2026-09-13, üretimde yakalandı): data/loans.ts'te Letonya ve
+    // Litvanya teklifleri Estonya bankasıyla AYNI bankId'yi paylaşıyor ("Bigbank
+    // Latvia", "SEB Bankas Lithuania", "Inbank Latvia", "Swedbank Latvia" → bankId
+    // bigbank/seb/inbank/swedbank). Eşleme bankId ile yapılınca Estonya sayfasından
+    // okunan oran Letonya/Litvanya ürününe basılıyordu. Aynı banka farklı ülkede
+    // farklı fiyatlar; oran yalnızca teklifin kendi sitesi scraper'ın okuduğu
+    // siteyle birebir aynı alan adındaysa (seb.ee = seb.ee, seb.lt ≠ seb.ee) uygulanır.
+    const sameSite =
+      o != null && registrableDomain(offer.applyUrl) === registrableDomain(o.sourceUrl);
+
     // Kaba tutarsızlık koruması: statik tavanın %50 üstü şüpheli bir parse'tır
-    if (!o || o.rate > offer.interestRateMax * 1.5) {
+    if (!o || !sameSite || o.rate > offer.interestRateMax * 1.5) {
       return { ...offer, rateCheckedAt: null, rateSourceUrl: null, isLiveRate: false };
     }
 
