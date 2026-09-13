@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Info, ArrowUpDown } from "lucide-react";
 import LoanOfferCard from "@/components/loans/LoanOfferCard";
 import LoanCalculator from "@/components/loans/LoanCalculator";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { mortgageLoans } from "@/data/loans";
+import type { LiveLoanOffer } from "@/lib/live-loan-offers";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 import SocialProofBar from "@/components/SocialProofBar";
 
@@ -34,21 +35,36 @@ export default function MortgageContent() {
   const setDownPayment = (v: number) => { setDownPaymentRaw(v); persist(amount, termMonths, v); };
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+
+  // 2026-09-13: Bu sayfa statik data/loans.ts'i DOGRUDAN render ediyordu; bankalarin
+  // sitesinden gunluk cekilen oranlar hic uygulanmiyordu. Statik liste ilk render'da
+  // kalir (bos ekran / SEO kaybi olmasin), ardindan canli API sonucu uzerine yazilir.
+  const [offers, setOffers] = useState<(typeof mortgageLoans[number] & Partial<LiveLoanOffer>)[]>(mortgageLoans);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/loans/mortgage")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.loans) && data.loans.length > 0) setOffers(data.loans);
+      })
+      .catch(() => { /* canli veri gelmezse statik liste kalir, kartlar "indicative" der */ });
+    return () => { cancelled = true; };
+  }, []);
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
     const e3m = rates.find(r => r.key === 'euribor3m');
     if (e3m) setLiveEuribor(e3m.rate);
   }, []);
 
   const sortedOffers = useMemo(() => {
-    return [...mortgageLoans].sort((a, b) => {
+    return [...offers].sort((a, b) => {
       if (sortBy === "rate") return a.representativeRate - b.representativeRate;
       const aM = calculateMonthlyPayment(amount, a.representativeRate, termMonths);
       const bM = calculateMonthlyPayment(amount, b.representativeRate, termMonths);
       return sortBy === "monthly" ? aM - bM : aM * termMonths - bM * termMonths;
     });
-  }, [sortBy, amount, termMonths]);
+  }, [offers, sortBy, amount, termMonths]);
 
-  const bestRate = Math.min(...mortgageLoans.map((l) => l.representativeRate));
+  const bestRate = Math.min(...offers.map((l) => l.representativeRate));
   const bestMonthly = calculateMonthlyPayment(amount, bestRate, termMonths);
 
   return (
@@ -62,7 +78,7 @@ export default function MortgageContent() {
           </nav>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-2">Mortgage Loans in Estonia</h1>
           <p className="text-white/80">
-            Compare {mortgageLoans.length} mortgage offers · Euribor + margin
+            Compare {offers.length} mortgage offers · Euribor + margin
           </p>
           <div className="flex flex-wrap gap-4 mt-4 text-sm">
             <div className="bg-white/15 rounded-lg px-3 py-1.5">

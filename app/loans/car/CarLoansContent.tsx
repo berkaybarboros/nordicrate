@@ -7,6 +7,7 @@ import LoanCalculator from "@/components/loans/LoanCalculator";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import { carLoans } from "@/data/loans";
+import type { LiveLoanOffer } from "@/lib/live-loan-offers";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 import SocialProofBar from "@/components/SocialProofBar";
 
@@ -20,6 +21,21 @@ export default function CarLoansContent() {
   const [downPayment, setDownPayment] = useState(0);
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
+
+  // 2026-09-13: Bu sayfa statik data/loans.ts'i DOGRUDAN render ediyordu; bankalarin
+  // sitesinden gunluk cekilen oranlar hic uygulanmiyordu. Statik liste ilk render'da
+  // kalir (bos ekran / SEO kaybi olmasin), ardindan canli API sonucu uzerine yazilir.
+  const [offers, setOffers] = useState<(typeof carLoans[number] & Partial<LiveLoanOffer>)[]>(carLoans);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/loans/car")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.loans) && data.loans.length > 0) setOffers(data.loans);
+      })
+      .catch(() => { /* canli veri gelmezse statik liste kalir, kartlar "indicative" der */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Restore from sessionStorage on mount
   useEffect(() => {
@@ -44,15 +60,15 @@ export default function CarLoansContent() {
   }, []);
 
   const sortedOffers = useMemo(() => {
-    return [...carLoans].sort((a, b) => {
+    return [...offers].sort((a, b) => {
       if (sortBy === "rate") return a.representativeRate - b.representativeRate;
       const aM = calculateMonthlyPayment(netAmount, a.representativeRate, termMonths);
       const bM = calculateMonthlyPayment(netAmount, b.representativeRate, termMonths);
       return sortBy === "monthly" ? aM - bM : aM * termMonths - bM * termMonths;
     });
-  }, [sortBy, netAmount, termMonths]);
+  }, [offers, sortBy, netAmount, termMonths]);
 
-  const bestRate = Math.min(...carLoans.map((l) => l.representativeRate));
+  const bestRate = Math.min(...offers.map((l) => l.representativeRate));
   const bestMonthly = calculateMonthlyPayment(netAmount, bestRate, termMonths);
 
   return (
@@ -66,7 +82,7 @@ export default function CarLoansContent() {
           </nav>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-2">Car Loans in Estonia</h1>
           <p className="text-white/80">
-            Compare {carLoans.length} offers for new & used vehicles · From {bestRate}% p.a.
+            Compare {offers.length} offers for new & used vehicles · From {bestRate}% p.a.
           </p>
           <div className="flex flex-wrap gap-4 mt-4 text-sm">
             <div className="bg-white/15 rounded-lg px-3 py-1.5">

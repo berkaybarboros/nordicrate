@@ -54,6 +54,19 @@ interface ScrapedRateRow {
   scraped_at: string;
 }
 
+interface DepositRateRow {
+  bank_id: string;
+  rates: Record<string, number> | null;
+  min_amount: number | null;
+  scraped_at: string;
+}
+
+interface FailedAttemptRow {
+  bank_id: string;
+  product_type?: string;
+  scraped_at: string;
+}
+
 interface OnboardingStepRow {
   session_id: string | null;
   metadata: { step?: number } | null;
@@ -67,6 +80,8 @@ const EMPTY_DATA = {
   eventsError: null as string | null,
   alertCount: 0,
   scrapedRates: [] as ScrapedRateRow[],
+  depositRates: [] as DepositRateRow[],
+  failedAttempts: [] as FailedAttemptRow[],
   onboardingSteps: [] as OnboardingStepRow[],
 };
 
@@ -85,7 +100,9 @@ async function loadDataInner() {
 
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes] = await Promise.all([
+  const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+
+  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -110,6 +127,23 @@ async function loadDataInner() {
       .eq('event_type', 'onboarding_step')
       .gte('created_at', since30d)
       .limit(5000),
+    // Rate feed health: mevduat (2026-09-13'ten beri scrape ediliyor)
+    client
+      .from('latest_deposit_rates')
+      .select('bank_id, rates, min_amount, scraped_at')
+      .order('bank_id'),
+    // Son 48 saatteki BASARISIZ denemeler: son basarili veri eski mi yoksa bugun de
+    // denenip kirildi mi (sayfa degisti mi, erisim mi) ayirt etmek icin
+    client
+      .from('scraped_rates')
+      .select('bank_id, product_type, scraped_at')
+      .eq('parse_ok', false)
+      .gte('scraped_at', since48h),
+    client
+      .from('scraped_deposit_rates')
+      .select('bank_id, scraped_at')
+      .eq('parse_ok', false)
+      .gte('scraped_at', since48h),
   ]);
 
   return {
@@ -120,6 +154,11 @@ async function loadDataInner() {
     eventsError: eventsRes.error?.message ?? null,
     alertCount: alertsRes.count ?? 0,
     scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
+    depositRates: (depRes.data ?? []) as DepositRateRow[],
+    failedAttempts: [
+      ...((loanFailRes.data ?? []) as FailedAttemptRow[]),
+      ...((depFailRes.data ?? []) as FailedAttemptRow[]).map((r) => ({ ...r, product_type: 'deposit' })),
+    ],
     onboardingSteps: (onbRes.data ?? []) as OnboardingStepRow[],
   };
 }
@@ -141,7 +180,35 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, onboardingSteps } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps } = await loadData();
+
+  // Rate feed health: esikler lib/live-rates.ts ile ayni (48 saat taze, 7 gun ust sinir).
+  // Scraper kendi kendine calisir; bu panel "sessizce bozuldu mu" sorusunu cevaplar.
+  const nowMs = Date.now();
+  const feedStatus = (iso: string) => {
+    const age = nowMs - new Date(iso).getTime();
+    return age <= 48 * 3600000 ? 'fresh' : age <= 7 * 86400000 ? 'aging' : 'stale';
+  };
+  const failedKeys = new Set(failedAttempts.map((f) => `${f.bank_id}:${f.product_type}`));
+  const feedRows = [
+    ...scrapedRates.map((r) => ({
+      key: `${r.bank_id}:${r.product_type}`,
+      bank: r.bank_id,
+      product: r.product_type,
+      value: r.rate_min != null ? `${r.rate_min}%` : '-',
+      detail: r.raw_snippet ?? '',
+      at: r.scraped_at,
+    })),
+    ...depositRates.map((r) => ({
+      key: `${r.bank_id}:deposit`,
+      bank: r.bank_id,
+      product: 'deposit',
+      value: r.rates?.['12'] != null ? `${r.rates['12']}% (12m)` : '-',
+      detail: r.rates ? Object.entries(r.rates).map(([t, v]) => `${t}m ${v}%`).join(' / ') : '',
+      at: r.scraped_at,
+    })),
+  ].sort((a, b) => a.bank.localeCompare(b.bank) || a.product.localeCompare(b.product));
+  const feedProblems = feedRows.filter((r) => feedStatus(r.at) !== 'fresh' || failedKeys.has(r.key)).length;
 
   const eventCounts = new Map(countBy(events, (e) => e.event_type));
   const pageViews = eventCounts.get('page_view') ?? 0;
@@ -375,45 +442,60 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* D1 pilot — scraped rates */}
+      {/* Rate feed health (2026-09-13). Eski "D1 Pilot - LHV" tablosunun yerine:
+          kredi + mevduat, banka bazinda son basarili okuma ve son 48 saatteki
+          basarisiz deneme. Amber/kirmizi satir = sitede o banka eskiyor ya da
+          "indicative"e dusuyor. */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-extrabold text-slate-900">Scraped Rates (D1 Pilot — LHV)</h2>
-          <span className="text-xs text-slate-400">daily via VPS cron</span>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-extrabold text-slate-900">Rate Feed Health</h2>
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${feedProblems === 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>
+            {feedProblems === 0 ? 'All feeds fresh' : `${feedProblems} need attention`}
+          </span>
         </div>
-        {scrapedRates.length === 0 ? (
+        <p className="text-xs text-slate-400 mb-4">
+          Daily VPS cron 06:30 · fresh up to 48h · aging up to 7d (still shown, amber) · stale beyond 7d (hidden on site)
+        </p>
+        {feedRows.length === 0 ? (
           <p className="text-sm text-slate-400">
-            No scraped data yet. Run <code className="bg-slate-50 px-1 rounded">deploy/scraper/schema.sql</code> in Supabase,
-            then set up the cron per <code className="bg-slate-50 px-1 rounded">deploy/scraper/README.md</code>.
+            No scraped data yet. Check the cron and <code className="bg-slate-50 px-1 rounded">/var/log/nordicrate-scraper.log</code>.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                  <th className="py-2 pr-4">Status</th>
                   <th className="py-2 pr-4">Bank</th>
                   <th className="py-2 pr-4">Product</th>
-                  <th className="py-2 pr-4">Rate from</th>
-                  <th className="py-2 pr-4">APRC</th>
-                  <th className="py-2 pr-4">Scraped</th>
-                  <th className="py-2">Snippet (verify)</th>
+                  <th className="py-2 pr-4">Rate</th>
+                  <th className="py-2 pr-4">Last success</th>
+                  <th className="py-2">Parsed (verify)</th>
                 </tr>
               </thead>
               <tbody>
-                {scrapedRates.map((r) => (
-                  <tr key={`${r.bank_id}-${r.product_type}`} className="border-b border-slate-50 last:border-0">
-                    <td className="py-2 pr-4 font-bold text-slate-800 uppercase">{r.bank_id}</td>
-                    <td className="py-2 pr-4 text-slate-600">{r.product_type}</td>
-                    <td className="py-2 pr-4 font-bold text-sky-700">{r.rate_min != null ? `${r.rate_min}%` : '—'}</td>
-                    <td className="py-2 pr-4 text-slate-600">{r.aprc != null ? `${r.aprc}%` : '—'}</td>
-                    <td className="py-2 pr-4 text-slate-500 whitespace-nowrap">
-                      {new Date(r.scraped_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                    <td className="py-2 text-xs text-slate-400 max-w-md truncate" title={r.raw_snippet ?? ''}>
-                      {r.raw_snippet ?? '—'}
-                    </td>
-                  </tr>
-                ))}
+                {feedRows.map((r) => {
+                  const st = feedStatus(r.at);
+                  const failed = failedKeys.has(r.key);
+                  return (
+                    <tr key={r.key} className="border-b border-slate-50 last:border-0">
+                      <td className="py-2 pr-4 whitespace-nowrap">
+                        <span className={`inline-block w-2 h-2 rounded-full mr-1.5 ${st === 'fresh' ? 'bg-emerald-500' : st === 'aging' ? 'bg-amber-500' : 'bg-red-500'}`} />
+                        <span className="text-xs text-slate-600">{st}</span>
+                        {failed && <span className="ml-1.5 text-[10px] font-bold text-red-600">last run failed</span>}
+                      </td>
+                      <td className="py-2 pr-4 font-bold text-slate-800 uppercase">{r.bank}</td>
+                      <td className="py-2 pr-4 text-slate-600">{r.product}</td>
+                      <td className="py-2 pr-4 font-bold text-sky-700 whitespace-nowrap">{r.value}</td>
+                      <td className="py-2 pr-4 text-slate-500 whitespace-nowrap">
+                        {new Date(r.at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="py-2 text-xs text-slate-400 max-w-md truncate" title={r.detail}>
+                        {r.detail || '-'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

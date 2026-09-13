@@ -9,9 +9,15 @@ import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 import { useProductViewed } from "@/lib/use-product-viewed";
+import RateFreshness from "@/components/RateFreshness";
 
 interface Props {
-  offer: LoanOffer;
+  /** API (/api/loans/[type]) canli oran alanlarini ekler; statik kullanimda yoklar */
+  offer: LoanOffer & {
+    rateCheckedAt?: string | null;
+    rateSourceUrl?: string | null;
+    isLiveRate?: boolean;
+  };
   amount: number;
   termMonths: number;
 }
@@ -51,7 +57,9 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
           <BankLogo bankId={offer.bankId} name={offer.bankName} size={56} />
           <div>
             <p className="font-bold text-gray-900">{offer.bankName}</p>
-            {offer.badge && (
+            {/* "Best Rate" statik bir karsilastirma iddiasiydi — canli oranlar gunluk
+                degistiginde yanlis bankada kalabiliyordu (UCPD). Siralama zaten oran. */}
+            {offer.badge && offer.badge !== "Best Rate" && (
               <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeColors[offer.badge] || "bg-gray-100 text-gray-600"}`}>
                 {offer.badge}
               </span>
@@ -60,6 +68,11 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
               <Clock size={11} className="text-gray-400" />
               <span className="text-xs text-gray-400">{offer.processingTime}</span>
             </div>
+            <RateFreshness
+              checkedAt={offer.isLiveRate ? offer.rateCheckedAt : null}
+              sourceUrl={offer.rateSourceUrl}
+              className="mt-1"
+            />
           </div>
         </div>
 
@@ -67,8 +80,12 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
         <div className="grid grid-cols-3 md:flex md:flex-1 gap-3 md:gap-0">
           <div className="md:flex-1 md:border-l md:border-gray-100 md:pl-5">
             <p className="text-xs text-gray-400 mb-0.5">{t.loans.interestRate}</p>
-            <p className="text-lg font-extrabold text-[#1a3c6e]">{offer.representativeRate}%</p>
-            <p className="text-xs text-gray-400">{t.loans.perYear}</p>
+            <p className="text-lg font-extrabold text-[#1a3c6e]">
+              {/* Canli oran bankanin yayinladigi "from X%" — en iyi basvurana verilen oran */}
+              {offer.isLiveRate && <span className="text-xs font-semibold text-gray-500 mr-1">from</span>}
+              {offer.representativeRate}%
+            </p>
+            <p className="text-xs text-gray-400">{offer.isLiveRate ? "best-case, per year" : t.loans.perYear}</p>
           </div>
           <div className="md:flex-1 md:border-l md:border-gray-100 md:pl-5">
             <p className="text-xs text-gray-400 mb-0.5">{t.loans.monthly}</p>

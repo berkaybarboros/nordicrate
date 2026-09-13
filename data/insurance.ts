@@ -908,61 +908,61 @@ export const lifeInsurance: InsuranceOffer[] = [
 
 ];
 
-export const deposits = [
+/**
+ * Vadeli mevduat kataloğu — YALNIZCA meta veri (banka adı, linkler, koşullar).
+ *
+ * 2026-09-13 yeniden yazıldı. Önceki katalog gerçeğin ~2 katı oran gösteriyordu
+ * (LHV 12 ay 4.1% / bankada 2.20%; Coop 4.0% / 2.25%; SEB 3.9% / 2.20%) ve
+ * web'de vadeli mevduat ürünü OLMAYAN Bigbank'ı "4.3% Highest Rate" rozetiyle
+ * listeliyordu. ECB resmi Estonya mevduat faizi 2026-07: %2.18.
+ *
+ * Oranların birincil kaynağı artık scraper'dır (scraped_deposit_rates, günlük).
+ * Aşağıdaki `rates` yalnızca yedek: 2026-09-13'te her bankanın kendi sayfasından
+ * elle doğrulandı ve `ratesVerifiedAt` ile tarihlendi. /api/deposits bu yedeği de
+ * canlı veriyle aynı 7 günlük tazelik kuralına tabi tutar — yani scraper bir
+ * banka için bir haftadan uzun çökerse o banka listeden düşer, eski oran asla
+ * sessizce gösterilmez.
+ *
+ * Katalog dışı bırakılanlar:
+ * - Bigbank: web'de vadeli mevduat ürünü yok (ürün kataloğu yalnızca cari hesap)
+ * - Luminor: Cloudflare otomasyonu blokluyor — doğrulanamayan oran yayınlamayız
+ * - Citadele LV, Šiaulių/Artea LT: bu turda doğrulanmadı
+ *
+ * Özellikler ve limitler yalnızca bankanın sayfasında yazanlardır; yayınlanmayan
+ * üst limit uydurulmaz (null).
+ */
+export interface DepositCatalogEntry {
+  id: string;
+  /** scraped_deposit_rates.bank_id ile eşleşir */
+  bankId: string;
+  bankName: string;
+  bankLogo: string;
+  minAmount: number;
+  /** Banka yayınlamıyorsa null */
+  maxAmount: number | null;
+  features: string[];
+  applyUrl: string;
+  websiteUrl: string;
+  /** Yedek oranlar (vade ay → %), ratesVerifiedAt tarihinde elle doğrulandı */
+  rates: Record<number, number>;
+  ratesVerifiedAt: string;
+  ratesSourceUrl: string;
+}
+
+export const deposits: DepositCatalogEntry[] = [
   {
     id: "lhv-deposit",
     bankId: "lhv",
     bankName: "LHV Pank",
     bankLogo: "🇪🇪",
-    minAmount: 1000,
-    maxAmount: 500000,
-    termOptions: [3, 6, 12, 18, 24, 36],
-    rates: { 3: 3.5, 6: 3.8, 12: 4.1, 18: 3.9, 24: 3.7, 36: 3.5 },
-    features: ["DGSD protected up to €100k", "Online management", "Auto-renewal option"],
-    badge: "Best Rate",
+    minAmount: 100,
+    maxAmount: null,
+    features: ["Minimum deposit €100", "Terms from 1 to 24 months", "Paid out automatically on the last day"],
     applyUrl: "https://www.lhv.ee/en/fixed-term-deposit",
-    websiteUrl: "https://www.lhv.ee/en/savings",
-  },
-  {
-    id: "bigbank-deposit",
-    bankId: "bigbank",
-    bankName: "Bigbank",
-    bankLogo: "💰",
-    minAmount: 500,
-    maxAmount: 1000000,
-    termOptions: [3, 6, 12, 18, 24, 36, 48, 60],
-    rates: { 3: 3.6, 6: 4.0, 12: 4.3, 18: 4.1, 24: 3.9, 36: 3.7, 48: 3.5, 60: 3.4 },
-    features: ["Deposit specialist", "High limits", "Guaranteed interest"],
-    badge: "Highest Rate",
-    applyUrl: "https://www.bigbank.ee/hoiused/",
-    websiteUrl: "https://www.bigbank.ee/savings",
-  },
-  {
-    id: "swedbank-deposit",
-    bankId: "swedbank",
-    bankName: "Swedbank",
-    bankLogo: "🏦",
-    minAmount: 500,
-    maxAmount: 500000,
-    termOptions: [1, 3, 6, 12, 24],
-    rates: { 1: 2.5, 3: 3.2, 6: 3.5, 12: 3.8, 24: 3.5 },
-    features: ["Most trusted brand", "Mobile banking", "Branch support"],
-    badge: "Most Popular",
-    applyUrl: "https://www.swedbank.ee/private/savings/deposits",
-    websiteUrl: "https://www.swedbank.ee/private/savings",
-  },
-  {
-    id: "seb-deposit",
-    bankId: "seb",
-    bankName: "SEB Bank",
-    bankLogo: "🏛️",
-    minAmount: 1000,
-    maxAmount: 500000,
-    termOptions: [3, 6, 12, 24, 36],
-    rates: { 3: 3.3, 6: 3.6, 12: 3.9, 24: 3.6, 36: 3.4 },
-    features: ["Swedish banking reliability", "Digital management", "Auto-renewal"],
-    applyUrl: "https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit-privates",
-    websiteUrl: "https://www.seb.ee/en/savings",
+    websiteUrl: "https://www.lhv.ee/en/fixed-term-deposit",
+    rates: { 1: 1.8, 3: 2.05, 6: 2.15, 9: 2.15, 12: 2.2, 18: 2.2, 24: 2.2 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.lhv.ee/en/fixed-term-deposit",
   },
   {
     id: "coop-deposit",
@@ -970,12 +970,27 @@ export const deposits = [
     bankName: "Coop Pank",
     bankLogo: "🤝",
     minAmount: 100,
-    maxAmount: 200000,
-    termOptions: [3, 6, 12, 18, 24],
-    rates: { 3: 3.4, 6: 3.7, 12: 4.0, 18: 3.8, 24: 3.6 },
-    features: ["Low minimum deposit", "Community banking", "Local offices"],
+    maxAmount: 5000000,
+    features: ["Minimum deposit €100", "Terms from 1 month to 10 years", "Automatic extension available", "Monthly payout option (rate 0.05% lower)"],
     applyUrl: "https://www.cooppank.ee/en/private/growing-funds/term-deposit",
-    websiteUrl: "https://www.cooppank.ee/en/savings",
+    websiteUrl: "https://www.cooppank.ee/en/private/growing-funds/deposit-interests",
+    rates: { 1: 1.8, 3: 2.1, 6: 2.2, 9: 2.2, 12: 2.25, 18: 2.25, 24: 2.3, 36: 2.35, 48: 2.35, 60: 2.5 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.cooppank.ee/en/private/growing-funds/deposit-interests",
+  },
+  {
+    id: "seb-deposit",
+    bankId: "seb",
+    bankName: "SEB",
+    bankLogo: "🏛️",
+    minAmount: 100,
+    maxAmount: 1000000,
+    features: ["Minimum deposit €100", "Terms from 1 month to 3 years", "Early termination forfeits earned interest"],
+    applyUrl: "https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit-privates",
+    websiteUrl: "https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit-privates",
+    rates: { 1: 1.75, 3: 2.0, 6: 2.15, 9: 2.15, 12: 2.2, 24: 2.2, 36: 1.75 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.seb.ee/en/private/savings-and-investments/savings/term-deposit-privates",
   },
   {
     id: "inbank-deposit",
@@ -983,52 +998,46 @@ export const deposits = [
     bankName: "Inbank",
     bankLogo: "📱",
     minAmount: 500,
-    maxAmount: 500000,
-    termOptions: [3, 6, 12, 18, 24, 36],
-    rates: { 3: 3.7, 6: 4.0, 12: 4.25, 18: 4.0, 24: 3.85, 36: 3.65 },
-    features: ["Digital-first savings", "Pan-Baltic deposits accepted", "Auto-renewal", "DGSD protected"],
-    badge: "Best Rate",
+    maxAmount: 300000,
+    features: ["€500 – €300,000", "Terms from 3 to 60 months", "+0.10% on automatic renewal", "Fully online with Smart-ID / ID-card"],
     applyUrl: "https://www.inbank.ee/en/deposit",
     websiteUrl: "https://www.inbank.ee/en/deposit",
+    rates: { 3: 2.2, 6: 2.5, 9: 2.5, 12: 2.5, 18: 2.6, 24: 2.8, 36: 2.8, 48: 3.0, 60: 3.0 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.inbank.ee/en/deposit",
   },
   {
-    id: "citadele-deposit-lv",
-    bankId: "citadele",
-    bankName: "Citadele banka",
-    bankLogo: "🇱🇻",
-    minAmount: 500,
-    maxAmount: 500000,
-    termOptions: [3, 6, 12, 24, 36],
-    rates: { 3: 3.4, 6: 3.75, 12: 4.1, 24: 3.8, 36: 3.6 },
-    features: ["Latvian bank DGSD protection", "Online management", "Competitive rates", "Multi-currency option"],
-    applyUrl: "https://www.citadele.lv/en/private/savings/",
-    websiteUrl: "https://www.citadele.lv/en/private/savings",
+    id: "swedbank-deposit",
+    bankId: "swedbank",
+    bankName: "Swedbank",
+    bankLogo: "🏦",
+    minAmount: 190,
+    maxAmount: null,
+    features: ["Minimum deposit €190", "Terms from 1 to 24 months", "Interest on a 360-day basis"],
+    applyUrl: "https://www.swedbank.ee/private/investor/deposits?language=ENG",
+    websiteUrl: "https://www.swedbank.ee/private/home/more/pricesrates/interests?language=ENG",
+    rates: { 1: 1.8, 3: 2.05, 6: 2.15, 9: 2.15, 12: 2.2, 18: 2.2, 24: 2.2 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.swedbank.ee/private/home/more/pricesrates/interests?language=ENG",
   },
   {
-    id: "luminor-deposit",
-    bankId: "luminor",
-    bankName: "Luminor Bank",
-    bankLogo: "💡",
-    minAmount: 1000,
-    maxAmount: 500000,
-    termOptions: [3, 6, 12, 24],
-    rates: { 3: 3.3, 6: 3.6, 12: 3.95, 24: 3.7 },
-    features: ["Pan-Baltic savings", "DGSD protected", "Fixed rate guarantee", "Digital management"],
-    applyUrl: "https://www.luminor.ee/en/private/term-deposit",
-    websiteUrl: "https://www.luminor.ee/en/private/term-deposit",
-  },
-  {
-    id: "siauliu-deposit-lt",
-    bankId: "siauliu",
-    bankName: "Šiaulių bankas",
-    bankLogo: "🇱🇹",
-    minAmount: 300,
-    maxAmount: 500000,
-    termOptions: [1, 3, 6, 12, 24, 36],
-    rates: { 1: 2.8, 3: 3.5, 6: 3.8, 12: 4.15, 24: 3.9, 36: 3.7 },
-    features: ["Lithuanian-owned bank", "Low minimum", "DGSD protected", "Competitive 12-month rate"],
-    badge: "Best Rate LT",
-    applyUrl: "https://www.artea.lt/en/private/saving-investment/deposits/term-deposit",
-    websiteUrl: "https://www.sb.lt/en/private/savings",
+    id: "citadele-ee-deposit",
+    bankId: "citadele-ee",
+    bankName: "Citadele (Estonia)",
+    bankLogo: "🇪🇪",
+    minAmount: 100,
+    maxAmount: 5000000,
+    features: [
+      "Minimum deposit €100",
+      "Terms from 1 month to 5 years",
+      // Citadele Estonya'da SUBE olarak calisiyor — mevduat Letonya garanti
+      // sistemiyle korunuyor (sayfanin kendi beyani). Ayni 100k AB tavani.
+      "Branch of a Latvian bank — covered by the Latvian deposit guarantee",
+    ],
+    applyUrl: "https://www.citadele.ee/en/private/savings/",
+    websiteUrl: "https://www.citadele.ee/en/private/savings/rates/",
+    rates: { 1: 1.8, 3: 2.05, 6: 2.15, 9: 2.15, 12: 2.2, 18: 2.2, 24: 2.2, 36: 2.3, 60: 2.5 },
+    ratesVerifiedAt: "2026-09-13T12:00:00Z",
+    ratesSourceUrl: "https://www.citadele.ee/en/private/savings/rates/",
   },
 ];

@@ -81,6 +81,8 @@ export interface LoanProduct {
   isPromoted?: boolean;
   /** Scraper override katmanı işaretledi: rateMin bankanın sitesinden alınan güncel oran */
   isLiveRate?: boolean;
+  /** Canlı oranın çekildiği banka sayfası (kartta kaynak linki) */
+  rateSourceUrl?: string;
 }
 
 export interface GovernmentProgram {

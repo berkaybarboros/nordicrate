@@ -8,6 +8,7 @@ import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 import { ProductViewed } from "@/lib/use-product-viewed";
+import RateFreshness from "@/components/RateFreshness";
 
 interface DepositOffer {
   id: string;
@@ -15,16 +16,25 @@ interface DepositOffer {
   bankName: string;
   bankLogo: string;
   minAmount: number;
-  maxAmount: number;
+  maxAmount: number | null;
   termOptions: number[];
   rates: Record<number, number>;
   features: string[];
-  badge?: string;
   applyUrl: string;
   websiteUrl: string;
   rate: number;
   interest: number;
   totalAtMaturity: number;
+  /** Oranın bankanın sitesinden en son okunduğu an (API: canlı scrape ya da elle doğrulama) */
+  rateCheckedAt: string;
+  rateSourceUrl: string;
+  rateSource: "live" | "manual";
+}
+
+interface DepositsMeta {
+  newestCheckedAt: string | null;
+  liveCount: number;
+  hidden: number;
 }
 
 function SkeletonDepositCard() {
@@ -61,6 +71,7 @@ export default function DepositsContent() {
   const [selectedTerm, setSelectedTerm] = useState(12);
   const [offers, setOffers] = useState<DepositOffer[]>([]);
   const [allTerms, setAllTerms] = useState<number[]>([]);
+  const [meta, setMeta] = useState<DepositsMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const amountPercent = ((amount - 500) / (1000000 - 500)) * 100;
@@ -72,6 +83,7 @@ export default function DepositsContent() {
       .then((data) => {
         setOffers(data.deposits || []);
         if (data.allTerms) setAllTerms(data.allTerms);
+        if (data.meta) setMeta(data.meta);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -92,11 +104,21 @@ export default function DepositsContent() {
           </nav>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-2">{t.deposits.title}</h1>
           <p className="text-white/80">{t.deposits.subtitle}</p>
+          {/* 2026-09-13: Oranlar artik bankalarin kendi sitesinden gunluk okunuyor.
+              Onceki "dogrulanmamis" uyari bandi kaldirildi; yerine gercek tazelik. */}
+          {meta?.newestCheckedAt && (
+            <p className="mt-3 text-[13px] text-white/80">
+              Rates are read every day from each bank&rsquo;s own website. Each offer shows when it was last checked.
+            </p>
+          )}
           <div className="flex flex-wrap gap-3 mt-4">
             {[
               { icon: Lock, text: "€100k DGSD protection" },
-              { icon: TrendingUp, text: "Up to 4.3% p.a." },
-              { icon: PiggyBank, text: "Guaranteed returns" },
+              // 2026-09-13: "Up to 4.3% p.a." kaldirildi — dogrulama sonucu statik
+              // veri gercegin ~2 kati cikti (LHV gercek 1.00-2.20%, Coop max 2.5%,
+              // SEB 1.65%; ECB resmi Estonya mevduat faizi 2026-07: %2.18).
+              { icon: TrendingUp, text: "Terms from 1 to 60 months" },
+              { icon: PiggyBank, text: "Fixed rate for the full term" },
             ].map(({ icon: Icon, text }) => (
               <div
                 key={text}
@@ -228,11 +250,14 @@ export default function DepositsContent() {
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">{offer.bankName}</p>
-                      {offer.badge && (
-                        <span className="text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
-                          {offer.badge}
-                        </span>
-                      )}
+                      {/* Statik "Best Rate"/"Highest Rate" rozetleri kaldirildi (Bigbank'in
+                          urunu yokken "Highest Rate" diyordu). Onun yerine banka bazli tazelik. */}
+                      <RateFreshness
+                        checkedAt={offer.rateCheckedAt}
+                        sourceUrl={offer.rateSourceUrl}
+                        source={offer.rateSource}
+                        className="mt-1"
+                      />
                     </div>
                   </div>
 
@@ -349,10 +374,11 @@ export default function DepositsContent() {
           )}
 
           <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-            All deposits are covered by the Estonian Guarantee Fund (DGSD) up to €100,000 per
-            depositor per bank. Interest rates are annual gross rates before tax (20% income tax
-            applies to interest income in Estonia). NordicRate is a comparison service — we do not
-            accept deposits directly.
+            Deposits are protected under the EU deposit guarantee up to €100,000 per depositor per
+            bank — by the Estonian scheme for Estonian banks, and by the home-country scheme for
+            branches of foreign banks (e.g. Citadele). Rates are annual gross rates before tax and are
+            read daily from each bank&rsquo;s own website; confirm the final rate before signing.
+            NordicRate is a comparison service — we do not accept deposits directly.
           </p>
         </div>
       </div>

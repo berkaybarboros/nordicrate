@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { personalLoans, mortgageLoans, carLoans } from "@/data/loans";
 import type { LoanOffer } from "@/data/loans";
 import { enforceRateLimit } from "@/lib/security";
+import { withLiveRates } from "@/lib/live-loan-offers";
 
 const loanDataMap: Record<string, LoanOffer[]> = {
   personal: personalLoans,
@@ -32,7 +33,8 @@ export async function GET(
   const sortBy = searchParams.get("sort") || "rate";
   const bankId = searchParams.get("bankId") || undefined;
 
-  let filtered = [...loans];
+  // Bankaların sitesinden günlük çekilen oranlar statik kataloğun üzerine yazılır
+  let filtered = await withLiveRates(loans);
 
   if (bankId) {
     filtered = filtered.filter((l) => l.bankId === bankId);
@@ -75,7 +77,15 @@ export async function GET(
       amount: amt,
       term: t,
       sortBy,
-      updatedAt: new Date().toISOString(),
+      // Eskiden her istekte new Date() donuyordu — statik veri icin sahte tazelik.
+      // Artik listedeki EN YENI dogrulama ani; hic canli veri yoksa null.
+      updatedAt:
+        filtered
+          .map((l) => l.rateCheckedAt)
+          .filter((x): x is string => Boolean(x))
+          .sort()
+          .at(-1) ?? null,
+      liveCount: filtered.filter((l) => l.isLiveRate).length,
     },
   });
 }

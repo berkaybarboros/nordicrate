@@ -7,17 +7,20 @@ import { logoFromBankId, monogram } from '@/lib/logos';
 
 // Product catalogs
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
+import { withLiveRates } from '@/lib/live-loan-offers';
 import {
   motorInsurance, cascoInsurance, homeInsurance, healthInsurance,
 } from '@/data/insurance';
 
 // ─── Product lookup ─────────────────────────────────────────────────────────────
-function getProducts(productType: string) {
+// Kredi teklifleri canlı oranla gelir (lib/live-loan-offers) — AI önerisi statik
+// katalogdan eski oranı önermesin.
+async function getProducts(productType: string) {
   switch (productType) {
-    case 'personal':  return personalLoans.map(p => ({ ...p, category: 'loan' }));
-    case 'mortgage':  return mortgageLoans.map(p => ({ ...p, category: 'loan' }));
-    case 'car':       return carLoans.map(p => ({ ...p, category: 'loan' }));
-    case 'business':  return personalLoans.map(p => ({ ...p, category: 'loan' })); // fallback to personal
+    case 'personal':  return (await withLiveRates(personalLoans)).map(p => ({ ...p, category: 'loan' }));
+    case 'mortgage':  return (await withLiveRates(mortgageLoans)).map(p => ({ ...p, category: 'loan' }));
+    case 'car':       return (await withLiveRates(carLoans)).map(p => ({ ...p, category: 'loan' }));
+    case 'business':  return (await withLiveRates(personalLoans)).map(p => ({ ...p, category: 'loan' })); // fallback to personal
     case 'motor':     return motorInsurance.map(p => ({ ...p, category: 'insurance' }));
     case 'casco':     return cascoInsurance.map(p => ({ ...p, category: 'insurance' }));
     case 'home':      return homeInsurance.map(p => ({ ...p, category: 'insurance' }));
@@ -59,7 +62,7 @@ export async function POST(req: NextRequest) {
     const termMonths    = clampNumber(body.termMonths, 1, 480);
     const monthlyIncome = clampNumber(body.monthlyIncome, 0, 1_000_000);
 
-    const products = getProducts(productType);
+    const products = await getProducts(productType);
     if (products.length === 0) {
       return NextResponse.json({ error: 'Unknown product type' }, { status: 400 });
     }

@@ -19,16 +19,18 @@ import { enforceRateLimit, isValidSessionId, clampNumber } from '@/lib/security'
 
 // Product catalogs (static data — gerçek banka verileri)
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
+import { withLiveRates } from '@/lib/live-loan-offers';
 import { motorInsurance, cascoInsurance, homeInsurance, healthInsurance } from '@/data/insurance';
 
 export const runtime = 'nodejs';
 
 // ─── Product lookup ──────────────────────────────────────────────────────────
-function getCatalog(productType: string) {
+// Kredi katalogları canlı oranla gelir (lib/live-loan-offers)
+async function getCatalog(productType: string) {
   switch (productType) {
-    case 'personal':  return personalLoans;
-    case 'mortgage':  return mortgageLoans;
-    case 'car':       return carLoans;
+    case 'personal':  return withLiveRates(personalLoans);
+    case 'mortgage':  return withLiveRates(mortgageLoans);
+    case 'car':       return withLiveRates(carLoans);
     case 'motor':     return motorInsurance;
     case 'casco':     return cascoInsurance;
     case 'home':      return homeInsurance;
@@ -131,7 +133,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Step 4: Get static catalog + merge all signals ───────────────────────
-    const catalog = getCatalog(productType);
+    const catalog = await getCatalog(productType);
     const collabMap = new Map<string, { score: number; reasons: string[] }>();
     for (const r of (collabRecs ?? [])) {
       collabMap.set(r.product_id, { score: Number(r.score), reasons: r.reasons ?? [] });

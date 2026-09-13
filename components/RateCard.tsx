@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
 import type { LoanProduct, Institution, CountryInfo } from '@/lib/types';
 import { trackApplyClick } from '@/lib/tracker';
 import { useProductViewed } from '@/lib/use-product-viewed';
+import RateFreshness from './RateFreshness';
 import {
   formatAmount,
   formatRate,
@@ -28,9 +28,6 @@ interface RateCardProps {
 }
 
 export default function RateCard({ product, institution, country }: RateCardProps) {
-  // Mount anı — render içinde Date.now() impure sayılır (react-compiler kuralı)
-  const [mountedAt] = useState(() => Date.now());
-
   // Kartın yarısı 1 sn ekranda kalırsa `product_view` üretir (funnel orta adımı)
   const viewRef = useProductViewed<HTMLDivElement>(product.id, product.type);
 
@@ -113,7 +110,7 @@ export default function RateCard({ product, institution, country }: RateCardProp
           {product.isLiveRate && (
             <span
               className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5 mb-1.5"
-              title="Rate pulled directly from the bank's website within the last 48 hours"
+              title="Rate read directly from the bank's own website — see the check time below"
             >
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
               LIVE RATE
@@ -190,15 +187,14 @@ export default function RateCard({ product, institution, country }: RateCardProp
                 <UserCheck size={10} /> Fits your profile
               </span>
             )}
-            {/* Tarih chip'i sadece taze veride (90 gün) — bayat "19 Nov 25" görünümü güven zedeler */}
-            {mountedAt - new Date(product.updatedAt).getTime() < 90 * 86400000 && (
-              <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Verified {new Date(product.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-              </span>
-            )}
+            {/* 2026-09-13: Eskiden statik katalog tarihini "Verified 19 Nov" diye
+                basiyordu — hic dogrulanmamis veriye dogrulama rozeti. Artik yalnizca
+                bankanin sitesinden gercekten okunan oranlar tarih tasir. */}
+            <RateFreshness
+              checkedAt={product.isLiveRate ? product.updatedAt : null}
+              sourceUrl={product.rateSourceUrl}
+              className="w-full"
+            />
             {institution.isDigitalFriendly && (
               <span className="inline-flex items-center gap-1 text-xs text-sky-600 bg-sky-50 border border-sky-100 rounded-full px-2 py-0.5 font-medium">
                 <Smartphone size={10} /> 100% Online
