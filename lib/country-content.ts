@@ -37,6 +37,34 @@ export const COUNTRY_LANDINGS: CountryLanding[] = [
       { q: 'Can I get a loan in Estonia as an e-resident?', a: 'e-Residency alone does not qualify you for consumer credit — banks generally require Estonian tax residency and verifiable local income. Business financing through an Estonian company is more accessible; several banks and government programs serve e-resident-founded companies.' },
       { q: 'How are Estonian loan rates set?', a: 'Estonia uses the euro, so variable-rate loans are typically priced as 6-month EURIBOR plus a fixed bank margin. The margin varies by bank and applicant profile, which is why comparing several offers matters.' },
       { q: 'How fast is loan approval in Estonia?', a: 'Consumer loan decisions are often same-day thanks to fully digital applications with ID-card, Mobile-ID or Smart-ID signing. Mortgages take longer — typically one to a few weeks including property valuation.' },
+      { q: 'How much deposit do I need for an Estonian mortgage?', a: 'Housing loans are capped relative to the property value under Eesti Pank rules, so you contribute the remainder yourself. A state-backed guarantee administered by EIS (historically KredEx) can reduce that deposit for eligible borrowers such as first-home buyers — it lowers the deposit hurdle, not your interest rate.' },
+  { q: 'Why do Estonian banks decide so quickly?', a: 'Identity is proven with ID-card, Mobile-ID or Smart-ID and contracts are signed digitally, so no step needs a branch visit. The speed is in the process, not the scrutiny — income, credit register and affordability rules are still checked. Mortgages take longer because of valuation and notarisation.' },
+    ],
+    sections: [
+      {
+        h2: 'Why Estonian lending is fast, and where that speed stops',
+        body: [
+          'Estonia runs the most digital lending process in the region. Applications are completed online, identity is proven with an ID-card, Mobile-ID or Smart-ID, and contracts are signed digitally with the same legal weight as ink. Consumer loan decisions frequently arrive the same day because no step requires a branch visit.',
+          'That speed applies to the decision, not to the assessment. Banks still verify income, check the credit register and apply the affordability rules; the digital layer removes paperwork, not scrutiny. Mortgages remain slower because a property valuation and notarised transaction sit in the middle.',
+          'The practical benefit for a borrower is that comparing several banks costs little more than comparing one. Where a paper process discourages second applications, a digital one makes it reasonable to get more than a single offer before committing.',
+        ],
+      },
+      {
+        h2: 'How much you can borrow: the limits behind the offer',
+        body: [
+          'Estonian lending is shaped by macroprudential rules set by Eesti Pank that every licensed lender must follow. Housing loans are capped relative to the property value, meaning a minimum contribution of your own, and there is a maximum loan maturity. Your total monthly debt service is also limited as a share of net income, and lenders must stress-test that against a higher rate than today.',
+          'The consequence is that the amount a bank offers already assumes rates could rise. If an offer looks conservative next to your salary, this is usually why. Confirm the current percentages with the lender or Eesti Pank, as they are reviewed periodically.',
+          'A state-backed guarantee, historically known as the KredEx guarantee and now administered by EIS, lets eligible borrowers — commonly first-home buyers and young families — proceed with a smaller deposit. It does not lower your interest rate; it lowers the deposit hurdle.',
+        ],
+      },
+      {
+        h2: 'e-Residency, tax residency and credit — three different things',
+        body: [
+          'This distinction causes more confusion than any other topic in Estonian finance. e-Residency grants a digital identity for dealing with the state and running a company remotely. It is not residency, it does not make you an Estonian tax resident, and it does not by itself open access to consumer credit.',
+          'Consumer lending generally requires Estonian tax residency and verifiable local income. An e-resident living and earning abroad will usually be declined for a personal loan regardless of income level — not as a policy against e-residents, but because the file lacks the local substance every applicant is assessed on.',
+          'Business financing is the more realistic route for e-resident founders, though banks apply their own substance test there too: where management sits, whether there are employees here, whether revenue passes through an Estonian account. We cover that assessment in detail on the [business loans](/loans/business) page.',
+        ],
+      },
     ],
   },
   {
@@ -90,6 +118,33 @@ export const COUNTRY_LANDINGS: CountryLanding[] = [
       { q: 'Which banks dominate lending in Latvia?', a: 'The market is led by pan-Baltic groups: Swedbank, SEB, Luminor and Citadele. Local fintechs and consumer lenders compete mainly in unsecured credit, which keeps pressure on rates and processing speed.' },
       { q: 'How are Latvian mortgage rates structured?', a: 'Latvia uses the euro, so mortgages are typically priced as EURIBOR (commonly 6-month) plus a bank margin fixed in your contract. When EURIBOR resets, your payment changes accordingly.' },
       { q: 'Can non-residents borrow in Latvia?', a: 'Generally you need Latvian residency and locally verifiable income. Some banks consider EU citizens working in Latvia earlier than non-EU applicants, but expect to establish local income history first.' },
+      { q: 'What does ALTUM do for borrowers?', a: 'ALTUM is Latvia development finance institution. For housing it offers guarantees aimed at families with children and other defined groups, working by reducing the deposit a bank requires rather than lowering your rate. For businesses it provides guarantees, micro-loans and start-up finance, usually sharing risk with a commercial lender.' },
+  { q: 'Can non-residents borrow in Latvia?', a: 'It is difficult without local substance. Lenders want a Latvian personal code, an account here and documented domestic income; salary earned abroad is discounted. EU citizens working in Latvia generally apply on standard terms once a few months of local record exists.' },
+    ],
+    sections: [
+      {
+        h2: 'Euro pricing and a concentrated banking market',
+        body: [
+          'Latvia is in the eurozone, so variable-rate loans are priced as Euribor plus a bank margin and reprice at each reset. The reference is the same across the euro area; the margin is what differs between banks and what you are actually comparing.',
+          'The Latvian market is concentrated among a few large banks alongside smaller local lenders and consumer finance companies. Concentration matters for borrowers in one practical way: fewer competitors means margin differences can be wider than in a crowded market, so obtaining more than one offer is worth the effort.',
+          'Consumer credit is regulated with caps on total cost, which pushed the market away from very short high-cost lending. Compare on the annual percentage rate of charge, which must include mandatory fees rather than interest alone.',
+        ],
+      },
+      {
+        h2: 'State support through ALTUM',
+        body: [
+          'Latvia runs its development finance through ALTUM, which provides guarantees and targeted lending rather than competing with banks directly. For housing, the guarantee programme is aimed at families with children and other defined groups, and it works by reducing the deposit a bank requires rather than by lowering the interest rate.',
+          'For businesses, ALTUM offers loan guarantees, micro-lending and start-up finance. As with the housing guarantee, the mechanism is usually risk-sharing with a commercial lender — meaning the bank still assesses you, but the collateral gap that would otherwise end the conversation can be covered.',
+          'Eligibility criteria change over time. Confirm the current conditions with ALTUM or your bank before assuming a programme applies to your situation.',
+        ],
+      },
+      {
+        h2: 'Requirements for residents and newcomers',
+        body: [
+          'A Latvian personal code (personas kods) and a local bank account are the practical prerequisites. Lenders then assess income, existing obligations and your record in the credit register, applying affordability limits on how much of your income can go to debt service.',
+          'For non-residents and recent arrivals the pattern matches the rest of the region: income earned abroad is discounted relative to salary arriving in a Latvian account, and a few months of domestic record changes what lenders will consider. EU citizens working in Latvia generally apply on standard terms once that record exists.',
+        ],
+      },
     ],
   },
   {
@@ -103,6 +158,32 @@ export const COUNTRY_LANDINGS: CountryLanding[] = [
       { q: 'Why does Lithuania have so many online lenders?', a: 'The Bank of Lithuania runs one of the EU’s most active fintech licensing regimes, which attracted many digital lenders. More competition generally benefits borrowers, but always verify the lender is licensed and compare full APR.' },
       { q: 'What reference rate do Lithuanian mortgages use?', a: 'As a eurozone country, Lithuanian variable-rate mortgages are typically tied to 6-month EURIBOR plus a contractual bank margin. Fixed-rate periods are also offered by the larger banks.' },
       { q: 'What do I need to borrow in Lithuania?', a: 'Residency, a personal code and verifiable income in Lithuania are the standard requirements. Fully digital onboarding is common, so once you have local income history the process is fast.' },
+      { q: 'How much can I borrow in Lithuania?', a: 'Largely decided by regulation rather than by the bank. The Bank of Lithuania caps the share of income that can go to repayments, limits housing loan maturity and requires a minimum own contribution. Comparing lenders changes your rate and fees, but rarely the ceiling.' },
+  { q: 'Are fintech lenders in Lithuania safe to use?', a: 'Licensed providers are supervised by the Bank of Lithuania, and Lithuania has an unusually large licensed fintech sector that makes digital lending fast and competitive. Their products are not equivalent to bank loans though — compare on the annual percentage rate of charge, which puts different funding models on the same footing.' },
+    ],
+    sections: [
+      {
+        h2: 'Responsible lending rules set the ceiling before the bank does',
+        body: [
+          'Lithuania applies responsible lending regulations issued by the Bank of Lithuania that bind every licensed lender. They cap how much of your income can go to loan repayments, limit the maximum maturity for housing loans, and require a minimum contribution of your own for property purchases.',
+          'Because these limits are regulatory rather than commercial, the maximum you can borrow is largely decided before any individual bank looks at your application. Shopping around changes your rate and fees; it rarely changes the ceiling.',
+          'Lenders must also stress-test affordability against a higher interest rate than the one you would pay today. This is why an offer can look conservative relative to your salary — the calculation already assumes rates rise.',
+        ],
+      },
+      {
+        h2: 'Euro pricing and a competitive digital market',
+        body: [
+          'As a eurozone member, Lithuania prices variable loans as Euribor plus margin. Alongside the traditional banks, Lithuania has an unusually large licensed fintech and electronic money sector, which has made digital consumer lending competitive and applications fast.',
+          'That breadth is genuinely useful for comparison, but the products are not equivalent. A consumer credit provider and a bank operate under different funding costs and risk appetites, and the annual percentage rate of charge is the only number that puts their offers on the same footing.',
+        ],
+      },
+      {
+        h2: 'Business finance and what newcomers should expect',
+        body: [
+          'For companies, Invega is the state instrument, providing guarantees and risk-sharing that help viable businesses over a collateral gap rather than offering cheap money directly. Startup and innovation support runs through separate national programmes — several are listed on our [programmes page](/programs).',
+          'For individuals, a personal code (asmens kodas) and a Lithuanian account are prerequisites, followed by the familiar requirement for documented local income. Lithuania is comparatively accessible for EU citizens who live and work here, but the first months without a domestic record remain the hard part, as everywhere in the region.',
+        ],
+      },
     ],
   },
   {
@@ -156,6 +237,34 @@ export const COUNTRY_LANDINGS: CountryLanding[] = [
       { q: 'What drives Norwegian loan rates?', a: 'Norges Bank’s policy rate. Most Norwegian mortgages are floating-rate, so payment changes follow policy-rate moves relatively quickly — EURIBOR is not used since Norway keeps the krone.' },
       { q: 'How much can I borrow in Norway?', a: 'Regulation limits total debt to a multiple of gross annual income and requires banks to stress-test affordability against a rate increase. Unsecured debt is centrally registered and counts against your capacity.' },
       { q: 'Can foreigners get a mortgage in Norway?', a: 'With Norwegian residency, a national ID number and local income, yes — terms are broadly similar to locals. Without residency it is rare and typically limited to special cases.' },
+      { q: 'What is the Norwegian debt register?', a: 'A central register (gjeldsregisteret) of unsecured consumer debt — credit cards and consumer loans — that lenders must consult. Your existing obligations are visible when you apply rather than depending on disclosure, so affordability is assessed against your real total. Mortgages are recorded separately.' },
+  { q: 'Why is it hard to get a large mortgage in Norway?', a: 'A national lending regulation caps total debt relative to gross income, requires a minimum contribution of your own capital, and forces banks to stress-test against a substantial rate rise. Banks have little room to lend outside these limits, so the ceiling is usually regulatory rather than bank-specific.' },
+    ],
+    sections: [
+      {
+        h2: 'The debt register made every obligation visible',
+        body: [
+          'Norway operates a central debt register (gjeldsregisteret) covering unsecured consumer debt — credit cards, consumer loans and similar. Lenders must consult it, so your existing unsecured obligations are visible at the moment you apply rather than depending on what you disclose.',
+          'This changed the market noticeably. Before it existed, a borrower could accumulate consumer credit across several lenders, each unaware of the others. Now affordability is assessed against your real total, which tightened approvals for people carrying multiple credits and made comparison cleaner for everyone else.',
+          'Mortgages are recorded separately, so the register is not a complete picture of all borrowing — but for unsecured credit it is authoritative, and it is the first thing a lender sees.',
+        ],
+      },
+      {
+        h2: 'Krone pricing and the lending regulation',
+        body: [
+          'Norway keeps its own currency and Norges Bank sets policy independently, so Norwegian loan pricing follows domestic rates rather than Euribor. Most mortgages are variable and reprice when the bank adjusts its rates, with notice requirements protecting the borrower.',
+          'Lending is governed by a national regulation that sets the framework every bank works within: a minimum contribution of your own capital for property purchases, a ceiling on total debt relative to gross income, and a requirement to stress-test affordability against a substantial rate increase. Banks have limited room to lend outside these limits.',
+          'For borrowers this means the question is rarely which bank will bend the rules — none can, much. The differences are in margin, fees and how each bank treats your specific income profile.',
+        ],
+      },
+      {
+        h2: 'What newcomers need',
+        body: [
+          'A Norwegian national identity number (fodselsnummer) or a D-number is the prerequisite for banking. After that, lenders want documented income in Norway, a domestic account receiving salary, and a payment record.',
+          'Norway is a comparatively expensive market to enter as a borrower because the equity requirement for property is meaningful and the income ceiling is applied strictly. Newcomers frequently find that the constraint is the debt-to-income ceiling rather than their ability to service the loan.',
+          'The BSU scheme for young savers is worth knowing about if you are under the age threshold: it combines tax relief with a savings record that strengthens a later mortgage application.',
+        ],
+      },
     ],
   },
   {
