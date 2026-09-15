@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import MatchCta from '@/components/MatchCta';
 import { notFound } from 'next/navigation';
 import { getPostBySlug, getPublishedPosts, extractFaqs } from '@/lib/blog';
 import { buildFaqJsonLd } from '@/lib/seo';
@@ -94,6 +95,10 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content_md) }}
       />
 
+      <div className="mt-10">
+        <MatchCta tone="light" />
+      </div>
+
       {/* Newsletter — acquisition döngüsü (P1-3) */}
       <div className="mt-12">
         <NewsletterCTA />
@@ -101,7 +106,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       {/* CTA */}
       <div className="mt-8 bg-slate-950 rounded-2xl p-8 text-center">
-        <p className="text-white font-extrabold text-lg mb-2">Compare live rates across 8 countries</p>
+        <p className="text-white font-extrabold text-lg mb-2">Compare bank rates across 8 countries</p>
         <p className="text-slate-400 text-sm mb-5">Free, independent, no impact on your credit score.</p>
         <Link
           href="/loans"

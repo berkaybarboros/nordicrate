@@ -145,7 +145,7 @@ export default function HealthContent() {
 
             <AIPageBanner
               productType="health-insurance"
-              context={!loading && offers.length > 0 ? `${offers.length} health insurance plans · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+              context={!loading && offers.length > 0 ? `${offers.length} health insurance plans · example premiums from €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
             />
 
             {loading && (

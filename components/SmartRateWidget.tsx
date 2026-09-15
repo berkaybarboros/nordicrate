@@ -213,7 +213,7 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
           )}
 
           <p className="text-[10px] text-white/20 text-center pt-1">
-            Indicative rates · ECB & Norges Bank · Updated hourly
+            Reference rates · ECB & Norges Bank · not a loan offer
           </p>
 
           {showAlertCta && (

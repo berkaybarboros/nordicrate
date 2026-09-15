@@ -11,49 +11,53 @@ import PartnerLeadForm from '@/components/partners/PartnerLeadForm';
 import RateReportSignup from '@/components/partners/RateReportSignup';
 
 export const metadata: Metadata = {
-  title: 'Partner with NordicRate — Qualified Borrower Leads in Nordic & Baltic Markets',
+  title: 'For Banks, Insurers & Comparison Partners | NordicRate',
   description:
-    'CPL partnerships for banks, brokers and fintechs. AI-qualified loan leads (income, DTI, country, amount) from expats, e-residents and locals across 8 Nordic & Baltic markets.',
+    'Free listing, fast data corrections, rate feeds, referral and lead partnerships for banks, insurers and fintechs across 8 Nordic & Baltic markets.',
   alternates: { canonical: 'https://nordicrate.com/partners' },
 };
 
+// 2026-09-15: onceki metin henuz olmayan yetenekleri vaat ediyordu ("webhook ile
+// gercek zamanli teslim", "paylasilan dashboard", "her lead AI ile nitelikli").
+// Bankalarla ilk temasta bu sayfa aciliyor — erken asamayi saklamayan, ise
+// baslamayi kolaylastiran bir metin daha cok kapi acar.
 const VALUE_PROPS = [
   {
-    Icon: UserCheck,
-    title: 'AI-qualified, not just clicks',
-    desc: 'Every lead passes our NordicAI eligibility check before reaching you: net income, debt-to-income ratio, residency status, requested amount and term. You receive applicants, not traffic.',
-  },
-  {
-    Icon: Target,
-    title: 'A niche you cannot reach with ads',
-    desc: 'English-speaking expats, digital nomads and Estonian e-residents actively comparing credit. High intent, underserved by domestic marketing channels.',
-  },
-  {
-    Icon: Globe2,
-    title: '8 markets, one integration',
-    desc: 'Denmark, Finland, Iceland, Norway, Sweden, Estonia, Latvia and Lithuania — filter leads by country, product type and loan size.',
-  },
-  {
-    Icon: LineChart,
-    title: 'Backed by live market data',
-    desc: 'Our platform runs on daily ECB EURIBOR and central bank feeds plus a bank-rate monitoring pipeline — borrowers arrive informed and decision-ready.',
-  },
-  {
     Icon: ShieldCheck,
-    title: 'GDPR-clean consent chain',
-    desc: 'Leads are collected with explicit consent and transparent data use. Full audit trail from first touch to handover.',
+    title: 'Free listing, no contract',
+    desc: 'Being listed and having your data corrected costs nothing. Commercial relationships never change the rates we show or the default ordering.',
   },
   {
     Icon: Zap,
-    title: 'Pay per lead — nothing upfront',
-    desc: 'Pure CPL model: you define the qualification criteria, you pay only for leads that match them. Monthly invoicing, cancel anytime.',
+    title: 'Corrections within 2 business days',
+    desc: 'Send the page URL and your official source to info@nordicrate.com. Logo or listing removal on request within 5 business days.',
+  },
+  {
+    Icon: LineChart,
+    title: 'Rates checked daily, with a timestamp',
+    desc: 'For selected banks we read the published rate from your own product page every day and show when it was checked, with a link back to you. Prefer to send a feed? Even better.',
+  },
+  {
+    Icon: Target,
+    title: 'An audience domestic ads miss',
+    desc: 'English-speaking expats, e-residents and people moving to the region, comparing credit, deposits and insurance across borders.',
+  },
+  {
+    Icon: UserCheck,
+    title: 'Referral or leads — your choice',
+    desc: 'Pay per click, application or approved contract through Awin, Adtraction or directly; or receive consented leads that match your criteria.',
+  },
+  {
+    Icon: Globe2,
+    title: 'Start small, leave anytime',
+    desc: 'An email is enough to start under our Partner Terms. No exclusivity, 30 days notice to end. A signed agreement or network terms take precedence.',
   },
 ];
 
 const STEPS = [
-  { n: 1, title: 'Define your criteria', desc: 'Country, product type, loan amount range, minimum income — we configure qualification to your underwriting profile.' },
-  { n: 2, title: 'Receive qualified leads', desc: 'Real-time delivery via email or webhook. Each lead includes the full eligibility snapshot our AI collected.' },
-  { n: 3, title: 'Pay per result', desc: 'Monthly invoice for delivered leads only. Transparent reporting in a shared dashboard.' },
+  { n: 1, title: 'Check your listing', desc: 'Look up your products on NordicRate. Anything wrong or missing? Tell us — it is fixed within 2 business days.' },
+  { n: 2, title: 'Pick a model', desc: 'Free listing only, a rate feed, affiliate referral, or consented leads. We agree the details by email.' },
+  { n: 3, title: 'Review together monthly', desc: 'Monthly summary of clicks, leads and conversions. Adjust or stop with 30 days notice.' },
 ];
 
 export default function PartnersPage() {
@@ -67,17 +71,18 @@ export default function PartnersPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-              For banks, brokers &amp; fintechs
+              For banks, insurers, fintechs &amp; comparison partners
             </div>
             <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5">
-              Qualified borrowers.
+              Accurate listings.
               <br />
-              <span className="text-sky-400">Delivered, not promised.</span>
+              <span className="text-sky-400">Easy to work with.</span>
             </h1>
             <p className="text-slate-300 text-lg leading-relaxed mb-8">
-              NordicRate compares {PRODUCTS.length}+ credit products from {INSTITUTIONS.length}+ institutions
-              across {COUNTRIES.length} Nordic &amp; Baltic markets. Our AI assistant qualifies every borrower
-              before they reach a lender — partner with us and receive only the leads that fit your criteria.
+              NordicRate compares {PRODUCTS.length}+ financial products from {INSTITUTIONS.length}+ institutions
+              across {COUNTRIES.length} Nordic &amp; Baltic markets. We are a young, independent service: we
+              keep your data right, label what is indicative, and make cooperation simple — from a free
+              listing to referral and lead partnerships.
             </p>
             <a
               href="#contact"
@@ -85,6 +90,11 @@ export default function PartnersPage() {
             >
               Become a partner →
             </a>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 text-sm">
+              <a href="/listing-policy" className="text-slate-300 underline hover:text-white">Listing &amp; Data Policy</a>
+              <a href="/partner-terms" className="text-slate-300 underline hover:text-white">Partner Terms</a>
+              <a href="/corrections" className="text-slate-300 underline hover:text-white">Report a correction</a>
+            </div>
           </div>
         </div>
       </section>
@@ -93,7 +103,7 @@ export default function PartnersPage() {
       <section className="py-14 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-extrabold text-slate-900">Why lenders work with us</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900">How we work with institutions</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {VALUE_PROPS.map(({ Icon, title, desc }) => (
@@ -113,7 +123,7 @@ export default function PartnersPage() {
       <section className="py-14 px-4 bg-slate-50 border-y border-slate-200">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-extrabold text-slate-900">How the CPL partnership works</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900">How to start</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {STEPS.map(({ n, title, desc }) => (

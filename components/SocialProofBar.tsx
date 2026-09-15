@@ -64,10 +64,18 @@ export default function SocialProofBar({ productType }: Props) {
 
       {/* Data freshness — pushed right */}
       <div className="ml-auto flex items-center gap-1.5">
-        {updatedAt ? (
+        {/* 2026-09-15: /api/rates yalnizca ECB/Norges Bank referans oranlarini tazeler.
+            Onceden sigorta sayfasinda bile "Rates updated 5m ago" basiyordu — urun
+            fiyatlari canliymis gibi. Artik neyin tazelendigini soyluyor. */}
+        {productType === 'insurance' ? (
+          <span className="flex items-center gap-1 text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
+            <span className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+            Example premiums · not live quotes
+          </span>
+        ) : updatedAt ? (
           <span className="flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Rates updated {timeAgo(updatedAt)}
+            EURIBOR reference updated {timeAgo(updatedAt)}
           </span>
         ) : (
           <span className="flex items-center gap-1 text-[10px] text-slate-300">

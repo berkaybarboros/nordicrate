@@ -13,7 +13,7 @@ const deep = DEEP_CONTENT.insuranceHub.en;
 export const metadata: Metadata = {
   title: "Insurance Estonia | Compare All Types — Motor, CASCO, Home, Health, Travel, Life",
   description:
-    "Compare all insurance types in Estonia. Motor (liikluskindlustus), CASCO, home, health, travel (reisikindlustus) and life (elukindlustus) insurance from If, ERGO, Swedbank, LHV, Gjensidige, SEB. Instant quotes.",
+    "Compare all insurance types in Estonia. Motor (liikluskindlustus), CASCO, home, health, travel (reisikindlustus) and life (elukindlustus) insurance from If, ERGO, Swedbank, LHV, Gjensidige, SEB. Coverage compared side by side; prices are examples — get your quote from the insurer.",
   keywords: [
     "insurance Estonia",
     "kindlustus Eesti",
@@ -42,7 +42,7 @@ const insuranceTypes = [
     title: "Motor Insurance",
     subtitle: "liikluskindlustus",
     desc: "Mandatory liability for all vehicles",
-    price: "From €79/year",
+    price: "Example: €79/year",
     color: "from-orange-500 to-orange-600",
     badge: "Required by law",
     badgeColor: "bg-red-500",
@@ -53,7 +53,7 @@ const insuranceTypes = [
     title: "CASCO",
     subtitle: "kaskokindlustus",
     desc: "Comprehensive vehicle cover",
-    price: "From €240/year",
+    price: "Example: €240/year",
     color: "from-teal-500 to-teal-600",
     badge: null,
     badgeColor: "",
@@ -64,7 +64,7 @@ const insuranceTypes = [
     title: "Home Insurance",
     subtitle: "kodukindlustus",
     desc: "Property & contents protection",
-    price: "From €99/year",
+    price: "Example: €99/year",
     color: "from-green-500 to-green-600",
     badge: null,
     badgeColor: "",
@@ -75,7 +75,7 @@ const insuranceTypes = [
     title: "Health Insurance",
     subtitle: "ravikindlustus",
     desc: "Private healthcare & dental",
-    price: "From €150/year",
+    price: "Example: €150/year",
     color: "from-rose-500 to-rose-600",
     badge: null,
     badgeColor: "",
@@ -86,7 +86,7 @@ const insuranceTypes = [
     title: "Travel Insurance",
     subtitle: "reisikindlustus",
     desc: "Medical, cancellation & baggage",
-    price: "From €49/year",
+    price: "Example: €49/year",
     color: "from-sky-500 to-sky-600",
     badge: "Schengen required",
     badgeColor: "bg-sky-500",
@@ -97,7 +97,7 @@ const insuranceTypes = [
     title: "Life Insurance",
     subtitle: "elukindlustus",
     desc: "Term life & death benefit",
-    price: "From €11/month",
+    price: "Example: €11/month",
     color: "from-violet-500 to-violet-600",
     badge: "Mortgage required",
     badgeColor: "bg-violet-500",
@@ -130,7 +130,7 @@ export default function InsurancePage() {
           </div>
           <p className="text-white/80 max-w-xl">
             Compare all insurance types from licensed Estonian insurers — motor, home, health,
-            travel, CASCO and life. Real prices, instant quotes.
+            travel, CASCO and life. Example premiums — your real price comes from the insurer.
           </p>
           <div className="flex flex-wrap gap-3 mt-5">
             {["If P&C", "ERGO", "Swedbank", "LHV", "Gjensidige", "SEB Life"].map((name) => (

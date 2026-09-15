@@ -54,6 +54,16 @@ interface ScrapedRateRow {
   scraped_at: string;
 }
 
+interface FeedbackRow {
+  created_at: string;
+  page: string;
+  kind: string;
+  helpful: boolean | null;
+  message: string | null;
+  email: string | null;
+  source: string | null;
+}
+
 interface DepositRateRow {
   bank_id: string;
   rates: Record<string, number> | null;
@@ -81,6 +91,7 @@ const EMPTY_DATA = {
   alertCount: 0,
   scrapedRates: [] as ScrapedRateRow[],
   depositRates: [] as DepositRateRow[],
+  feedback: [] as FeedbackRow[],
   failedAttempts: [] as FailedAttemptRow[],
   onboardingSteps: [] as OnboardingStepRow[],
 };
@@ -102,7 +113,7 @@ async function loadDataInner() {
 
   const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes] = await Promise.all([
+  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes, fbRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -144,6 +155,13 @@ async function loadDataInner() {
       .select('bank_id, scraped_at')
       .eq('parse_ok', false)
       .gte('scraped_at', since48h),
+    // Kullanıcı geri bildirimi (PageFeedback + onboarding sonuç ekranı)
+    client
+      .from('user_feedback')
+      .select('created_at, page, kind, helpful, message, email, source')
+      .gte('created_at', since30d)
+      .order('created_at', { ascending: false })
+      .limit(200),
   ]);
 
   return {
@@ -155,6 +173,7 @@ async function loadDataInner() {
     alertCount: alertsRes.count ?? 0,
     scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
     depositRates: (depRes.data ?? []) as DepositRateRow[],
+    feedback: (fbRes.data ?? []) as FeedbackRow[],
     failedAttempts: [
       ...((loanFailRes.data ?? []) as FailedAttemptRow[]),
       ...((depFailRes.data ?? []) as FailedAttemptRow[]).map((r) => ({ ...r, product_type: 'deposit' })),
@@ -180,7 +199,10 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps, feedback } = await loadData();
+  const fbYes = feedback.filter((f) => f.helpful === true).length;
+  const fbNo = feedback.filter((f) => f.helpful === false).length;
+  const fbMessages = feedback.filter((f) => f.message);
 
   // Rate feed health: esikler lib/live-rates.ts ile ayni (48 saat taze, 7 gun ust sinir).
   // Scraper kendi kendine calisir; bu panel "sessizce bozuldu mu" sorusunu cevaplar.
@@ -440,6 +462,47 @@ export default async function AdminDashboard() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* User feedback (2026-09-15) — sayfa mikro-anketi + onboarding sonuçları */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-extrabold text-slate-900">User Feedback · 30d</h2>
+          <span className="text-xs text-slate-500">
+            <strong className="text-emerald-700">{fbYes}</strong> found it · <strong className="text-amber-700">{fbNo}</strong> didn&apos;t · {fbMessages.length} messages
+          </span>
+        </div>
+        <p className="text-xs text-slate-400 mb-4">Every &quot;No&quot; with a message is a roadmap item. Reply to those that left an email.</p>
+        {fbMessages.length === 0 ? (
+          <p className="text-sm text-slate-400">No written feedback yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                  <th className="py-2 pr-4">When</th>
+                  <th className="py-2 pr-4">Page</th>
+                  <th className="py-2 pr-4">Source</th>
+                  <th className="py-2 pr-4">Message</th>
+                  <th className="py-2">Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fbMessages.slice(0, 50).map((f) => (
+                  <tr key={f.created_at + f.page} className="border-b border-slate-50 last:border-0 align-top">
+                    <td className="py-2 pr-4 text-slate-500 whitespace-nowrap">
+                      {new Date(f.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                    </td>
+                    <td className="py-2 pr-4 text-slate-700 whitespace-nowrap">{f.page}</td>
+                    <td className="py-2 pr-4 text-slate-500">{f.source ?? '-'}</td>
+                    <td className="py-2 pr-4 text-slate-800 max-w-md">{f.message}</td>
+                    <td className="py-2 text-slate-500">{f.email ?? '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Rate feed health (2026-09-13). Eski "D1 Pilot - LHV" tablosunun yerine:

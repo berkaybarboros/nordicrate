@@ -103,6 +103,8 @@ function PersonalLoansInner() {
 
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [offers, setOffers] = useState<LoanOffer[]>([]);
+  // Kaç teklifin oranı bugün bankanın sitesinden okundu — "Updated today" sahte iddiasının yerine
+  const [liveCount, setLiveCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
@@ -118,6 +120,7 @@ function PersonalLoansInner() {
       .then((r) => r.json())
       .then((data) => {
         setOffers(data.loans || []);
+        setLiveCount(typeof data.meta?.liveCount === "number" ? data.meta.liveCount : null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -138,7 +141,8 @@ function PersonalLoansInner() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-white/80">
-                {loading ? "Loading..." : `${offers.length} ${t.loans.offersFound}`} · Updated today
+                {loading ? "Loading..." : `${offers.length} ${t.loans.offersFound}`}
+                {!loading && liveCount != null && ` · ${liveCount} rates read from bank websites, others indicative`}
               </p>
             </div>
             <button

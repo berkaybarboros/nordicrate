@@ -52,7 +52,7 @@ export default function ConsentBanner() {
             LCP elementi olup skoru 5.8s'e çekiyordu (Lighthouse 2026-08-01) */}
         <p className="text-sm text-slate-700 leading-relaxed">
           <strong className="text-slate-900">Cookies on NordicRate.</strong>{' '}
-          One optional analytics cookie (Google Analytics) — nothing is set until you choose.{' '}
+          Google Analytics runs only if you accept. Declining also switches off our own anonymous visit counter.{' '}
           <Link href="/cookies" className="text-sky-700 underline">Cookie Policy</Link>
           {' · '}
           <Link href="/privacy" className="text-sky-700 underline">Privacy Policy</Link>

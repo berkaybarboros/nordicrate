@@ -3,9 +3,9 @@ import CategorySeoBlock from "@/components/seo/CategorySeoBlock";
 import HomeInsuranceContent from "./HomeInsuranceContent";
 
 export const metadata: Metadata = {
-  title: "Home Insurance Estonia | Compare Property Coverage from €99/yr",
+  title: "Home Insurance Estonia | Compare Property Coverage",
   description:
-    "Compare home and property insurance in Estonia from If, ERGO and Gjensidige. Protect your home against fire, theft, flood and storm. Contents coverage included. From €99/year.",
+    "Compare home and property insurance in Estonia from If, ERGO and Gjensidige. Protect your home against fire, theft, flood and storm. Contents coverage included.",
   keywords: [
     "home insurance Estonia",
     "kodukindlustus",
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://nordicrate.com/insurance/home" },
   openGraph: {
-    title: "Home Insurance Estonia | From €99/yr | NordicRate",
-    description: "Compare home insurance from If, ERGO, Gjensidige. From €99/year.",
+    title: "Home Insurance Estonia | Compare Insurers | NordicRate",
+    description: "Compare home insurance from If, ERGO, Gjensidige — coverage side by side.",
     url: "https://nordicrate.com/insurance/home",
     type: "website",
   },

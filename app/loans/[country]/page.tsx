@@ -15,6 +15,7 @@ import { buildProductsItemList, buildFaqJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 import CountryFlag from '@/components/CountryFlag';
 import RateCard from '@/components/RateCard';
+import MatchCta from '@/components/MatchCta';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
@@ -54,8 +55,10 @@ export default async function CountryLoansPage({ params }: PageProps) {
     PRODUCTS.filter((p) => institutions.some((i) => i.id === p.institutionId))
   )).sort((a, b) => a.rateMin - b.rateMin);
 
-  const bestPersonal = products.find((p) => p.type === 'personal');
-  const bestMortgage = products.find((p) => p.type === 'mortgage');
+  // "from X%" başlık istatistiği yalnızca bankanın sitesinden okunmuş oranlardan —
+  // statik katalog oranı başlıkta "en düşük" gibi durursa yanıltıcı olur.
+  const bestPersonal = products.find((p) => p.type === 'personal' && p.isLiveRate);
+  const bestMortgage = products.find((p) => p.type === 'mortgage' && p.isLiveRate);
 
   return (
     <div>
@@ -94,6 +97,9 @@ export default async function CountryLoansPage({ params }: PageProps) {
                 <p className="text-xs text-slate-400 mt-1">{label}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-8 max-w-2xl">
+            <MatchCta country={landing.code} />
           </div>
         </div>
       </section>

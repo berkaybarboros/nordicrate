@@ -24,13 +24,29 @@ export type EventType =
   | 'recommendation_click' // öneri tıklandı
   | 'onboarding_step'      // onboarding adımı görüntülendi (funnel)
   | 'onboarding_complete'  // onboarding sihirbazı tamamlandı
-  | 'lead_capture';        // e-posta yakalama (newsletter / rate report gate)
+  | 'lead_capture'         // e-posta yakalama (newsletter / rate report gate)
+  | 'feedback';            // sayfa mikro-anketi (PageFeedback)
 
 interface TrackPayload {
   product_id?:   string;
   product_type?: string;
   page?:         string;
   [key: string]: unknown; // rest → metadata JSONB
+}
+
+/**
+ * First-party ölçüm yalnızca ziyaretçi analitiği REDDETMEDİYSE çalışır.
+ * 2026-09-15: banner'da "Decline" diyen ziyaretçinin page_view/product_view'ı yine
+ * Supabase'e yazılıyordu. Muafiyet dayanağı (sekme ömürlü sessionStorage kimliği,
+ * kişisel veri yok, yalnız toplu kullanım) itiraz hakkı tanınmasını gerektirir —
+ * reddetmek bu itirazdır. Cookie Policy bu davranışı anlatır.
+ */
+function firstPartyAllowed(): boolean {
+  try {
+    return localStorage.getItem('nr-consent') !== 'denied';
+  } catch {
+    return true;
+  }
 }
 
 // Session ID: browser sessionStorage'da tutulur (tab başına unique)
@@ -156,6 +172,8 @@ export async function track(
     });
   } catch { /* analytics asla UI'yı bozmaz */ }
 
+  if (!firstPartyAllowed()) return;
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -205,6 +223,7 @@ async function flushProductViews(): Promise<void> {
   if (viewQueue.length === 0) return;
 
   const batch = viewQueue.splice(0, viewQueue.length);
+  if (!firstPartyAllowed()) return;
   try {
     const { data: { user } } = await supabase.auth.getUser();
     const sid = getSessionId();
@@ -270,3 +289,8 @@ export const trackFindRateSubmit = (productType: string, leadId: string | null) 
 
 export const trackRecommendationClick = (rank: number, productId: string, leadId: string | null) =>
   track('recommendation_click', { product_id: productId, rank, lead_id: leadId });
+
+/** Feedback formu için oturum + ilk kaynak (feedback'i trafik kanalıyla eşlemek için) */
+export function getSessionContext(): { sessionId: string; source: string | null } {
+  return { sessionId: getSessionId(), source: getAttribution()?.source ?? null };
+}

@@ -111,7 +111,7 @@ export default async function HomePage() {
                   `${totalProducts}+ offers from ${totalInstitutions}+ banks in one view`,
                   `${totalCountries} Nordic & Baltic countries covered`,
                   'Free & independent — no credit check, no sign-up',
-                  'Live EURIBOR & bank-verified rates, updated daily',
+                  'Rates read daily from bank websites — anything else is marked indicative',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-slate-700">
                     <span className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">

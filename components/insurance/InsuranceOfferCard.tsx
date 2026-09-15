@@ -13,12 +13,6 @@ interface Props {
   offer: InsuranceOffer;
 }
 
-const badgeColors: Record<string, string> = {
-  "Most Popular": "bg-blue-100 text-blue-700 border border-blue-200",
-  "Best Price": "bg-green-100 text-green-700 border border-green-200",
-  "Estonian Choice": "bg-orange-100 text-orange-700 border border-orange-200",
-  "Best Value": "bg-purple-100 text-purple-700 border border-purple-200",
-};
 
 export default function InsuranceOfferCard({ offer }: Props) {
   const { t } = useTranslation();
@@ -45,11 +39,17 @@ export default function InsuranceOfferCard({ offer }: Props) {
           <BankLogo bankId={offer.companyId} name={offer.companyName} size={56} />
           <div>
             <p className="font-bold text-gray-900 text-sm">{offer.companyName}</p>
-            {offer.badge && (
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeColors[offer.badge] || "bg-gray-100 text-gray-600"}`}>
-                {offer.badge}
-              </span>
-            )}
+            {/* 2026-09-15: "Best Price / Most Popular / Best Value" rozetleri kaldırıldı —
+                ne fiyat karşılaştırması ne popülerlik verisi var (UCPD). Yerine verinin
+                niteliğini açıkça söyleyen rozet: sigorta primleri kişiye göre fiyatlanır,
+                buradaki rakam örnek profildir, canlı teklif değildir. */}
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
+              title="Insurance is priced individually. This is an example premium for a typical profile, not a quote. We do not read insurer prices live."
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
+              Example premium · not a quote
+            </span>
           </div>
         </div>
 
@@ -58,7 +58,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
           <div className="md:flex-1 md:border-l md:border-gray-100 md:pl-5">
             <p className="text-xs text-gray-400 mb-0.5">{t.insurance.annualPremium}</p>
             <p className="text-xl font-extrabold text-[#1a3c6e]">
-              €{offer.representativePremium}
+              ~€{offer.representativePremium}
             </p>
             <p className="text-xs text-gray-400">{t.insurance.perYear}</p>
           </div>
@@ -114,7 +114,7 @@ export default function InsuranceOfferCard({ offer }: Props) {
                   applyUrl: quoteUrl,
                   rawPremium: offer.representativePremium,
                   metrics: [
-                    { label: "Annual Premium", value: `€${offer.representativePremium}` },
+                    { label: "Annual Premium (example)", value: `~€${offer.representativePremium}` },
                     { label: "Monthly Premium", value: `€${monthly}` },
                     { label: "Excess / Deductible", value: offer.excess === 0 ? "None" : `€${offer.excess}` },
                     { label: "Online Discount", value: offer.onlineDiscount ? `-${offer.onlineDiscount}%` : "—" },

@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Hukuk sayfaları
-  const legalRoutes: MetadataRoute.Sitemap = ['privacy', 'terms', 'cookies', 'imprint'].map((s) => ({
+  const legalRoutes: MetadataRoute.Sitemap = ['privacy', 'terms', 'cookies', 'imprint', 'listing-policy', 'partner-terms', 'corrections'].map((s) => ({
     url: `${BASE_URL}/${s}`,
     lastModified: now,
     changeFrequency: 'yearly' as const,

@@ -5,7 +5,7 @@ import LifeInsuranceContent from "./LifeInsuranceContent";
 export const metadata: Metadata = {
   title: "Life Insurance Estonia | Compare elukindlustus Prices 2026",
   description:
-    "Compare life insurance in Estonia from SEB Life, Swedbank Life, ERGO Life, If Life. Term life from €11/month. Death benefit, critical illness, total disability cover. Compare quotes.",
+    "Compare life insurance in Estonia from SEB Life, Swedbank Life, ERGO Life, If Life. Death benefit, critical illness, total disability cover.",
   keywords: [
     "life insurance Estonia",
     "elukindlustus Eesti",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Life Insurance Estonia | Compare elukindlustus | NordicRate",
     description:
-      "Compare life insurance from SEB Life, Swedbank Life, ERGO, If. Term life from €11/month. Death benefit up to €500,000 + critical illness cover.",
+      "Compare life insurance from SEB Life, Swedbank Life, ERGO, If. Death benefit up to €500,000 + critical illness cover.",
     url: "https://nordicrate.com/insurance/life",
     type: "website",
   },
@@ -68,7 +68,7 @@ const jsonLd = {
           name: "How much does life insurance cost in Estonia?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Term life insurance in Estonia starts from approximately €11/month (€132/year) for a healthy non-smoker aged 30–40 with €100,000 cover. Premiums depend on age, health, smoking status, and cover amount.",
+            text: "Term life insurance in Estonia can start around €11/month in our example profile (€132/year) for a healthy non-smoker aged 30–40 with €100,000 cover. Premiums depend on age, health, smoking status, and cover amount.",
           },
         },
         {

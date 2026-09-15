@@ -5,8 +5,9 @@
  *
  * Trafik denetimi (2026-08-08) bulgusu: events tablosunda page_view HİÇ yoktu —
  * tracker'da tip tanımlıydı ama hiçbir yer çağırmıyordu. GA4 page_view'ı GTM
- * otomatik atar ama consent'e bağlı; bu first-party kayıt consent'ten bağımsız
- * (kişisel veri yok: path + anonim session) ve admin funnel'ının tabanı.
+ * otomatik atar ama consent'e bağlı; bu first-party kayıt varsayılan açık
+ * (kişisel veri yok: path + sekme ömürlü anonim session), ziyaretçi analitiği
+ * reddederse kapanır (lib/tracker.ts firstPartyAllowed).
  */
 
 import { useEffect } from 'react';

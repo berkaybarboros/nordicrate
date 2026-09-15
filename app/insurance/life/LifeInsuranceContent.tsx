@@ -85,7 +85,7 @@ export default function LifeInsuranceContent() {
               <h1 className="text-2xl md:text-3xl font-extrabold">Life Insurance Estonia</h1>
             </div>
             <p className="text-white/80">
-              elukindlustus — Compare SEB Life, Swedbank Life, ERGO & If · From €11/month
+              elukindlustus — Compare SEB Life, Swedbank Life, ERGO & If · example premiums, not quotes
             </p>
           </div>
         </div>
@@ -326,7 +326,7 @@ export default function LifeInsuranceContent() {
 
             <AIPageBanner
               productType="life-insurance"
-              context={!loading && offers.length > 0 ? `${offers.length} life insurers · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+              context={!loading && offers.length > 0 ? `${offers.length} life insurers · example premiums from €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
             />
 
             {loading && (

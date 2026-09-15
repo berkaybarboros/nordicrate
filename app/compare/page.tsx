@@ -418,11 +418,11 @@ export default function ComparePage() {
               </p>
             </div>
             <div className="flex-shrink-0 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-right">
-              <p className="text-[10px] text-white/50 uppercase tracking-wide">Data updated</p>
-              <p className="text-xs font-bold text-white/90">
-                {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-              </p>
-              <p className="text-[10px] text-emerald-300 mt-0.5">✓ Live rates</p>
+              {/* 2026-09-15: burada bugunun tarihi + "Live rates" basiliyordu — karsilastirma
+                  sepetindeki degerler ekleme anindaki kart verisi, canli degil. */}
+              <p className="text-[10px] text-white/50 uppercase tracking-wide">Figures</p>
+              <p className="text-xs font-bold text-white/90">As shown when added</p>
+              <p className="text-[10px] text-amber-200 mt-0.5">Confirm with provider</p>
             </div>
           </div>
         </div>

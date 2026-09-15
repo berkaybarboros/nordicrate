@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { upsertUserProfile } from '@/lib/db';
@@ -10,7 +9,7 @@ import { buildGoLink } from '@/lib/affiliate';
 import { calculateEligibility, type EligibilityResult } from '@/lib/profile';
 import { useUserProfile } from '@/contexts/UserProfileContext';
 import { calculateMonthlyPayment } from '@/lib/utils';
-import { track, trackRecommendationClick } from '@/lib/tracker';
+import { getSessionContext, track, trackRecommendationClick } from '@/lib/tracker';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -42,6 +41,16 @@ const INCOME_OPTIONS = [
 ];
 
 const STEP_LABELS = ['Loan type', 'Country', 'Amount', 'Income'];
+
+// Kim olduğunu bilmeden kime pazarlama yapacağımızı bilemeyiz: hedef kitle tezi
+// "expat / e-resident / yerel" — bu soru o tezi gerçek cevaplarla test eder.
+const RESIDENCY_OPTIONS = [
+  { value: 'local',      label: 'I grew up here' },
+  { value: 'expat',      label: 'I moved here (expat)' },
+  { value: 'e_resident', label: 'e-Resident / living abroad' },
+  { value: 'moving',     label: 'Planning to move' },
+] as const;
+type Residency = typeof RESIDENCY_OPTIONS[number]['value'];
 
 // Funnel analytics — adım adları (GA4 nr_onboarding_step + admin dashboard)
 const STEP_NAMES = ['loan_type', 'country', 'amount', 'income', 'results'] as const;
@@ -102,36 +111,59 @@ function RecLogo({ logo, mono }: { logo: string | null; mono: string }) {
 }
 
 export default function OnboardingPage() {
-  const router = useRouter();
   const { refresh: refreshProfile } = useUserProfile();
   const [step, setStep]           = useState<Step>(1);
   const [loanType, setLoanType]   = useState<LoanType | ''>('');
   const [country, setCountry]     = useState('');
+  const [residency, setResidency] = useState<Residency | ''>('');
   const [amount, setAmount]       = useState<number | null>(null);
   const [income, setIncome]       = useState<number | null>(null);
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState('');
-  const [authChecked, setAuth]    = useState(false);
+  // 2026-09-15: onboarding yalnizca kayit sonrasi aciliyordu → 0 kullanim (5 hesap,
+  // hepsi test). Artik anonim calisir; hesap yalnizca profili kaydetmek icindir.
+  const [hasSession, setHasSession] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [recs, setRecs]           = useState<FindRateResult | null>(null);
   const [recsLoading, setRecsLoading] = useState(false);
   const [recsError, setRecsError] = useState(false);
   const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
+  const [fbState, setFbState] = useState<'ask' | 'why' | 'done'>('ask');
+  const [fbText, setFbText] = useState('');
+
+  function sendOnboardingFeedback(payload: { helpful?: boolean; message?: string }) {
+    const ctx = getSessionContext();
+    void fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'onboarding',
+        page: `/onboarding?type=${loanType || 'none'}&residency=${residency || 'none'}`,
+        ...payload,
+        sessionId: ctx.sessionId,
+        source: ctx.source,
+      }),
+      keepalive: true,
+    }).catch(() => null);
+  }
   const sessionId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) router.replace('/register');
-      else setAuth(true);
-    });
-  }, [router]);
+    supabase.auth.getSession().then(({ data }) => setHasSession(!!data.session));
+    // Ülke/blog sayfasındaki MatchCta ülkeyi ön-seçili gönderir
+    const qs = new URLSearchParams(window.location.search);
+    const qc = qs.get('country')?.toUpperCase();
+    if (qc && COUNTRIES.some(c => c.code === qc)) setCountry(qc);
+    const qt = qs.get('type');
+    const lt = LOAN_TYPES.find(t => t.value === qt);
+    if (lt) setLoanType(lt.value);
+  }, []);
 
   // Funnel: her adım görüntülenmesi bir event — drop-off admin dashboard'da
   // adım başına distinct session sayısıyla ölçülür (Back tekrarları orada elenir)
   useEffect(() => {
-    if (!authChecked) return;
     track('onboarding_step', { step, step_name: STEP_NAMES[step - 1] });
-  }, [step, authChecked]);
+  }, [step]);
 
   async function fetchRecommendations(type: LoanType, userEmail?: string) {
     setRecsLoading(true);
@@ -173,8 +205,8 @@ export default function OnboardingPage() {
     setError('');
     setSaving(true);
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { router.replace('/login'); return; }
 
+    if (session) {
     const { error: dbError } = await upsertUserProfile({
       userId:              session.user.id,
       email:               session.user.email,
@@ -187,15 +219,18 @@ export default function OnboardingPage() {
       onboardingCompleted: true,
     });
 
-    setSaving(false);
-    if (dbError) { setError(dbError); return; }
+    if (dbError) { setSaving(false); setError(dbError); return; }
     refreshProfile(); // WelcomeBack + RateCard rozetleri reload'suz güncellensin
 
     const fullName = session.user.user_metadata?.full_name as string | undefined;
     setFirstName(fullName?.split(' ')[0] ?? '');
+    }
+    setSaving(false);
+
     track('onboarding_complete', {
       product_type: loanType, country: country || null,
       amount, has_income: !!(income && income > 0),
+      residency: residency || null, signed_in: !!session,
     });
 
     // Sonuç ekranı: client-side eligibility + AI top-3 (business hariç —
@@ -209,7 +244,7 @@ export default function OnboardingPage() {
         country:        country || undefined,
       }));
       if (loanType !== 'business') {
-        fetchRecommendations(loanType, session.user.email);
+        fetchRecommendations(loanType, session?.user.email);
       }
     }
     setStep(5);
@@ -225,14 +260,6 @@ export default function OnboardingPage() {
   function advance() {
     if (step < 4) setStep((step + 1) as Step);
     else handleFinish();
-  }
-
-  if (!authChecked) {
-    return (
-      <div className="min-h-[calc(100vh-130px)] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
   }
 
   // ── Step 5: Your matches ──
@@ -251,10 +278,10 @@ export default function OnboardingPage() {
           {/* Header */}
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full px-3 py-1 text-xs font-semibold mb-3">
-              ✓ Profile saved
+              {hasSession ? '✓ Profile saved' : '✓ No sign-up needed'}
             </div>
             <h1 className="text-2xl font-extrabold text-slate-900">
-              {firstName ? `Great, ${firstName} — ` : ''}here are your best matches
+              {firstName ? `Great, ${firstName} — ` : ''}here are your matches
             </h1>
             <p className="text-sm text-slate-500 mt-1.5 max-w-lg mx-auto">
               {recs?.aiSummary ?? `Based on your profile, we picked the strongest ${typeLabel} offers for you.`}
@@ -399,6 +426,45 @@ export default function OnboardingPage() {
             </div>
           )}
 
+          {/* Sonuç ekranı geri bildirimi — eşleşme işe yaradı mı? */}
+          <div className="bg-white rounded-2xl border border-slate-200 px-5 py-4">
+            {fbState === 'ask' && (
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-sm font-semibold text-slate-800">Were these matches useful?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { sendOnboardingFeedback({ helpful: true }); setFbState('done'); }}
+                    className="text-sm font-semibold px-4 py-1.5 rounded-xl border border-slate-200 hover:bg-emerald-50"
+                  >Yes</button>
+                  <button
+                    onClick={() => { sendOnboardingFeedback({ helpful: false }); setFbState('why'); }}
+                    className="text-sm font-semibold px-4 py-1.5 rounded-xl border border-slate-200 hover:bg-amber-50"
+                  >Not really</button>
+                </div>
+              </div>
+            )}
+            {fbState === 'why' && (
+              <form
+                onSubmit={(e) => { e.preventDefault(); if (fbText.trim()) sendOnboardingFeedback({ message: fbText }); setFbState('done'); }}
+                className="flex flex-col sm:flex-row gap-2"
+              >
+                <input
+                  value={fbText}
+                  onChange={(e) => setFbText(e.target.value)}
+                  maxLength={1000}
+                  placeholder="What would have made them useful?"
+                  className="flex-1 text-sm border border-slate-200 rounded-xl px-3 py-2"
+                />
+                <button type="submit" className="text-sm font-semibold px-4 py-2 rounded-xl bg-sky-600 text-white">Send</button>
+              </form>
+            )}
+            {fbState === 'done' && (
+              <p className="text-sm text-slate-600">Thanks — noted.{!hasSession && (
+                <> Want these saved and a note when rates move? <Link href="/register" className="text-sky-700 underline">Create a free account</Link>.</>
+              )}</p>
+            )}
+          </div>
+
           {/* Footer CTAs */}
           <div className="flex gap-3">
             <Link
@@ -515,6 +581,25 @@ export default function OnboardingPage() {
                   ))}
                 </div>
                 <p className="text-xs text-slate-400 text-center">Optional — tap again to deselect</p>
+                <div className="pt-2 border-t border-slate-100">
+                  <p className="text-sm font-semibold text-slate-700 mb-2">Which describes you best?</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {RESIDENCY_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setResidency(residency === opt.value ? '' : opt.value)}
+                        className={`rounded-xl border-2 px-3 py-2 text-sm transition-all ${
+                          residency === opt.value
+                            ? 'border-sky-500 bg-sky-50 text-sky-800 font-medium'
+                            : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-400 text-center mt-2">Optional — some banks only lend to local residents, so this changes what you can get</p>
+                </div>
               </div>
             )}
 

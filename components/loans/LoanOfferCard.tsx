@@ -22,12 +22,6 @@ interface Props {
   termMonths: number;
 }
 
-const badgeColors: Record<string, string> = {
-  "Best Rate": "bg-green-100 text-green-700 border border-green-200",
-  "Most Popular": "bg-blue-100 text-blue-700 border border-blue-200",
-  "Fast Approval": "bg-orange-100 text-orange-700 border border-orange-200",
-};
-
 export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
   const { t } = useTranslation();
   const { add, remove, has, items, MAX } = useCompare();
@@ -57,13 +51,8 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
           <BankLogo bankId={offer.bankId} name={offer.bankName} size={56} />
           <div>
             <p className="font-bold text-gray-900">{offer.bankName}</p>
-            {/* "Best Rate" statik bir karsilastirma iddiasiydi — canli oranlar gunluk
-                degistiginde yanlis bankada kalabiliyordu (UCPD). Siralama zaten oran. */}
-            {offer.badge && offer.badge !== "Best Rate" && (
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeColors[offer.badge] || "bg-gray-100 text-gray-600"}`}>
-                {offer.badge}
-              </span>
-            )}
+            {/* Editoryal rozetler ("Best Rate", "Most Popular") kaldirildi: siralama zaten
+                orana gore, populerlik verisi yok — kanitsiz ustunluk iddiasi (UCPD). */}
             <div className="flex items-center gap-1 mt-1">
               <Clock size={11} className="text-gray-400" />
               <span className="text-xs text-gray-400">{offer.processingTime}</span>

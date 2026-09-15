@@ -5,7 +5,7 @@ import TravelInsuranceContent from "./TravelInsuranceContent";
 export const metadata: Metadata = {
   title: "Travel Insurance Estonia | Compare reisikindlustus Prices 2026",
   description:
-    "Compare travel insurance in Estonia from If, ERGO, LHV, Gjensidige. Single trip from €4.90, annual multi-trip from €49/year. Medical cover, trip cancellation, baggage. Instant quotes.",
+    "Compare travel insurance in Estonia from If, ERGO, LHV, Gjensidige. Medical cover, trip cancellation, baggage.",
   keywords: [
     "travel insurance Estonia",
     "reisikindlustus",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Travel Insurance Estonia | Compare reisikindlustus | NordicRate",
     description:
-      "Compare travel insurance from If, ERGO, LHV, Gjensidige. Annual multi-trip from €49/year. Medical, cancellation, baggage cover included.",
+      "Compare travel insurance from If, ERGO, LHV, Gjensidige. Medical, cancellation, baggage cover included.",
     url: "https://nordicrate.com/insurance/travel",
     type: "website",
   },
@@ -68,7 +68,7 @@ const jsonLd = {
           name: "How much does annual travel insurance cost in Estonia?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Annual multi-trip travel insurance in Estonia starts from €49/year for Europe cover and €69/year for worldwide cover. Single trip policies from €4.90 per trip.",
+            text: "In our example profiles, annual multi-trip travel insurance in Estonia starts around €49/year for Europe cover and €69/year for worldwide cover. Single trip policies from €4.90 per trip.",
           },
         },
         {

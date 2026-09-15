@@ -267,7 +267,7 @@ export default function MotorInsuranceContent() {
 
             <AIPageBanner
               productType="motor-insurance"
-              context={!loading && offers.length > 0 ? `Cheapest found: €${Math.min(...offers.map(o => o.representativePremium))}/year — ${offers.length} insurers compared` : undefined}
+              context={!loading && offers.length > 0 ? `Lowest example premium: €${Math.min(...offers.map(o => o.representativePremium))}/year — ${offers.length} insurers compared` : undefined}
             />
 
             {loading && (

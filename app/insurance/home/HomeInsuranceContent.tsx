@@ -134,7 +134,7 @@ export default function HomeInsuranceContent() {
 
             <AIPageBanner
               productType="home-insurance"
-              context={!loading && offers.length > 0 ? `${offers.length} home insurance plans · From €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+              context={!loading && offers.length > 0 ? `${offers.length} home insurance plans · example premiums from €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
             />
 
             {loading && (

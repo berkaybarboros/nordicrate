@@ -136,7 +136,7 @@ export default function CascoContent() {
 
             <AIPageBanner
               productType="casco-insurance"
-              context={!loading && offers.length > 0 ? `${offers.length} CASCO plans · Cheapest: €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+              context={!loading && offers.length > 0 ? `${offers.length} CASCO plans · lowest example premium €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
             />
 
             {loading && (

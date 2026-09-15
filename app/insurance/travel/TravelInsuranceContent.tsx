@@ -93,7 +93,7 @@ export default function TravelInsuranceContent() {
               <h1 className="text-2xl md:text-3xl font-extrabold">Travel Insurance Estonia</h1>
             </div>
             <p className="text-white/80">
-              reisikindlustus — Compare all major Estonian insurers · Annual from €49/year
+              reisikindlustus — Compare all major Estonian insurers · example premiums, not quotes
             </p>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function TravelInsuranceContent() {
 
             <AIPageBanner
               productType="travel-insurance"
-              context={!loading && offers.length > 0 ? `${offers.length} travel plans · Annual from €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
+              context={!loading && offers.length > 0 ? `${offers.length} travel plans · example annual premiums from €${Math.min(...offers.map(o => o.representativePremium))}/year` : undefined}
             />
 
             {loading && (

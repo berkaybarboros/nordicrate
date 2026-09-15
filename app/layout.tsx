@@ -10,6 +10,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompareProvider } from '@/contexts/CompareContext';
 import { UserProfileProvider } from '@/contexts/UserProfileContext';
 import PageViewTracker from '@/components/PageViewTracker';
+import PageFeedback from '@/components/PageFeedback';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -166,6 +167,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <CompareProvider>
               <Header />
               <main className="flex-1">{children}</main>
+              <PageFeedback />
               <Footer />
               <AIAssistant />
               <CompareBar />
