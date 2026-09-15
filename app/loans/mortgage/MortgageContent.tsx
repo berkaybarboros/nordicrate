@@ -82,7 +82,7 @@ export default function MortgageContent() {
           </p>
           <div className="flex flex-wrap gap-4 mt-4 text-sm">
             <div className="bg-white/15 rounded-lg px-3 py-1.5">
-              <span className="text-white/60">Best Rate: </span>
+              <span className="text-white/60">Lowest listed rate: </span>
               <span className="font-bold text-green-300">{bestRate}% p.a.</span>
             </div>
             <div className="bg-white/15 rounded-lg px-3 py-1.5">
