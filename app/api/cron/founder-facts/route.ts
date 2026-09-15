@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
+import { fetchAllRows } from '@/lib/supabase-paginate';
 import { safeCompareSecret, isBotSessionId } from '@/lib/security';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { PROGRAMS } from '@/lib/programs-data';
@@ -47,12 +48,23 @@ export async function GET(req: NextRequest) {
   const since60 = new Date(now - 60 * DAY).toISOString();
   const since30 = new Date(now - 30 * DAY).toISOString();
 
-  const [eventsRes, leadsRes, postsRes, feedbackRes, liveLoans, liveDeposits] = await Promise.all([
-    client
-      .from('events')
-      .select('session_id, event_type, metadata')
-      .gte('created_at', since60)
-      .limit(50000),
+  // PostgREST istek başına en fazla 1000 satır döner — ilk sürüm 3.966 olaydan
+  // rastgele 1000'ini sayıp "60 günde 4 oturum" dedi. Başvuru formuna giden rakam.
+  const fetchEvents = async (): Promise<EventRow[]> => {
+    const { data, error } = await fetchAllRows<EventRow>((from, to) =>
+      client
+        .from('events')
+        .select('session_id, event_type, metadata')
+        .gte('created_at', since60)
+        .order('id', { ascending: true })
+        .range(from, to),
+    );
+    if (error) throw new Error(error);
+    return data;
+  };
+
+  const [eventRows, leadsRes, postsRes, feedbackRes, liveLoans, liveDeposits] = await Promise.all([
+    fetchEvents(),
     client.from('leads').select('id', { count: 'exact', head: true }),
     client.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published'),
     client.from('user_feedback').select('kind, helpful').gte('created_at', since30).limit(5000),
@@ -60,7 +72,7 @@ export async function GET(req: NextRequest) {
     getLiveDepositRates().catch(() => new Map()),
   ]);
 
-  const events = ((eventsRes.data ?? []) as EventRow[]).filter((e) => !isBotSessionId(e.session_id));
+  const events = eventRows.filter((e) => !isBotSessionId(e.session_id));
   const sessionsWith = (type: string) =>
     new Set(events.filter((e) => e.event_type === type).map((e) => e.session_id)).size;
 

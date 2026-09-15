@@ -9,6 +9,7 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { isAdminAuthed } from '@/lib/admin-auth';
+import { fetchAllRows } from '@/lib/supabase-paginate';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { isBotSessionId } from '@/lib/security';
 import { createSupabaseServer } from '@/lib/supabase-server';
@@ -119,12 +120,16 @@ async function loadDataInner() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(200),
-    client
-      .from('events')
-      .select('event_type, page, product_type, created_at, session_id, metadata')
-      .gte('created_at', since30d)
-      .order('created_at', { ascending: false })
-      .limit(2000),
+    // PostgREST 1000 satirda kirpar — .limit(2000) funnel'i eksik sayiyordu (2026-09-15)
+    fetchAllRows<EventRow>((from, to) =>
+      client
+        .from('events')
+        .select('event_type, page, product_type, created_at, session_id, metadata')
+        .gte('created_at', since30d)
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
+        .range(from, to),
+    ),
     client.from('rate_alerts').select('id', { count: 'exact', head: true }),
     // D1 pilot — tablo henüz yoksa sessizce boş döner
     client
@@ -132,12 +137,15 @@ async function loadDataInner() {
       .select('bank_id, product_type, rate_min, aprc, raw_snippet, scraped_at')
       .order('bank_id'),
     // Onboarding funnel — adım event'leri (dedup dashboard'da session bazlı yapılır)
-    client
-      .from('events')
-      .select('session_id, metadata')
-      .eq('event_type', 'onboarding_step')
-      .gte('created_at', since30d)
-      .limit(5000),
+    fetchAllRows<OnboardingStepRow>((from, to) =>
+      client
+        .from('events')
+        .select('session_id, metadata')
+        .eq('event_type', 'onboarding_step')
+        .gte('created_at', since30d)
+        .order('id', { ascending: true })
+        .range(from, to),
+    ),
     // Rate feed health: mevduat (2026-09-13'ten beri scrape ediliyor)
     client
       .from('latest_deposit_rates')
@@ -168,8 +176,8 @@ async function loadDataInner() {
     usingServiceRole,
     leads: (leadsRes.data ?? []) as LeadRow[],
     leadsError: leadsRes.error?.message ?? null,
-    events: (eventsRes.data ?? []) as EventRow[],
-    eventsError: eventsRes.error?.message ?? null,
+    events: eventsRes.data,
+    eventsError: eventsRes.error,
     alertCount: alertsRes.count ?? 0,
     scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
     depositRates: (depRes.data ?? []) as DepositRateRow[],
@@ -178,7 +186,7 @@ async function loadDataInner() {
       ...((loanFailRes.data ?? []) as FailedAttemptRow[]),
       ...((depFailRes.data ?? []) as FailedAttemptRow[]).map((r) => ({ ...r, product_type: 'deposit' })),
     ],
-    onboardingSteps: (onbRes.data ?? []) as OnboardingStepRow[],
+    onboardingSteps: onbRes.data,
   };
 }
 
