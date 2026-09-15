@@ -5,6 +5,7 @@ import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
 import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+import { FRESH_MS } from '@/lib/live-rates';
 
 export const revalidate = 1800;
 import { buildFaqJsonLd } from '@/lib/seo';
@@ -44,9 +45,29 @@ export default async function HomePage() {
   // Canlı oran override'ları — tip kartları gerçek scrape verisini yansıtsın
   const liveProducts = await applyScrapedOverrides(PRODUCTS);
 
-  const featuredProducts = liveProducts.filter((p) => p.isPromoted)
-    .sort((a, b) => a.rateMin - b.rateMin)
-    .slice(0, 6);
+  // 2026-09-15: vitrin ONCE bankanin sitesinden bugun okunmus oranlardan kurulur.
+  // Eskiden elle isaretlenmis isPromoted urunler (statik oranlarla) gosteriliyordu.
+  // Kurum+tip basina tek kart (cesitlilik), orana gore; 6'dan azsa gosterge
+  // oranli editoryal secimle tamamlanir — onlar kartta 'Indicative' etiketi tasir.
+  const byRate = (a: { rateMin: number }, b: { rateMin: number }) => a.rateMin - b.rateMin;
+  const seen = new Set<string>();
+  const pickDistinct = <T extends { institutionId: string; type: string }>(list: T[]) =>
+    list.filter((p) => {
+      const k = p.institutionId + ':' + p.type;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  const checkedAt = Date.now();
+  const liveOnly = liveProducts.filter(
+    (p) => p.isLiveRate && checkedAt - new Date(p.updatedAt).getTime() <= FRESH_MS,
+  );
+  const featuredLive = pickDistinct([...liveOnly].sort(byRate)).slice(0, 6);
+  const featuredProducts = [
+    ...featuredLive,
+    ...pickDistinct(liveProducts.filter((p) => p.isPromoted && !p.isLiveRate).sort(byRate)),
+  ].slice(0, 6);
+  const liveFeaturedCount = featuredLive.length;
 
   const countryStats = COUNTRIES.map((c) => ({
     country: c,
@@ -75,7 +96,9 @@ export default async function HomePage() {
     ] as const
   ).map(({ type, href, desc }) => {
     const prods = liveProducts.filter((p) => p.type === type);
-    const best = [...prods].sort((a, b) => a.rateMin - b.rateMin)[0];
+    // "from X%" once canli oranlardan; o tipte canli yoksa gosterge oran (etiketsiz Live degil)
+    const liveProds = prods.filter((p) => p.isLiveRate);
+    const best = [...(liveProds.length ? liveProds : prods)].sort((a, b) => a.rateMin - b.rateMin)[0];
     const inst = best ? getInstitution(best.institutionId) : null;
     return { type, href, desc, count: prods.length, best, inst };
   });
@@ -144,7 +167,7 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900">What do you need financing for?</h2>
-              <p className="text-slate-500 text-sm mt-1">Lowest APR in our database right now — per loan type</p>
+              <p className="text-slate-500 text-sm mt-1">Lowest rate read from bank websites today, per loan type — marked when only indicative</p>
             </div>
             <Link href="/loans" className="text-sky-600 hover:text-sky-800 font-semibold text-sm hidden sm:block">
               View all {totalProducts} products →
@@ -176,7 +199,7 @@ export default async function HomePage() {
                       {formatRate(best.rateMin)}
                     </p>
                     <p className="text-xs text-slate-500 mt-1 mb-3">
-                      APR from · {inst?.shortName}
+                      {best.isLiveRate ? 'from' : 'indicative, from'} · {inst?.shortName}
                     </p>
                   </>
                 )}
@@ -231,9 +254,14 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-sky-600">Featured</span>
-              <h2 className="text-2xl font-extrabold text-slate-900 mt-1">Top Credit Products</h2>
-              <p className="text-slate-500 text-sm mt-1">Handpicked offers from leading Nordic &amp; Baltic institutions</p>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Checked today
+              </span>
+              <h2 className="text-2xl font-extrabold text-slate-900 mt-1">Live rates from bank websites</h2>
+              <p className="text-slate-500 text-sm mt-1">
+                {liveFeaturedCount} offers whose rate we read from the bank&apos;s own page in the last 48 hours, lowest first
+                {liveFeaturedCount < featuredProducts.length ? ' — the rest are indicative and marked as such' : ''}.
+              </p>
             </div>
             <Link href="/loans" className="text-sky-600 hover:text-sky-800 font-semibold text-sm hidden sm:block">
               View all {PRODUCTS.length} products →

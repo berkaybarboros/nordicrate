@@ -230,8 +230,10 @@ export default function Header() {
                   <LogIn size={13} />
                   Sign in
                 </Link>
+                {/* 2026-09-15: /register'a gidiyordu — 60 gunde 11 oturum, 0 gercek kayit.
+                    Once deger (kayitsiz eslesme), hesap sonuc ekraninda istege bagli. */}
                 <Link
-                  href="/register"
+                  href="/onboarding"
                   className="text-xs font-bold px-4 py-2 rounded-lg transition-colors bg-sky-600 hover:bg-sky-500 text-white shadow-sm"
                 >
                   Get started
@@ -382,7 +384,7 @@ export default function Header() {
                     Sign in
                   </Link>
                   <Link
-                    href="/register"
+                    href="/onboarding"
                     onClick={() => setMenuOpen(false)}
                     className="block w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl text-center transition-colors"
                   >

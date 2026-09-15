@@ -66,7 +66,8 @@ export default function RateCard({ product, institution, country }: RateCardProp
       {/* Promoted banner */}
       {product.isPromoted && (
         <div className="bg-sky-600 text-white text-xs font-bold text-center py-1.5 tracking-widest uppercase">
-          Featured Offer
+          {/* Ucretli yerlesim yok (Listing Policy): bu editoryal secim, reklam degil */}
+          Editor&apos;s pick
         </div>
       )}
 
