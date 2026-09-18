@@ -55,6 +55,20 @@ interface ScrapedRateRow {
   scraped_at: string;
 }
 
+interface ApplicationRow {
+  program: string;
+  organisation: string | null;
+  url: string | null;
+  offer: string | null;
+  deadline: string | null;
+  deadline_note: string | null;
+  fit: string;
+  fit_reason: string | null;
+  status: string;
+  priority: number | null;
+  draft_doc_url: string | null;
+}
+
 interface FeedbackRow {
   created_at: string;
   page: string;
@@ -93,6 +107,7 @@ const EMPTY_DATA = {
   scrapedRates: [] as ScrapedRateRow[],
   depositRates: [] as DepositRateRow[],
   feedback: [] as FeedbackRow[],
+  applications: [] as ApplicationRow[],
   failedAttempts: [] as FailedAttemptRow[],
   onboardingSteps: [] as OnboardingStepRow[],
 };
@@ -114,7 +129,7 @@ async function loadDataInner() {
 
   const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes, fbRes] = await Promise.all([
+  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes, fbRes, appsRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -170,6 +185,12 @@ async function loadDataInner() {
       .gte('created_at', since30d)
       .order('created_at', { ascending: false })
       .limit(200),
+    // Hizlandirici/yatirimci basvurulari — tablo yoksa sessizce bos doner
+    client
+      .from('startup_applications')
+      .select('program, organisation, url, offer, deadline, deadline_note, fit, fit_reason, status, priority, draft_doc_url')
+      .order('priority', { ascending: true })
+      .limit(100),
   ]);
 
   return {
@@ -182,6 +203,7 @@ async function loadDataInner() {
     scrapedRates: (scrapedRes.data ?? []) as ScrapedRateRow[],
     depositRates: (depRes.data ?? []) as DepositRateRow[],
     feedback: (fbRes.data ?? []) as FeedbackRow[],
+    applications: (appsRes.data ?? []) as ApplicationRow[],
     failedAttempts: [
       ...((loanFailRes.data ?? []) as FailedAttemptRow[]),
       ...((depFailRes.data ?? []) as FailedAttemptRow[]).map((r) => ({ ...r, product_type: 'deposit' })),
@@ -207,7 +229,14 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps, feedback } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps, feedback, applications } = await loadData();
+  const appsOpen = applications
+    .filter((a) => a.status !== 'skipped' && a.fit !== 'not_eligible')
+    .sort((a, b) => {
+      const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const db = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return da - db;
+    });
   const fbYes = feedback.filter((f) => f.helpful === true).length;
   const fbNo = feedback.filter((f) => f.helpful === false).length;
   const fbMessages = feedback.filter((f) => f.message);
@@ -470,6 +499,79 @@ export default async function AdminDashboard() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Startup/investor basvurulari (2026-09-16). Kaynak: startup_applications.
+          Amac: son tarihi kacirmamak ve hangi basvurunun hangi asamada oldugunu
+          tek yerde gormek. Gonderim her zaman insan onayli. */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-extrabold text-slate-900">Startup Applications</h2>
+          <span className="text-xs text-slate-500">
+            {appsOpen.length} live · {applications.length} tracked
+          </span>
+        </div>
+        <p className="text-xs text-slate-400 mb-4">
+          Skipped and not-eligible programmes are hidden. Deadlines shown in days from today.
+        </p>
+        {appsOpen.length === 0 ? (
+          <p className="text-sm text-slate-400">No live applications tracked.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                  <th className="py-2 pr-4">Due</th>
+                  <th className="py-2 pr-4">Programme</th>
+                  <th className="py-2 pr-4">What you get</th>
+                  <th className="py-2 pr-4">Fit</th>
+                  <th className="py-2 pr-4">Status</th>
+                  <th className="py-2">Draft</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appsOpen.map((a) => {
+                  const days = a.deadline
+                    ? Math.ceil((new Date(a.deadline).getTime() - nowMs) / 86400000)
+                    : null;
+                  const urgent = days != null && days <= 10;
+                  return (
+                    <tr key={a.program} className="border-b border-slate-50 last:border-0 align-top">
+                      <td className="py-2 pr-4 whitespace-nowrap">
+                        {days == null ? (
+                          <span className="text-xs text-slate-500">{a.deadline_note ?? 'rolling'}</span>
+                        ) : (
+                          <span className={`text-xs font-bold ${urgent ? 'text-red-600' : 'text-slate-700'}`}>
+                            {days < 0 ? 'passed' : `${days} days`}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 pr-4 font-semibold text-slate-800">
+                        {a.url ? (
+                          <a href={a.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{a.program}</a>
+                        ) : a.program}
+                        <span className="block text-xs font-normal text-slate-400">{a.organisation}</span>
+                      </td>
+                      <td className="py-2 pr-4 text-slate-600 max-w-xs">{a.offer}</td>
+                      <td className="py-2 pr-4">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          a.fit === 'strong' ? 'bg-emerald-100 text-emerald-700'
+                          : a.fit === 'possible' ? 'bg-sky-100 text-sky-700'
+                          : 'bg-slate-100 text-slate-600'}`}>{a.fit}</span>
+                      </td>
+                      <td className="py-2 pr-4 text-slate-600">{a.status.replace(/_/g, ' ')}</td>
+                      <td className="py-2">
+                        {a.draft_doc_url ? (
+                          <a href={a.draft_doc_url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline text-xs">open</a>
+                        ) : <span className="text-xs text-slate-300">—</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* User feedback (2026-09-15) — sayfa mikro-anketi + onboarding sonuçları */}
