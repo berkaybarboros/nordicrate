@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { safeCompareSecret, clampString } from '@/lib/security';
 import { buildBoilerplate, collectMissing, type CompanyProfile } from '@/lib/company-profile';
+import { computeFounderFacts } from '@/lib/founder-facts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,20 +57,6 @@ function reminderStage(deadline: string | null, cadence: string): string | null 
   return null;
 }
 
-async function fetchFacts(req: NextRequest, secret: string): Promise<unknown> {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? new URL(req.url).origin;
-  try {
-    const res = await fetch(`${base}/api/cron/founder-facts`, {
-      headers: { 'x-cron-secret': secret },
-      cache: 'no-store',
-    });
-    if (!res.ok) return { error: `founder-facts ${res.status}` };
-    return await res.json();
-  } catch (e) {
-    return { error: e instanceof Error ? e.message : 'founder-facts unreachable' };
-  }
-}
-
 export async function GET(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret');
   if (!safeCompareSecret(secret, process.env.CRON_SECRET)) {
@@ -89,7 +76,7 @@ export async function GET(req: NextRequest) {
       .not('status', 'in', '("skipped","rejected","accepted")')
       .order('priority', { ascending: true })
       .limit(200),
-    fetchFacts(req, secret!),
+    computeFounderFacts().catch((e) => ({ error: e instanceof Error ? e.message : 'facts failed' })),
   ]);
 
   const profile = ((profileRes.data?.data ?? {}) as CompanyProfile);
