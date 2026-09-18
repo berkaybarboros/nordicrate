@@ -6,12 +6,13 @@
  *  2. Tıklamayı server-side events tablosuna logla (adblock-proof attribution)
  *  3. UTM ekle (ileride Awin deeplink dönüşümü burada tek noktadan yapılır) → 302
  *
- * Not: Awin onaylanınca, isAllowedApplyUrl geçen hedefler için buildUTMLink yerine
- * Awin deeplink sarmalayıcısı çağrılır — çağıran component'ları değiştirmeye gerek kalmaz.
+ * 2026-09-18: ağ takip linkleri `affiliate_links` tablosundan gelir (lib/affiliate-links).
+ * Program onaylanınca tek satır eklenir; çağıran component'lar değişmez, deploy gerekmez.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { isAllowedApplyUrl } from '@/lib/affiliate';
+import { wrapWithAffiliate } from '@/lib/affiliate-links';
 import { buildUTMLink } from '@/lib/utils';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { enforceRateLimit, isValidSessionId, clampString, isLikelyBot } from '@/lib/security';
@@ -53,7 +54,7 @@ function safeHost(u: string): string | null {
   try { return new URL(u).hostname; } catch { return null; }
 }
 
-export function GET(req: NextRequest) {
+export async function GET(req: NextRequest) {
   // Gateway abuse koruması — allowlist zaten var ama scanner'ları da yavaşlat
   const limited = enforceRateLimit(req, 'go', 120);
   if (limited) return limited;
@@ -101,11 +102,27 @@ export function GET(req: NextRequest) {
   }
 
   // UTM rule set v1 (docs/marketing/utm-ruleset.md) — UTM'ler yalnız burada yazılır
-  const finalUrl = buildUTMLink(dest, {
+  const utmUrl = buildUTMLink(dest, {
     campaign: productType ?? undefined,
     content:  placement ?? undefined,
     term:     productId ?? undefined,
   });
+
+  // Onaylı affiliate programı varsa ağın takip linkiyle sar; yoksa düz UTM linki.
+  // Tıklama LOGU her iki durumda da yukarıda atıldı — gelir ölçümü ağ panelinden,
+  // funnel ölçümü bizden; ikisi birbirine bağımlı değil.
+  let finalUrl = utmUrl;
+  try {
+    const wrapped = await wrapWithAffiliate(utmUrl, {
+      institutionId: institutionId,
+      productType,
+      country: clampString(sp.get('c'), 4),
+      subId: productId ?? sessionId,
+    });
+    if (wrapped) finalUrl = wrapped;
+  } catch (e) {
+    console.error('[go] affiliate wrap failed:', e instanceof Error ? e.message : e);
+  }
   const res = NextResponse.redirect(finalUrl, 302);
   res.headers.set('X-Robots-Tag', 'noindex, nofollow'); // redirect endpoint'i indekslenmesin
   return res;
