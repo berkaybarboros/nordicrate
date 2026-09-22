@@ -483,7 +483,10 @@ function extractSeListRates(text) {
   };
 }
 
-async function scrapeSeMortgages(page, url, key, dryRun) {
+async function scrapeSeMortgages(browser, url, key, dryRun) {
+  // Isvec siteleri dil/pazar secimine gore farkli sablon veriyor: en-GB sekmesinde
+  // oran tablolari hic basilmiyordu (Swedbank, L&F — 2026-09-22). Ayri sv-SE sekmesi.
+  const page = await browser.newPage({ locale: "sv-SE" });
   let ok = 0;
   for (const bank of SE_MORTGAGE_BANKS) {
     try {
@@ -518,6 +521,7 @@ async function scrapeSeMortgages(page, url, key, dryRun) {
     }
     await new Promise((r) => setTimeout(r, 3000));
   }
+  await page.close();
   return { ok, total: SE_MORTGAGE_BANKS.length };
 }
 
@@ -591,7 +595,7 @@ async function main() {
   }
 
   const se = seOnly || !depositsOnly
-    ? await scrapeSeMortgages(page, url, key, dryRun)
+    ? await scrapeSeMortgages(browser, url, key, dryRun)
     : { ok: 0, total: 0 };
   const dep = seOnly ? { ok: 0, total: 0 } : await scrapeDeposits(page, url, key, dryRun);
 
