@@ -426,8 +426,8 @@ const SE_MORTGAGE_BANKS = [
  * basliginda "Listranta" yazmaz ama ustundeki bolum basligi "Listrantor" der; orada
  * degisim sutunu isaretli (+0,25 %) oldugu icin isaretsiz ilk yuzde alinir.
  */
-const SE_SECTION_LIST = /listr[åa]nt|listpris/i;
-const SE_SECTION_AVG = /snittr[åa]nt|genomsnittlig/i;
+const SE_SECTION_LIST = /listr[äåa]nt|listpris/i; // ranta = ä (listränta), ar = å (år)
+const SE_SECTION_AVG = /snittr[äåa]nt|genomsnittlig/i;
 const SE_HEADER = /bindningstid/i;
 const SE_ROW = /^(\d{1,2})\s*(m[åa]n(?:ader)?|[åa]r)\b/i;
 const SE_PCT_PLAIN = /^(\d{1,2}[,.]\d{1,2})\s*%$/;
