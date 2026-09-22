@@ -57,6 +57,13 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
   bigbank: 'bigbank-ee',
   citadele: 'citadele-lv',
   'citadele-ee': 'citadele-ee',
+  // Isvec konut kredisi (2026-09-22): bankanin kendi "listranta" tablosundan.
+  // bank_id = institution id — Estonya Swedbank'i ('swedbank') ile karismasin.
+  'sbab-se': 'sbab-se',
+  'nordea-se': 'nordea-se',
+  'swedbank-se': 'swedbank-se',
+  'lansforsakringar-se': 'lansforsakringar-se',
+  'skandia-se': 'skandia-se',
 };
 
 /**
@@ -74,6 +81,13 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   bigbank: new Set(['personal', 'auto', 'mortgage']),
   citadele: new Set(['personal', 'mortgage']),
   'citadele-ee': new Set(['personal', 'auto', 'mortgage']),
+  // SE: yalnizca konut kredisi — bu bankalarin tuketici kredisi oranlari
+  // ayni sayfada yayinlanmiyor, kredi karti/blanco oranini yanlislikla almayalim.
+  'sbab-se': new Set(['mortgage']),
+  'nordea-se': new Set(['mortgage']),
+  'swedbank-se': new Set(['mortgage']),
+  'lansforsakringar-se': new Set(['mortgage']),
+  'skandia-se': new Set(['mortgage']),
 };
 
 export interface LiveLoanRate {

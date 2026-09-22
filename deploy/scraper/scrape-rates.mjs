@@ -403,6 +403,101 @@ async function scrapeDeposits(page, url, key, dryRun) {
   return { ok, total: DEPOSIT_BANKS.length };
 }
 
+
+/* ───────────────── ISVEC KONUT KREDISI (listränta) ─────────────────
+ * Isvec bankalari iki tablo yayinlar: "snittränta" (musterilerin GECMISTE aldigi
+ * ortalama) ve "listränta" (ilan edilen fiyat). Ikisini karistirmak ilan edilen
+ * fiyati oldugundan dusuk gosterir; bu yuzden YALNIZ listränta alinir, bulunamazsa
+ * parse_ok=false yazilir (tahmin yok). Oranlar SEK, tam nominal (marj+Euribor degil).
+ * robots.txt 2026-09-18'de kontrol edildi: bu yollar tum UA'lara acik.
+ */
+const SE_MORTGAGE_BANKS = [
+  { bankId: 'sbab-se',            url: 'https://www.sbab.se/1/privat/vara_rantor.html', waitMs: 6000 },
+  { bankId: 'nordea-se',          url: 'https://www.nordea.se/privat/produkter/bolan/bolanerantor.html', waitMs: 6000 },
+  { bankId: 'swedbank-se',        url: 'https://www.swedbank.se/privat/boende-och-bolan/bolanerantor.html', waitMs: 8000 },
+  { bankId: 'lansforsakringar-se', url: 'https://www.lansforsakringar.se/privat/bank/bolan/bolaneranta/', waitMs: 8000 },
+  { bankId: 'skandia-se',         url: 'https://www.skandia.se/lana/bolan/bolanerantor/', waitMs: 8000 },
+];
+
+// Vade ve oran komsu hucrelerde durur; innerText bunlari ayri satirlara koyar
+// ("3 man" alt satirda "3,15 %"), bu yuzden aradaki bosluk newline icerebilir.
+const SE_TERM_RATE = /(\d{1,2})\s*(m[åa]n(?:ader)?|[åa]r)\b[^%]{0,30}?(\d{1,2}[,.]\d{1,2})\s*%/gi;
+const SE_LIST_LABEL = /listr[åa]nt|listpris/gi;
+const SE_AVG_LABEL = /snittr[åa]nt|genomsnittlig/gi;
+
+function extractSeListRates(text) {
+  const marks = [];
+  for (const m of text.matchAll(SE_LIST_LABEL)) marks.push({ i: m.index ?? 0, kind: 'list' });
+  for (const m of text.matchAll(SE_AVG_LABEL)) marks.push({ i: m.index ?? 0, kind: 'avg' });
+  marks.sort((a, b) => a.i - b.i);
+  if (!marks.some((x) => x.kind === 'list')) return null;
+
+  // Bir oranin hangi tabloya ait oldugu, kendisinden ONCEKI en yakin basliktir
+  const labelAt = (idx) => {
+    let cur = null;
+    for (const mk of marks) {
+      if (mk.i > idx) break;
+      cur = mk.kind;
+    }
+    return cur;
+  };
+
+  const terms = {};
+  for (const m of text.matchAll(SE_TERM_RATE)) {
+    if (labelAt(m.index ?? 0) !== 'list') continue;
+    const n = parseInt(m[1], 10);
+    const months = /[åa]r/i.test(m[2]) ? n * 12 : n;
+    const rate = parseFloat(m[3].replace(',', '.'));
+    if (!Number.isFinite(rate) || rate < 0.5 || rate > 15) continue;
+    if (months < 1 || months > 180) continue;
+    if (terms[months] == null) terms[months] = rate; // belge sirasinda ilk deger
+  }
+
+  const keys = Object.keys(terms).map(Number).sort((a, b) => a - b);
+  if (keys.length < 3) return null; // tek satir yakalamak tablo bulundugunu kanitlamaz
+  return {
+    min: Math.min(...keys.map((k) => terms[k])),
+    snippet: 'listranta (SEK) ' + keys.map((k) => `${k}m ${terms[k]}%`).join(' / '),
+  };
+}
+
+async function scrapeSeMortgages(page, url, key, dryRun) {
+  let ok = 0;
+  for (const bank of SE_MORTGAGE_BANKS) {
+    try {
+      console.log(`[scraper] ${bank.bankId}/mortgage → ${bank.url}`);
+      const resp = await page.goto(bank.url, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      if (resp && resp.status() >= 400) throw new Error(`HTTP ${resp.status()}`);
+      await page.waitForTimeout(bank.waitMs ?? 6000);
+      const text = await page.evaluate(() => document.body.innerText);
+      const r = extractSeListRates(text);
+
+      if (!dryRun) {
+        await insertRow(url, key, {
+          bank_id:      bank.bankId,
+          product_type: 'mortgage',
+          rate_min:     r?.min ?? null,
+          aprc:         null,
+          source_url:   bank.url,
+          raw_snippet:  r?.snippet ?? text.slice(0, 300),
+          parse_ok:     r !== null,
+        });
+      }
+
+      if (r) {
+        ok++;
+        console.log(`[scraper] OK — ${bank.bankId} list rate from ${r.min}% | ${r.snippet.slice(0, 110)}`);
+      } else {
+        console.warn(`[scraper] PARSE FAILED — ${bank.bankId}: listränta tablosu bulunamadi`);
+      }
+    } catch (err) {
+      console.error(`[scraper] ERROR ${bank.bankId}/mortgage:`, err instanceof Error ? err.message : err);
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  return { ok, total: SE_MORTGAGE_BANKS.length };
+}
+
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -416,10 +511,11 @@ async function main() {
   let total = 0;
   let failures = 0;
 
-  // --deposits-only: yalnizca mevduat (manuel test / ayri calistirma icin)
+  // --deposits-only / --se-only: tek grubu manuel calistirmak icin
   const depositsOnly = process.argv.includes('--deposits-only');
+  const seOnly = process.argv.includes('--se-only');
 
-  for (const bank of depositsOnly ? [] : BANKS) {
+  for (const bank of (depositsOnly || seOnly) ? [] : BANKS) {
     for (const target of bank.targets) {
       total++;
       try {
@@ -471,12 +567,18 @@ async function main() {
     }
   }
 
-  const dep = await scrapeDeposits(page, url, key, dryRun);
+  const se = seOnly || !depositsOnly
+    ? await scrapeSeMortgages(page, url, key, dryRun)
+    : { ok: 0, total: 0 };
+  const dep = seOnly ? { ok: 0, total: 0 } : await scrapeDeposits(page, url, key, dryRun);
 
   await browser.close();
-  console.log(`[scraper] Done — loans ${total - failures}/${total} OK, deposits ${dep.ok}/${dep.total} OK`);
+  console.log(`[scraper] Done — loans ${total - failures}/${total} OK, SE mortgages ${se.ok}/${se.total} OK, deposits ${dep.ok}/${dep.total} OK`);
   // Tamamen basarisiz kosu = altyapi sorunu (tarayici/ag) -> cron log'da exit 1
-  process.exit((total > 0 && failures === total) || dep.ok === 0 ? 1 : 0);
+  // Tamamen basarisiz kosu = altyapi sorunu. SE grubu henuz olgunlasmadigi icin
+  // tek basina exit kodunu belirlemez (kismi basari normal).
+  const hardFail = (total > 0 && failures === total) || (!seOnly && dep.total > 0 && dep.ok === 0);
+  process.exit(hardFail ? 1 : 0);
 }
 
 main();
