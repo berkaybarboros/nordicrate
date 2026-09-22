@@ -43,7 +43,8 @@ interface Facts {
     products?: number;
     fundingPrograms?: number;
     publishedArticles?: number | null;
-    liveRateProductsTotal?: number;
+    liveRateFeeds?: number;
+    liveRateOffersShown?: number;
   };
   traction60d?: {
     sessions?: number;
@@ -84,7 +85,7 @@ export function buildBoilerplate(profile: CompanyProfile, factsUnknown: unknown)
 
   const catalogueSentence =
     c.products != null && c.institutions != null && c.countries != null
-      ? `${c.products}+ products from ${c.institutions} institutions across ${c.countries} countries, of which ${c.liveRateProductsTotal ?? 0} have rates read daily from the bank's own website.`
+      ? `${c.products}+ products from ${c.institutions} institutions across ${c.countries} countries, of which ${c.liveRateOffersShown ?? 0} show a rate read from the bank's own website every day (${c.liveRateFeeds ?? 0} live bank feeds).`
       : 'Catalogue figures unavailable.';
 
   const oneLiner =
@@ -120,7 +121,7 @@ export function buildBoilerplate(profile: CompanyProfile, factsUnknown: unknown)
       `${profile.founder_name ?? 'Founder'} — ${profile.founder_role ?? 'Founder'}. ${profile.founder_bio ?? 'MISSING — founder bio'} Built the product solo since ${f.company?.firstCommit ?? profile.founded ?? '2026'}: data pipeline, comparison engine, LLM assistant, analytics and content automation. Missing competencies: partnerships and sales with Nordic and Baltic banks and insurers, and a second engineer for data work.`,
 
     goals_6m:
-      'Coverage: live rate extraction for Sweden, Iceland, Latvia and Lithuania, taking live-rate products from 20 to 60+. Revenue: first affiliate income with measured conversion, and at least one signed bank or insurer partnership. Matching: residency-aware eligibility matching validated against real user outcomes.',
+      'Coverage: live rate extraction for Latvia, Lithuania, Finland and Denmark on top of Estonia, Sweden and Iceland, taking live bank feeds from 32 to 60+. Revenue: first affiliate income with measured conversion, and at least one signed bank or insurer partnership. Matching: residency-aware eligibility matching validated against real user outcomes.',
 
     use_of_funds:
       `Target raise €${profile.target_raise_eur ?? 200000}: growth and partnerships hire 35%, data coverage and partnerships 30%, founder runway 25%, EU entity and legal 10%.`,
