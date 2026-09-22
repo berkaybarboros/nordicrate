@@ -111,6 +111,14 @@ const BANKS = [
       { productType: 'mortgage', url: 'https://www.citadele.ee/en/private/mortgage/', marginPlusEuribor: true, band: BAND_MARGIN, aprcBand: [2, 9], waitMs: 5000 },
     ],
   },
+  {
+    // Swedbank Latvia (2026-09-22): sayfa yalniz 'no 7,9%' (alt sinir) yayinliyor,
+    // ust sinir yok. Temsili ornek: 15 000 EUR / 5 yil / GPL 9,24%.
+    bankId: 'swedbank-lv',
+    targets: [
+      { productType: 'personal', url: 'https://www.swedbank.lv/private/credit/loans/consumer', band: BAND_RATE, waitMs: 5000 },
+    ],
+  },
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -258,6 +266,8 @@ const RATE_PATTERNS = [
   /interest(?:\s+rate)?[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
   /intress[^%\d]{0,80}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
   /(?:from|alates)\s+(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+  // Letonca: "Procentu likme no 7,9%". APR satiri "Gada procentu likme" ayri desende.
+  /(?<!gada )procentu likme no\s+(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
 ];
 
 // SADECE marginPlusEuribor hedeflerinde eklenir: "(margin 1.8% + six-month EURIBOR)"
@@ -267,6 +277,7 @@ const MARGIN_PATTERN = /margin(?:aal)?[^%\d]{0,40}?(\d{1,2}(?:[.,]\d{1,3})?)\s*%
 const APRC_PATTERNS = [
   /(?:APRC|annual percentage rate(?: of charge)?)[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
   /krediidi kulukuse m[aä]{1,2}r[^%\d]{0,120}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
+  /gada procentu likme[^%\d]{0,40}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%/i,
 ];
 
 // Faiz yerine ücret/peşinat yakalamayı önler ("Contract fee 2%", "Self-financing from 10%")

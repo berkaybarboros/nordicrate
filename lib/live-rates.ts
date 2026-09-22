@@ -57,6 +57,7 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
   bigbank: 'bigbank-ee',
   citadele: 'citadele-lv',
   'citadele-ee': 'citadele-ee',
+  'swedbank-lv': 'swedbank-lv',
   // Isvec konut kredisi (2026-09-22): bankanin kendi "listranta" tablosundan.
   // bank_id = institution id — Estonya Swedbank'i ('swedbank') ile karismasin.
   'sbab-se': 'sbab-se',
@@ -84,6 +85,7 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   bigbank: new Set(['personal', 'auto', 'mortgage']),
   citadele: new Set(['personal', 'mortgage']),
   'citadele-ee': new Set(['personal', 'auto', 'mortgage']),
+  'swedbank-lv': new Set(['personal']),
   // SE: yalnizca konut kredisi — bu bankalarin tuketici kredisi oranlari
   // ayni sayfada yayinlanmiyor, kredi karti/blanco oranini yanlislikla almayalim.
   'sbab-se': new Set(['mortgage']),

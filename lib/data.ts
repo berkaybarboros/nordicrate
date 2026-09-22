@@ -202,7 +202,10 @@ export const PRODUCTS: LoanProduct[] = [
   { id: 'bigbank-ee-a1', institutionId: 'bigbank-ee', name: 'Auto Loan', type: 'auto', customerType: 'individual', rateMin: 6.9, rateMax: 19.9, limitMin: 1000, limitMax: 50000, termMin: 12, termMax: 84, currency: 'EUR', features: ['New & used vehicles', 'Fast approval', 'Simple process'], collateralRequired: true, updatedAt: '2026-07-19' },
 
   // ==================== LATVIA (EUR) ====================
-  { id: 'swedbank-lv-p1', institutionId: 'swedbank-lv', name: 'Consumer Credit', type: 'personal', customerType: 'individual', rateMin: 11.9, rateMax: 26.9, limitMin: 500, limitMax: 28000, termMin: 6, termMax: 120, currency: 'EUR', features: ['Smart-ID', 'Online banking', 'Fast decision'], collateralRequired: false, updatedAt: '2025-11-20' },
+  // Swedbank Latvia consumer credit — swedbank.lv dogrulamasi 2026-09-22: sayfa
+  // "Procentu likme no 7,9%" ve 300-20 000 EUR yaziyor; ust oran sinirini yayinlamiyor,
+  // bu yuzden rateMax=rateMin (uydurmuyoruz). Temsili GPL ornegi %9,24.
+  { id: 'swedbank-lv-p1', institutionId: 'swedbank-lv', name: 'Consumer Credit', type: 'personal', customerType: 'individual', rateMin: 7.9, rateMax: 7.9, limitMin: 300, limitMax: 20000, termMin: 6, termMax: 120, currency: 'EUR', features: ['Rate fixed for the whole term', 'Apply in internet bank', 'Representative APR 9.24%'], collateralRequired: false, updatedAt: '2026-09-22' },
   { id: 'swedbank-lv-m1', institutionId: 'swedbank-lv', name: 'Mortgage Loan', type: 'mortgage', customerType: 'individual', rateMin: 4.75, rateMax: 7.5, limitMin: 15000, limitMax: 600000, termMin: 60, termMax: 300, currency: 'EUR', features: ['EURIBOR + margin', 'Up to 90% LTV first home', 'Green property bonus'], collateralRequired: true, processingFeePercent: 0.4, updatedAt: '2025-11-21' },
   { id: 'swedbank-lv-b1', institutionId: 'swedbank-lv', name: 'Business Loan', type: 'business', customerType: 'corporate', rateMin: 6.9, rateMax: 13.9, limitMin: 5000, limitMax: 800000, termMin: 12, termMax: 84, currency: 'EUR', features: ['Latvia-focused', 'EU-funded programs', 'Investment support'], collateralRequired: false, updatedAt: '2025-11-19' },
 
