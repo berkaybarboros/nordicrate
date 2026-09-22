@@ -416,45 +416,67 @@ const SE_MORTGAGE_BANKS = [
   { bankId: 'nordea-se',          url: 'https://www.nordea.se/privat/produkter/bolan/bolanerantor.html', waitMs: 6000 },
   { bankId: 'swedbank-se',        url: 'https://www.swedbank.se/privat/boende-och-bolan/bolanerantor.html', waitMs: 8000 },
   { bankId: 'lansforsakringar-se', url: 'https://www.lansforsakringar.se/privat/bank/bolan/bolaneranta/', waitMs: 8000 },
-  { bankId: 'skandia-se',         url: 'https://www.skandia.se/lana/bolan/bolanerantor/', waitMs: 8000 },
+  // skandia-se: 403 — otomatik erisim engelli (2026-09-22), eklenmedi
 ];
 
-// Vade ve oran komsu hucrelerde durur; innerText bunlari ayri satirlara koyar
-// ("3 man" alt satirda "3,15 %"), bu yuzden aradaki bosluk newline icerebilir.
-const SE_TERM_RATE = /(\d{1,2})\s*(m[åa]n(?:ader)?|[åa]r)\b[^%]{0,30}?(\d{1,2}[,.]\d{1,2})\s*%/gi;
-const SE_LIST_LABEL = /listr[åa]nt|listpris/gi;
-const SE_AVG_LABEL = /snittr[åa]nt|genomsnittlig/gi;
+/* Isvec tablolari iki sutun tasiyabilir: "Snittranta" (musterilerin gecmiste aldigi
+ * ortalama) ve "Listranta" (ilan edilen fiyat). Swedbank ikisini AYNI satirda verir
+ * ("3 manader\t2,70 %\t3,89 %") — ilk yuzdeyi almak ilan edilen fiyat yerine
+ * ortalamayi basar. Bu yuzden sutun tablo BASLIGINDAN secilir. L&F liste tablosunun
+ * basliginda "Listranta" yazmaz ama ustundeki bolum basligi "Listrantor" der; orada
+ * degisim sutunu isaretli (+0,25 %) oldugu icin isaretsiz ilk yuzde alinir.
+ */
+const SE_SECTION_LIST = /listr[åa]nt|listpris/i;
+const SE_SECTION_AVG = /snittr[åa]nt|genomsnittlig/i;
+const SE_HEADER = /bindningstid/i;
+const SE_ROW = /^(\d{1,2})\s*(m[åa]n(?:ader)?|[åa]r)\b/i;
+const SE_PCT_PLAIN = /^(\d{1,2}[,.]\d{1,2})\s*%$/;
+const SE_PCT_SIGNED = /^[+\u2212-]\s*\d{1,2}[,.]\d{1,2}\s*%$/;
 
 function extractSeListRates(text) {
-  const marks = [];
-  for (const m of text.matchAll(SE_LIST_LABEL)) marks.push({ i: m.index ?? 0, kind: 'list' });
-  for (const m of text.matchAll(SE_AVG_LABEL)) marks.push({ i: m.index ?? 0, kind: 'avg' });
-  marks.sort((a, b) => a.i - b.i);
-  if (!marks.some((x) => x.kind === 'list')) return null;
-
-  // Bir oranin hangi tabloya ait oldugu, kendisinden ONCEKI en yakin basliktir
-  const labelAt = (idx) => {
-    let cur = null;
-    for (const mk of marks) {
-      if (mk.i > idx) break;
-      cur = mk.kind;
-    }
-    return cur;
-  };
-
+  const lines = text.split('\n').map((l) => l.replace(/\u00a0/g, ' ').trimEnd());
+  let section = null;      // 'list' | 'avg'
+  let listColIdx = null;   // baslikta listranta sutununun indeksi (terim sutunu haric)
   const terms = {};
-  for (const m of text.matchAll(SE_TERM_RATE)) {
-    if (labelAt(m.index ?? 0) !== 'list') continue;
+
+  for (const line of lines) {
+    const cells = line.split('\t').map((c) => c.trim()).filter((c) => c !== '');
+
+    // Vade ile baslamayan satir = baslik/aciklama
+    if (!SE_ROW.test(cells[0] ?? '')) {
+      if (SE_HEADER.test(line)) {
+        const cols = cells.slice(1);
+        const i = cols.findIndex((c) => SE_SECTION_LIST.test(c));
+        listColIdx = i >= 0 ? i : null;
+        if (i >= 0) section = 'list';
+        else if (cols.some((c) => SE_SECTION_AVG.test(c))) section = 'avg';
+        continue;
+      }
+      if (SE_SECTION_LIST.test(line) && !SE_SECTION_AVG.test(line)) { section = 'list'; listColIdx = null; }
+      else if (SE_SECTION_AVG.test(line) && !SE_SECTION_LIST.test(line)) { section = 'avg'; listColIdx = null; }
+      continue;
+    }
+
+    if (section !== 'list') continue;
+    const m = SE_ROW.exec(cells[0]);
     const n = parseInt(m[1], 10);
     const months = /[åa]r/i.test(m[2]) ? n * 12 : n;
-    const rate = parseFloat(m[3].replace(',', '.'));
-    if (!Number.isFinite(rate) || rate < 0.5 || rate > 15) continue;
     if (months < 1 || months > 180) continue;
-    if (terms[months] == null) terms[months] = rate; // belge sirasinda ilk deger
+
+    const values = cells.slice(1);
+    const raw = (listColIdx != null && values[listColIdx])
+      ? values[listColIdx]
+      : values.find((v) => SE_PCT_PLAIN.test(v) && !SE_PCT_SIGNED.test(v));
+    if (!raw) continue;
+    const pm = SE_PCT_PLAIN.exec(raw);
+    if (!pm) continue;
+    const rate = parseFloat(pm[1].replace(',', '.'));
+    if (!Number.isFinite(rate) || rate < 0.5 || rate > 15) continue;
+    if (terms[months] == null) terms[months] = rate;
   }
 
   const keys = Object.keys(terms).map(Number).sort((a, b) => a - b);
-  if (keys.length < 3) return null; // tek satir yakalamak tablo bulundugunu kanitlamaz
+  if (keys.length < 3) return null; // tek satir tablo bulundugunu kanitlamaz
   return {
     min: Math.min(...keys.map((k) => terms[k])),
     snippet: 'listranta (SEK) ' + keys.map((k) => `${k}m ${terms[k]}%`).join(' / '),
@@ -466,7 +488,8 @@ async function scrapeSeMortgages(page, url, key, dryRun) {
   for (const bank of SE_MORTGAGE_BANKS) {
     try {
       console.log(`[scraper] ${bank.bankId}/mortgage → ${bank.url}`);
-      const resp = await page.goto(bank.url, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      // networkidle: tablolar JS ile sonradan basiliyor (domcontentloaded'da bos)
+      const resp = await page.goto(bank.url, { waitUntil: 'networkidle', timeout: 60_000 });
       if (resp && resp.status() >= 400) throw new Error(`HTTP ${resp.status()}`);
       await page.waitForTimeout(bank.waitMs ?? 6000);
       const text = await page.evaluate(() => document.body.innerText);
