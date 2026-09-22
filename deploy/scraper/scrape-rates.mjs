@@ -556,7 +556,9 @@ const IS_MORTGAGE_BANKS = [
     pageUrl: 'https://www.islandsbanki.is/en/article/interest-table',
     pdfPattern: /https?:\/\/[^"' ]*islandsbanki_interest_rate_table_external_web\.pdf/i,
     sectionStart: /Non-indexed mortgage\s+3 Year Fixed/i,
-    sectionEnd: /Loans granted before|Indexed mortgage/i,
+    // DIKKAT: /Indexed mortgage/ basligi "Non-indexed mortgage" icinde de eslesir
+    // ve bolumu aninda keser — satir basina sabitlenmeli (2026-09-22 hatasi).
+    sectionEnd: /Loans granted before|\n\s*Indexed mortgage/i,
     rowLabel: /Base rate \/ Portion of loan with LTV below 50%/i,
     note: 'non-indexed fixed, LTV<50% base rate',
   },
