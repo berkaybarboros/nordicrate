@@ -64,6 +64,9 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
   'swedbank-se': 'swedbank-se',
   'lansforsakringar-se': 'lansforsakringar-se',
   'skandia-se': 'skandia-se',
+  // Izlanda: bankalarin PDF faiz tablosundan ENDEKSSIZ (overdtryggd) sabit oran
+  'landsbankinn-is': 'landsbankinn-is',
+  'islandsbanki-is': 'islandsbanki-is',
 };
 
 /**
@@ -88,6 +91,8 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   'swedbank-se': new Set(['mortgage']),
   'lansforsakringar-se': new Set(['mortgage']),
   'skandia-se': new Set(['mortgage']),
+  'landsbankinn-is': new Set(['mortgage']),
+  'islandsbanki-is': new Set(['mortgage']),
 };
 
 export interface LiveLoanRate {

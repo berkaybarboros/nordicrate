@@ -525,6 +525,125 @@ async function scrapeSeMortgages(browser, url, key, dryRun) {
   return { ok, total: SE_MORTGAGE_BANKS.length };
 }
 
+/* ───────────── IZLANDA KONUT KREDISI (PDF vaxtatafla) ─────────────
+ * Izlanda bankalari oranlarini HTML'de degil PDF faiz tablosunda yayinlar ve
+ * IKI ayri urun tutar: verdtryggd (endeksli, ~%4-5 + TUFE) ve overdtryggd
+ * (endekssiz, ~%8-10). Ikisini karistirmak Letonya'da duzelttigimiz hatanin
+ * aynisidir; bu yuzden YALNIZ endekssiz sabit oran okunur ve katalogdaki urun
+ * de endekssiz olarak etiketlenir.
+ *
+ * Ayrica her iki bankada "Loans granted before ... / New loans not available"
+ * bolumleri var — eski portfoy oranlari; kesim satirindan sonrasi okunmaz.
+ *
+ * PDF linki her faiz kararinda degisebildigi icin (Landsbankinn dosya adinda
+ * tarih tasiyor) once HTML sayfasindan link cozulur. pdftotext (poppler) VPS'te
+ * kurulu; yoksa parse_ok=false yazilir, uydurma yapilmaz.
+ */
+const IS_MORTGAGE_BANKS = [
+  {
+    bankId: 'landsbankinn-is',
+    pageUrl: 'https://www.landsbankinn.is/en/interest-rates-and-fees',
+    pdfPattern: /https?:\/\/[^"' ]*vextir\/vaxtaakvordun-[0-9]{6}-enska\.pdf/i,
+    // "1. Housing mortgages" bolumu -> "Loan to value up to 55%" satiri:
+    // 1/3/5 yil sabit oranlar; en dusugu (5 yil) "from" olarak kullanilir.
+    sectionStart: /1\.\s*Housing mortgages/i,
+    sectionEnd: /Loans granted before/i,
+    rowLabel: /Loan to value up to 55%/i,
+    note: 'non-indexed fixed, LTV<=55%',
+  },
+  {
+    bankId: 'islandsbanki-is',
+    pageUrl: 'https://www.islandsbanki.is/en/article/interest-table',
+    pdfPattern: /https?:\/\/[^"' ]*islandsbanki_interest_rate_table_external_web\.pdf/i,
+    sectionStart: /Non-indexed mortgage\s+3 Year Fixed/i,
+    sectionEnd: /Loans granted before|Indexed mortgage/i,
+    rowLabel: /Base rate \/ Portion of loan with LTV below 50%/i,
+    note: 'non-indexed fixed, LTV<50% base rate',
+  },
+];
+
+const IS_PCT = /(\d{1,2},\d{1,2})\s*%/g;
+
+function extractIsFixedRates(pdfText, cfg) {
+  const start = pdfText.search(cfg.sectionStart);
+  if (start < 0) return null;
+  const rest = pdfText.slice(start);
+  const endRel = rest.slice(1).search(cfg.sectionEnd);
+  const section = endRel > 0 ? rest.slice(0, endRel + 1) : rest;
+
+  const line = section.split('\n').find((l) => cfg.rowLabel.test(l));
+  if (!line) return null;
+
+  const rates = [...line.matchAll(IS_PCT)]
+    .map((m) => parseFloat(m[1].replace(',', '.')))
+    .filter((v) => Number.isFinite(v) && v >= 3 && v <= 20);
+  if (rates.length < 2) return null; // tek sayi tabloyu bulduguna kanit degil
+
+  return {
+    min: Math.min(...rates),
+    snippet: `${cfg.note} (ISK): ${rates.map((r) => r + '%').join(' / ')}`,
+  };
+}
+
+async function scrapeIsMortgages(url, key, dryRun) {
+  const { execFileSync } = await import('node:child_process');
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36';
+  let ok = 0;
+
+  for (const cfg of IS_MORTGAGE_BANKS) {
+    let snippet = '';
+    let value = null;
+    try {
+      console.log(`[scraper] ${cfg.bankId}/mortgage → ${cfg.pageUrl}`);
+      const html = await (await fetch(cfg.pageUrl, { headers: { 'user-agent': UA } })).text();
+      const m = html.match(cfg.pdfPattern);
+      if (!m) throw new Error('PDF linki sayfada bulunamadi (yapi degismis olabilir)');
+
+      const pdfUrl = m[0];
+      const buf = Buffer.from(await (await fetch(pdfUrl, { headers: { 'user-agent': UA } })).arrayBuffer());
+      const tmp = path.join(os.tmpdir(), `nr-${cfg.bankId}.pdf`);
+      fs.writeFileSync(tmp, buf);
+
+      const text = execFileSync('pdftotext', ['-layout', tmp, '-'], { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+      fs.unlinkSync(tmp);
+
+      const r = extractIsFixedRates(text, cfg);
+      if (r) {
+        value = r.min;
+        snippet = `${r.snippet} — ${pdfUrl.split('/').pop()}`;
+      } else {
+        snippet = `parse failed — ${pdfUrl.split('/').pop()}`;
+      }
+
+      if (!dryRun) {
+        await insertRow(url, key, {
+          bank_id: cfg.bankId,
+          product_type: 'mortgage',
+          rate_min: value,
+          aprc: null,
+          source_url: cfg.pageUrl,
+          raw_snippet: snippet.slice(0, 500),
+          parse_ok: value !== null,
+        });
+      }
+
+      if (value !== null) {
+        ok++;
+        console.log(`[scraper] OK — ${cfg.bankId} from ${value}% | ${snippet.slice(0, 110)}`);
+      } else {
+        console.warn(`[scraper] PARSE FAILED — ${cfg.bankId}: ${snippet}`);
+      }
+    } catch (err) {
+      console.error(`[scraper] ERROR ${cfg.bankId}/mortgage:`, err instanceof Error ? err.message : err);
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  return { ok, total: IS_MORTGAGE_BANKS.length };
+}
+
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -541,8 +660,9 @@ async function main() {
   // --deposits-only / --se-only: tek grubu manuel calistirmak icin
   const depositsOnly = process.argv.includes('--deposits-only');
   const seOnly = process.argv.includes('--se-only');
+  const isOnly = process.argv.includes('--is-only');
 
-  for (const bank of (depositsOnly || seOnly) ? [] : BANKS) {
+  for (const bank of (depositsOnly || seOnly || isOnly) ? [] : BANKS) {
     for (const target of bank.targets) {
       total++;
       try {
@@ -594,17 +714,20 @@ async function main() {
     }
   }
 
-  const se = seOnly || !depositsOnly
+  const se = (seOnly || (!depositsOnly && !isOnly))
     ? await scrapeSeMortgages(browser, url, key, dryRun)
     : { ok: 0, total: 0 };
-  const dep = seOnly ? { ok: 0, total: 0 } : await scrapeDeposits(page, url, key, dryRun);
+  const is = (isOnly || (!depositsOnly && !seOnly))
+    ? await scrapeIsMortgages(url, key, dryRun)
+    : { ok: 0, total: 0 };
+  const dep = (seOnly || isOnly) ? { ok: 0, total: 0 } : await scrapeDeposits(page, url, key, dryRun);
 
   await browser.close();
-  console.log(`[scraper] Done — loans ${total - failures}/${total} OK, SE mortgages ${se.ok}/${se.total} OK, deposits ${dep.ok}/${dep.total} OK`);
+  console.log(`[scraper] Done — loans ${total - failures}/${total} OK, SE ${se.ok}/${se.total}, IS ${is.ok}/${is.total}, deposits ${dep.ok}/${dep.total} OK`);
   // Tamamen basarisiz kosu = altyapi sorunu (tarayici/ag) -> cron log'da exit 1
   // Tamamen basarisiz kosu = altyapi sorunu. SE grubu henuz olgunlasmadigi icin
   // tek basina exit kodunu belirlemez (kismi basari normal).
-  const hardFail = (total > 0 && failures === total) || (!seOnly && dep.total > 0 && dep.ok === 0);
+  const hardFail = (total > 0 && failures === total) || (dep.total > 0 && dep.ok === 0);
   process.exit(hardFail ? 1 : 0);
 }
 
