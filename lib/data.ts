@@ -131,7 +131,12 @@ export const PRODUCTS: LoanProduct[] = [
 
   // ==================== ICELAND (ISK) ====================
   { id: 'islandsbanki-is-p1', institutionId: 'islandsbanki-is', name: 'Personal Loan', type: 'personal', customerType: 'individual', rateMin: 9.5, rateMax: 22.0, limitMin: 100000, limitMax: 8000000, termMin: 12, termMax: 96, currency: 'ISK', features: ['Digital banking', 'Flexible terms', 'Indexation options'], collateralRequired: false, updatedAt: '2025-11-15' },
-  { id: 'islandsbanki-is-m1', institutionId: 'islandsbanki-is', name: 'Home Loan', type: 'mortgage', customerType: 'individual', rateMin: 5.5, rateMax: 8.5, limitMin: 5000000, limitMax: 200000000, termMin: 60, termMax: 300, currency: 'ISK', features: ['CPI-linked option', 'Non-indexed option', 'Up to 85% LTV'], collateralRequired: true, processingFeePercent: 0.5, updatedAt: '2025-11-18' },
+  // 2026-09-22: Izlanda'da endeksli (verdtryggd, ~%4-5 + TUFE) ve endekssiz
+  // (overdtryggd, ~%8-9) konut kredisi AYRI urunlerdir. Onceki kayit ikisini tek
+  // satirda karistiriyordu; scraper endekssiz sabit orani okudugu icin urun de
+  // endekssiz olarak tanimlandi. Kaynak: bankanin PDF faiz tablosu (3y %8,75 /
+  // 5y %8,45 taban, LTV>%50 icin +%1,10 marj).
+  { id: 'islandsbanki-is-m1', institutionId: 'islandsbanki-is', name: 'Home Loan (non-indexed)', type: 'mortgage', customerType: 'individual', rateMin: 8.45, rateMax: 9.85, limitMin: 5000000, limitMax: 200000000, termMin: 60, termMax: 300, currency: 'ISK', features: ['Non-indexed (óverðtryggt)', '3 or 5 year fixed', 'Margin +1.10% above 50% LTV'], collateralRequired: true, processingFeePercent: 0.5, updatedAt: '2026-09-22' },
   { id: 'islandsbanki-is-b1', institutionId: 'islandsbanki-is', name: 'Business Financing', type: 'business', customerType: 'corporate', rateMin: 8.0, rateMax: 14.0, limitMin: 500000, limitMax: 500000000, termMin: 12, termMax: 120, currency: 'ISK', features: ['SME support', 'Export financing', 'Working capital'], collateralRequired: false, updatedAt: '2025-11-14' },
 
   { id: 'arion-is-p1', institutionId: 'arion-is', name: 'Personal Credit', type: 'personal', customerType: 'individual', rateMin: 10.5, rateMax: 24.9, limitMin: 50000, limitMax: 5000000, termMin: 12, termMax: 84, currency: 'ISK', features: ['Quick approval', 'Online process', 'No collateral'], collateralRequired: false, updatedAt: '2025-11-13', isPromoted: true },
@@ -139,7 +144,10 @@ export const PRODUCTS: LoanProduct[] = [
   { id: 'arion-is-b1', institutionId: 'arion-is', name: 'SME Loan', type: 'business', customerType: 'corporate', rateMin: 8.5, rateMax: 15.5, limitMin: 1000000, limitMax: 300000000, termMin: 12, termMax: 84, currency: 'ISK', features: ['SME-focused', 'Fast decision', 'Flexible security'], collateralRequired: false, updatedAt: '2025-11-11' },
 
   { id: 'landsbankinn-is-p1', institutionId: 'landsbankinn-is', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 8.9, rateMax: 20.5, limitMin: 100000, limitMax: 10000000, termMin: 6, termMax: 120, currency: 'ISK', features: ['State-backed stability', 'Nationwide branches', 'Digital & in-branch'], collateralRequired: false, updatedAt: '2025-11-16' },
-  { id: 'landsbankinn-is-m1', institutionId: 'landsbankinn-is', name: 'Home Loan', type: 'mortgage', customerType: 'individual', rateMin: 5.25, rateMax: 8.0, limitMin: 5000000, limitMax: 250000000, termMin: 60, termMax: 360, currency: 'ISK', features: ['Government scheme eligible', 'CPI and non-CPI', 'Large network'], collateralRequired: true, updatedAt: '2025-11-18' },
+  // 2026-09-22: endekssiz (overdtryggd) sabit oran urunu — bankanin PDF faiz
+  // tablosundan dogrulandi: LTV<=%55 icin 1y %9,20 / 3y %8,75 / 5y %8,35,
+  // LTV %90'a kadar en yuksek %9,90. Endeksli urun ayrica eklenecek.
+  { id: 'landsbankinn-is-m1', institutionId: 'landsbankinn-is', name: 'Home Loan (non-indexed)', type: 'mortgage', customerType: 'individual', rateMin: 8.35, rateMax: 9.9, limitMin: 5000000, limitMax: 250000000, termMin: 60, termMax: 360, currency: 'ISK', features: ['Non-indexed (óverðtryggt)', '1, 3 or 5 year fixed', 'Rate depends on LTV band'], collateralRequired: true, updatedAt: '2026-09-22' },
 
   // ==================== NORWAY (NOK) ====================
   { id: 'dnb-no-p1', institutionId: 'dnb-no', name: 'Consumer Loan', type: 'personal', customerType: 'individual', rateMin: 6.9, rateMax: 18.9, limitMin: 10000, limitMax: 600000, termMin: 12, termMax: 120, currency: 'NOK', features: ['Instant digital approval', 'Vipps integration', 'No security required'], collateralRequired: false, updatedAt: '2025-11-21', isPromoted: true },
