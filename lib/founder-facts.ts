@@ -14,6 +14,7 @@ import { PROGRAMS } from '@/lib/programs-data';
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
 import { withLiveRates } from '@/lib/live-loan-offers';
 import { getLiveDepositRates } from '@/lib/live-rates';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 
 interface EventRow {
   session_id: string | null;
@@ -56,13 +57,16 @@ export async function computeFounderFacts(): Promise<Record<string, unknown>> {
     return data;
   };
 
-  const [eventRows, leadsRes, postsRes, feedbackRes, liveLoans, liveDeposits] = await Promise.all([
+  const [eventRows, leadsRes, postsRes, feedbackRes, liveLoans, liveDeposits, liveProducts] = await Promise.all([
     fetchEvents(),
     client.from('leads').select('id', { count: 'exact', head: true }),
     client.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published'),
     client.from('user_feedback').select('kind, helpful').gte('created_at', since30).limit(5000),
     withLiveRates([...personalLoans, ...mortgageLoans, ...carLoans]).catch(() => []),
     getLiveDepositRates().catch(() => new Map()),
+    // PRODUCTS katalogu da canli oran tasiyor (Isvec/Izlanda konut kredileri);
+    // sayac 2026-09-22'ye kadar yalniz data/loans + mevduati sayiyordu
+    applyScrapedOverrides(PRODUCTS).catch(() => [] as typeof PRODUCTS),
   ]);
 
   const events = eventRows.filter((e) => !isBotSessionId(e.session_id));
@@ -93,6 +97,7 @@ export async function computeFounderFacts(): Promise<Record<string, unknown>> {
 
   const feedback = (feedbackRes.data ?? []) as { kind: string; helpful: boolean | null }[];
   const liveLoanCount = liveLoans.filter((o) => o.isLiveRate).length;
+  const liveProductCount = liveProducts.filter((p) => p.isLiveRate).length;
 
   return {
     generatedAt: new Date(now).toISOString(),
@@ -113,8 +118,9 @@ export async function computeFounderFacts(): Promise<Record<string, unknown>> {
       fundingPrograms: PROGRAMS.length,
       publishedArticles: postsRes.count ?? null,
       liveRateLoanOffers: liveLoanCount,
+      liveRateCatalogueProducts: liveProductCount,
       liveRateDepositBanks: liveDeposits.size,
-      liveRateProductsTotal: liveLoanCount + liveDeposits.size,
+      liveRateProductsTotal: liveLoanCount + liveProductCount + liveDeposits.size,
     },
     traction60d: {
       sessions,
