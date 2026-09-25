@@ -130,33 +130,73 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 - Chat live rates module-level cache (1 saat TTL) — "her mesajda HTTP round-trip" issue kapandı
 
 ## Aktif Bağlam
-**Son güncelleme**: 2026-07-02
-**Mevcut durum**: nordicrate.com canlıda (2026-07-04 taşındı; eski subdomain 301), HTTPS çalışıyor. V3 sprint başladı.
-**Bu sprint odağı**: V3 — backend security ✅ + admin funnel (B3) ✅; sıradaki: real data pipeline (D1 Playwright scraper), affiliate (Awin/LHV)
-**Tamamlananlar**:
-- ✅ ECB EURIBOR canlı veri (RT series key düzeltildi)
-- ✅ sitemap.ts + robots.ts
-- ✅ Let's Encrypt SSL (NPM üzerinden)
-- ✅ Groq AI asistan (streaming, personal + corporate mode)
-- ✅ AI context'e live rates + tüm ürün kataloğu inject
-- ✅ DataFreshnessBadge + RateCard badge'leri
-- ✅ Günlük cron job (06:00 rates cache)
-- ✅ `lib/profile.ts` — UserProfile + calculateEligibility()
-- ✅ `app/api/profile/route.ts` — konuşmadan profil çıkarımı
+**Son güncelleme**: 2026-09-25
+**Mevcut durum**: nordicrate.com canlı. Oranlar günlük olarak bankaların kendi sayfalarından
+okunuyor; gösterilen her rakam ya "checked X ago · kaynak" damgası taşıyor ya da "indicative /
+example" olarak etiketli.
 
-**Devam Eden**:
-- 🔄 Domain go-live (nordicrate.com satın alma kullanıcıda; sonrası: DNS/NPM/env geçişi)
-- 🔄 Awin + LHV başvuruları (metinler hazır: docs/affiliate/basvuru-paketi.md — domain sonrası gönder)
-- 🔄 SEO kalan: /blog + country landing pages (ItemList+FAQ JSON-LD tamamlandı)
+**Canlı veri (31 feed, 2026-09-25)**
+- Estonya: LHV (personal, mortgage, auto), Coop (personal, mortgage, auto), SEB (personal,
+  mortgage, auto), Swedbank (personal, auto), Inbank (personal, auto), Bigbank (personal, auto,
+  mortgage), Citadele EE (personal, auto, mortgage) + 6 banka vadeli mevduat
+- Letonya: Citadele LV (personal, mortgage), Swedbank LV (personal)
+- İsveç: SBAB, Nordea, Swedbank, Länsförsäkringar — konut kredisi *listränta* (snittränta değil)
+- İzlanda: Landsbankinn, Íslandsbanki — PDF faiz tablosundan endekssiz (óverðtryggt) sabit oran
+- Cron: `30 6 * * *` (deploy/scraper/scrape-rates.mjs) · sağlık paneli `/admin` → Rate Feed Health
 
-**Not**: EligibilityPanel + ProgramMatchPanel TAMAMLANDI ve AIAssistant'a entegre (eski "yazılmadı" notu bayattı).
+**2026-09'da tamamlananlar**
+- Dürüstlük katmanı: kanıtsız "Best Rate/Most Popular" rozetleri veri kaynağından silindi,
+  sigorta primleri "Example premium — not a quote", sahte tazelik iddiaları kaldırıldı
+- Sayfa içi feedback (`components/PageFeedback.tsx` + `/api/feedback` + `user_feedback` tablosu)
+- Onboarding kayıt duvarı kalktı; residency sorusu eklendi; header CTA `/onboarding`
+- Kurumlar için: `/listing-policy`, `/partner-terms`, `/corrections`; Cookie Policy gerçek
+  depolamayla eşlendi ("Decline" first-party ölçümü de kapatır)
+- Affiliate: `/go` artık `affiliate_links` tablosundan takip linki sarmalıyor (deploy gerekmez)
+- Başvuru otomasyonu: `startup_applications` + `company_profile` + `/api/cron/applications`
+  (+ n8n "Application Autopilot" — Gmail taslağı üretir, gönderim insanda)
+- `/api/cron/founder-facts`: pitch/başvuru rakamlarının tek kaynağı
 
-**Sıradaki Katmanlar**:
-- Katman 3: Kurumsal mod derinleştirme (program matching logic)
-- Katman 4: Oturum hafızası + lead form (email capture)
-- Katman 5: Supabase lead DB + analytics
+**Sıradaki**
+- İlk ödeme yapan partner: Adtraction/Awin ağlarında banka programlarına katılım (hesaplar onaylı,
+  program başvuruları bekliyor) → onaylanan programın satırı `affiliate_links`'e eklenir
+- Canlı kapsam: LV/LT (Bigbank engelliyor), Finlandiya (bankalar oran yayınlamıyor → ECB MIR
+  ortalaması), Estonya'da banka dışı sağlayıcılar ve sigorta
+- Deploy modeli kararı (aşağıdaki "Cloud sessions" bölümüne bak)
 
-**Bilinen Issues**:
-- `app/api/chat/route.ts`'de `fetchLiveRates()` her mesajda HTTP round-trip yapıyor — caching eklenecek
-- Ürün verileri statik (data.ts) — gerçek banka feed entegrasyonu yok
-- Norges Bank API bazen timeout → fallback devreye giriyor
+**Bilinen Issues**
+- **Deploy yalnızca Windows'tan**: SSH + `deploy/redeploy.sh`. Cloud oturumundan deploy edilemez.
+- Test yok, CI workflow yok; `npm run lint` için ESLint config kontrol edilmeli
+- Sigortada gerçek fiyat yok — tüm primler örnek profil (sigortacı fiyat feed'i gerekiyor)
+- Swedbank EE konut kredisi ve Luminor EE oran yayınlamıyor → indicative kalıyor
+- Bigbank LV/LT ve Skandia SE sunucunun IP'sini 403'lüyor (scraper'a eklenmedi)
+- İşletme kredisi ve devlet programları statik veri
+- Imprint'te işyeri adresi yok (AB'ye hizmet eden site için beklenen bilgi)
+- Sunucu: 3.8 GB RAM'de 7 pm2 uygulaması, disk %82 dolu — build'ler bu kutuda yapılıyor
+
+## Cloud sessions
+
+Claude Code on the web runs this repository in a fresh Linux container. What is true there:
+
+- **Setup:** `.claude/hooks/session-start.sh` runs `npm install` when a cloud session starts
+  (`CLAUDE_CODE_REMOTE=true` only; local checkouts skip it). The hook and its
+  `.claude/settings.json` registration live on branch `claude/cloud-onboard` — merge that PR
+  first, and keep the `.gitignore` exception that lets `.claude/hooks/*` be tracked
+  (`.gitignore` excludes all of `.claude/`).
+- **Checks that work in the cloud:** `npx tsc --noEmit` and `npm run build` (build needs no
+  secrets; pages that call external APIs fall back). `npm run lint` is `eslint` with no config
+  committed — verify before relying on it. There are no tests and no CI workflow.
+- **Deploy:** `git push origin main` → SSH to the server → `bash /var/www/nordicrate/deploy/redeploy.sh`
+  (git pull, npm install, npm run build, `pm2 restart nordicrate`). The SSH step needs the
+  `id_deploy` key that only exists on the Windows machine, so **a cloud session cannot deploy**;
+  it can prepare and push, then ask for the redeploy to be run from Windows.
+- **Not available in the cloud:** `.env.local` values — `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`,
+  `CRON_SECRET`, `ADMIN_TOKEN`, `NEXT_PUBLIC_BASE_URL`. Without them: the AI assistant and
+  `/api/chat` return errors, `/admin` cannot read the database, every `/api/cron/*` endpoint
+  refuses (401), and live rates fall back to the static catalogue. Also missing: SSH to the
+  server (so no scraper run, no pm2, no logs), a logged-in browser, and the Playwright scraper
+  (it reads bank sites from the server's IP; some banks 403 other IPs).
+- **Rules:** `git push` and any write to production need an explicit `uygula:` with a target.
+  No secrets in the repository or in the shared cloud environment. Do not add a second deploy
+  path.
