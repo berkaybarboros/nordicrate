@@ -687,25 +687,30 @@ export const carLoans: LoanOffer[] = [
     applyUrl: "https://www.lhv.ee/en/car-loan",
   },
   {
-    id: "swedbank-car",
+    // 2026-09-25: applyUrl /loans/car aslinda KUCUK KREDI sayfasina gidiyordu ve
+    // kart "20% down payment, CASCO required" gibi dogrulanmamis sartlar tasiyordu.
+    // Swedbank EE tasit kredisi sayfasi: oran "From 6.9%", sozlesme ucreti %1,5
+    // (min 100 EUR), CASCO onerilir. Tutar araligi sayfada yayinlanmiyor (asagidaki
+    // min/max dogrulanmamis, yalniz filtre icin duruyor).
+id: "swedbank-car",
     bankId: "swedbank",
     bankName: "Swedbank",
     bankLogo: "🏦",
     type: "car",
     minAmount: 5000,
     maxAmount: 60000,
-    minTermMonths: 12,
+    minTermMonths: 6,
     maxTermMonths: 84,
-    interestRateMin: 7.9,
-    interestRateMax: 14.9,
-    representativeRate: 10.5,
-    fee: 50,
-    feePercent: 0,
-    features: ["20% down payment", "CASCO insurance required", "Online application"],
+    interestRateMin: 6.9,
+    interestRateMax: 6.9,
+    representativeRate: 6.9,
+    fee: 0,
+    feePercent: 1.5,
+    features: ["Agreement fee 1.5% (min 100 EUR)", "CASCO recommended, not required", "Term 6 months to 7 years"],
     processingTime: "Same day",
     minAge: 21,
     requiresIncome: true,
-    applyUrl: "https://www.swedbank.ee/private/credit/loans/car",
+    applyUrl: "https://www.swedbank.ee/private/credit/leasing/car",
   },
   {
     id: "luminor-car",

@@ -60,6 +60,9 @@ const BANKS = [
     targets: [
       // SPA — oran metni geç render oluyor, uzun bekleme şart
       { productType: 'personal', url: 'https://www.swedbank.ee/private/credit/loans/personal?language=ENG', band: BAND_RATE, waitMs: 8000 },
+      // Tasit kredisi sayfasi 2026-09-25'te dogrulandi: hesap makinesi 'Car loan',
+      // sozlesme ucreti %1,5 (min 100 EUR), 'Interest rate From 6.9%'.
+      { productType: 'auto', url: 'https://www.swedbank.ee/private/credit/leasing/car?language=ENG', band: BAND_RATE, waitMs: 8000 },
     ],
   },
   {

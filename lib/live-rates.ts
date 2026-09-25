@@ -72,15 +72,15 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
 
 /**
  * Banka bazlı güvenilir ürün tipleri — sayfa doğrulamalarıyla belirlendi.
- * LHV auto: public oran yok (yanlış-pozitif riski). Swedbank mortgage: oran
+ * Swedbank mortgage: oran
  * yayınlanmıyor. Inbank small-home-loan mortgage değil. Citadele LV auto:
  * sayfada yalnızca fee'li örnek oran.
  */
 export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
-  lhv: new Set(['personal', 'mortgage']),
+  lhv: new Set(['personal', 'mortgage', 'auto']),
   coop: new Set(['personal', 'mortgage', 'auto']),
   seb: new Set(['personal', 'mortgage', 'auto']),
-  swedbank: new Set(['personal']),
+  swedbank: new Set(['personal', 'auto']),
   inbank: new Set(['personal', 'auto']),
   bigbank: new Set(['personal', 'auto', 'mortgage']),
   citadele: new Set(['personal', 'mortgage']),
