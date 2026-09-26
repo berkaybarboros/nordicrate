@@ -1,22 +1,9 @@
 #!/bin/bash
-# NordicRate — Redeploy (run after git push)
-# Run on server: bash /var/www/nordicrate/deploy/redeploy.sh
-set -e
-
-APP_DIR="/var/www/nordicrate"
-cd $APP_DIR
-
-echo "==> Pull latest changes"
-git pull origin main
-
-echo "==> Install dependencies"
-npm install
-
-echo "==> Build"
-npm run build
-
-echo "==> Restart PM2"
-pm2 restart nordicrate
-
-echo "✅ Redeployed successfully!"
-pm2 status
+# NordicRate — manual redeploy.
+#
+# There is one deploy path now: deploy/release.sh. A cron entry runs it every ten
+# minutes and it releases whatever is on main; this wrapper only forces a release
+# right now (same commit included), for when you do not want to wait.
+#
+#   bash /var/www/nordicrate/deploy/redeploy.sh
+exec /var/www/nordicrate/deploy/release.sh --force
