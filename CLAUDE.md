@@ -186,10 +186,11 @@ Claude Code on the web runs this repository in a fresh Linux container. What is 
   (`eslint.config.mjs` is committed) and `npm run build` — the build needs no secrets; pages
   that call external APIs fall back to the static catalogue. There are no tests and no CI
   workflow, so those three are the whole safety net.
-- **Deploy:** `git push origin main` → SSH to the server → `bash /var/www/nordicrate/deploy/redeploy.sh`
-  (git pull, npm install, npm run build, `pm2 restart nordicrate`). The SSH step needs the
-  `id_deploy` key that only exists on the Windows machine, so **a cloud session cannot deploy**;
-  it can prepare and push, then ask for the redeploy to be run from Windows.
+- **Deploy:** `git push origin main` — that is all. A cron on the server runs
+  `deploy/release.sh` at minutes 5,15,25,… : it pulls main, installs, builds, reloads pm2 and
+  curls the site, and restores the previous commit and build if anything fails. So **a cloud
+  session can ship**; it just cannot watch the server. `deploy/redeploy.sh` forces a release
+  immediately over SSH. Details and the firewall it lives behind: `deploy/SERVER.md`.
 - **Not available in the cloud:** `.env.local` values — `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
   `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`,
