@@ -73,6 +73,19 @@ log "releasing ${LOCAL:0:7} -> ${REMOTE:0:7}"
 rm -rf .next.prev
 [ -d .next ] && cp -a .next .next.prev
 
+# The release check is overridable (so the rollback path can be tested); the
+# post-rollback check never is — it must ask the real site.
+SITE_URL=http://localhost:3001/
+
+wait_healthy() {
+  local url=$1 tries=$2
+  for _ in $(seq 1 "$tries"); do
+    if curl -sf -o /dev/null --max-time 10 "$url"; then return 0; fi
+    sleep "$HEALTH_WAIT"
+  done
+  return 1
+}
+
 restore() {
   log "restoring ${LOCAL:0:7}"
   git reset --hard --quiet "$LOCAL"
@@ -81,6 +94,12 @@ restore() {
     mv .next.prev .next
   fi
   pm2 restart "$APP" --update-env >/dev/null 2>&1 || true
+  # A silent rollback that left the site down is the worst outcome in a cron log.
+  if wait_healthy "$SITE_URL" 10; then
+    log "restored and healthy"
+  else
+    log "RESTORED BUT STILL DOWN - needs a human"
+  fi
 }
 
 git reset --hard --quiet "$REMOTE"
@@ -97,17 +116,8 @@ fi
 
 pm2 reload "$APP" --update-env >/dev/null
 
-healthy=0
-for i in $(seq 1 "$HEALTH_TRIES"); do
-  if curl -sf -o /dev/null --max-time 10 "$HEALTH_URL"; then
-    healthy=1
-    break
-  fi
-  log "health check $i/$HEALTH_TRIES failed; retrying in ${HEALTH_WAIT}s"
-  sleep "$HEALTH_WAIT"
-done
-
-if [ "$healthy" -ne 1 ]; then
+if ! wait_healthy "$HEALTH_URL" "$HEALTH_TRIES"; then
+  log "unhealthy after $HEALTH_TRIES checks"
   restore
   die "unhealthy after reload" 3
 fi
