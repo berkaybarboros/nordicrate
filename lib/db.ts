@@ -1,10 +1,12 @@
-import { supabase } from './supabase';
+import { getSupabase, SUPABASE_NOT_CONFIGURED } from './supabase';
 import { INSTITUTIONS, PRODUCTS } from './data';
 import type { Institution, LoanProduct } from './types';
 
 // ── Institutions ──────────────────────────────────────────────
 // Tries Supabase first; falls back to static seed data.
 export async function getInstitutions(): Promise<Institution[]> {
+  const supabase = getSupabase();
+  if (!supabase) return INSTITUTIONS;
   try {
     const { data, error } = await supabase
       .from('institutions')
@@ -19,6 +21,8 @@ export async function getInstitutions(): Promise<Institution[]> {
 
 // ── Products ──────────────────────────────────────────────────
 export async function getProducts(): Promise<LoanProduct[]> {
+  const supabase = getSupabase();
+  if (!supabase) return PRODUCTS;
   try {
     const { data, error } = await supabase
       .from('products')
@@ -37,6 +41,8 @@ export async function createRateAlert(
   product: string,          // maps to rate_key column
   targetRate?: number | null,
 ): Promise<{ id?: string; error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: SUPABASE_NOT_CONFIGURED };
   const { data, error } = await supabase
     .from('rate_alerts')
     .insert({
@@ -73,6 +79,8 @@ export interface LeadInput {
 }
 
 export async function createLead(input: LeadInput): Promise<{ id?: string; error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: SUPABASE_NOT_CONFIGURED };
   const { data, error } = await supabase
     .from('leads')
     .insert({
@@ -124,6 +132,8 @@ export interface UserProfileInput {
 }
 
 export async function upsertUserProfile(input: UserProfileInput): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: SUPABASE_NOT_CONFIGURED };
   const { error } = await supabase
     .from('user_profiles')
     .upsert(
@@ -156,6 +166,8 @@ export async function upsertUserProfile(input: UserProfileInput): Promise<{ erro
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfileInput | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { upsertUserProfile } from '@/lib/db';
 import { COUNTRIES } from '@/lib/data';
 import { buildGoLink } from '@/lib/affiliate';
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
   const sessionId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setHasSession(!!data.session));
+    getSupabase()?.auth.getSession().then(({ data }) => setHasSession(!!data.session));
     // Ülke/blog sayfasındaki MatchCta ülkeyi ön-seçili gönderir
     const qs = new URLSearchParams(window.location.search);
     const qc = qs.get('country')?.toUpperCase();
@@ -204,7 +204,7 @@ export default function OnboardingPage() {
   async function handleFinish() {
     setError('');
     setSaving(true);
-    const { data: { session } } = await supabase.auth.getSession();
+    const session = (await getSupabase()?.auth.getSession())?.data.session ?? null;
 
     if (session) {
     const { error: dbError } = await upsertUserProfile({

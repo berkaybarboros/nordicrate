@@ -50,6 +50,48 @@ const DEPOSIT_PRESETS = [
 type LoanType      = typeof LOAN_TYPES[number]['value'];
 type InsuranceType = typeof INSURANCE_TYPES[number]['value'];
 
+// ─── Shared sub-components ─────────────────────────────────────────────────────
+// Modül seviyesinde: HeroSearch render'ı içinde tanımlanınca her render'da yeni
+// component tipi olur → select remount olup odak/açık durumunu kaybeder.
+function CountrySelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label className="text-xs text-white/50 font-semibold uppercase tracking-wider mb-1.5 block">Country</label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-full appearance-none bg-white/10 border border-white/20 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 pr-8"
+        >
+          <option value="" className="text-slate-900 bg-white">🌍 Any country</option>
+          {COUNTRIES.map(c => (
+            <option key={c.code} value={c.code} className="text-slate-900 bg-white">
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function SearchButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-white font-bold rounded-xl py-3 text-sm transition-all shadow-lg shadow-sky-900/50 flex items-center justify-center gap-2 group"
+    >
+      <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      {label}
+    </button>
+  );
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function HeroSearch() {
   const router = useRouter();
@@ -95,41 +137,6 @@ export default function HeroSearch() {
     router.push(`/deposits?${params.toString()}`);
   }
 
-  // ─── Shared sub-components ──────────────────────────────────────────────────
-  const CountrySelect = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
-    <div>
-      <label className="text-xs text-white/50 font-semibold uppercase tracking-wider mb-1.5 block">Country</label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="w-full appearance-none bg-white/10 border border-white/20 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 pr-8"
-        >
-          <option value="" className="text-slate-900 bg-white">🌍 Any country</option>
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code} className="text-slate-900 bg-white">
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-    </div>
-  );
-
-  const SearchButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
-    <button
-      onClick={onClick}
-      className="w-full bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-white font-bold rounded-xl py-3 text-sm transition-all shadow-lg shadow-sky-900/50 flex items-center justify-center gap-2 group"
-    >
-      <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-      {label}
-    </button>
-  );
 
   const [modalOpen, setModalOpen] = useState(false);
 

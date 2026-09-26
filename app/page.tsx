@@ -5,7 +5,7 @@ import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { FAQS } from '@/lib/faq-data';
 import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
-import { FRESH_MS } from '@/lib/live-rates';
+import { rateFreshness } from '@/lib/live-rates';
 
 export const revalidate = 1800;
 import { buildFaqJsonLd } from '@/lib/seo';
@@ -58,9 +58,8 @@ export default async function HomePage() {
       seen.add(k);
       return true;
     });
-  const checkedAt = Date.now();
   const liveOnly = liveProducts.filter(
-    (p) => p.isLiveRate && checkedAt - new Date(p.updatedAt).getTime() <= FRESH_MS,
+    (p) => p.isLiveRate && rateFreshness(p.updatedAt) === 'fresh',
   );
   const featuredLive = pickDistinct([...liveOnly].sort(byRate)).slice(0, 6);
   const featuredProducts = [

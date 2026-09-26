@@ -10,7 +10,7 @@ import type { CorporateProfile, ProgramMatch } from '@/lib/corporate-profile';
 import { matchPrograms } from '@/lib/corporate-profile';
 import EligibilityPanel from '@/components/EligibilityPanel';
 import ProgramMatchPanel from '@/components/ProgramMatchPanel';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { getUserProfile, createLead } from '@/lib/db';
 import { track } from '@/lib/tracker';
 import { COUNTRIES } from '@/lib/data';
@@ -150,7 +150,7 @@ export default function AIAssistant() {
 
   // Load Supabase profile once on mount
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
+    getSupabase()?.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
       const profile = await getUserProfile(data.session.user.id);
       if (!profile?.onboardingCompleted) return;

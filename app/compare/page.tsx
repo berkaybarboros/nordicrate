@@ -98,11 +98,11 @@ Be direct and concrete. No fluff.`,
 
 // ─── Scenario Slider ──────────────────────────────────────────────────────────
 function ScenarioSlider({ items }: { items: CompareItem[] }) {
+  const [amount, setAmount] = useState(10000);
+  const [termMonths, setTermMonths] = useState(36);
   const loanItems = items.filter(it => it.rawRate != null);
   if (loanItems.length < 2) return null;
 
-  const [amount, setAmount] = useState(10000);
-  const [termMonths, setTermMonths] = useState(36);
   const colColors = ["#1a3c6e", "#b45309", "#16a34a", "#7c3aed"];
 
   const scenarios = loanItems.map((item, i) => {

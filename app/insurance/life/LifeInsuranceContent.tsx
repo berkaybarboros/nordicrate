@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useFetchJson } from "@/lib/use-fetch-json";
 import { ArrowUpDown, CheckCircle, Heart, ShieldCheck, Info } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
@@ -46,8 +47,6 @@ export default function LifeInsuranceContent() {
   const [termYears, setTermYears] = useState(20);
   const [smoker, setSmoker] = useState(false);
   const [step, setStep] = useState<"form" | "results">("form");
-  const [offers, setOffers] = useState<InsuranceOffer[]>([]);
-  const [loading, setLoading] = useState(false);
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
 
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
@@ -55,20 +54,8 @@ export default function LifeInsuranceContent() {
     if (e3m) setLiveEuribor(e3m.rate);
   }, []);
 
-  const fetchOffers = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/insurance/life?sort=${sortBy}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setOffers(data.offers || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [sortBy]);
-
-  useEffect(() => {
-    if (step === "results") fetchOffers();
-  }, [step, fetchOffers]);
+  const { data, loading } = useFetchJson<{ offers?: InsuranceOffer[] }>(step === "results" ? `/api/insurance/life?sort=${sortBy}` : null);
+  const offers = data?.offers ?? [];
 
   if (step === "form") {
     return (

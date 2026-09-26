@@ -18,7 +18,7 @@
  * olduğundan SSR'da "3h ago" basmak hydration uyuşmazlığı üretir.
  */
 
-import { useEffect, useState } from "react";
+import { useMinuteClock } from "@/lib/use-client-store";
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -51,13 +51,8 @@ interface Props {
 }
 
 export default function RateFreshness({ checkedAt, sourceUrl, source = "live", className = "" }: Props) {
-  const [now, setNow] = useState<number | null>(null);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(id);
-  }, []);
+  // Server render / hydration'da null — göreli zaman yalnız client'ta hesaplanır
+  const now = useMinuteClock();
 
   if (!checkedAt) {
     return (

@@ -10,15 +10,17 @@ import { carLoans } from "@/data/loans";
 import type { LiveLoanOffer } from "@/lib/live-loan-offers";
 import { calculateMonthlyPayment, formatCurrency } from "@/lib/utils";
 import SocialProofBar from "@/components/SocialProofBar";
+import { useStoredNumber } from "@/lib/use-client-store";
 
 const SS_AMOUNT = 'car-loan-amount';
 const SS_TERM   = 'car-loan-term';
 const SS_DP     = 'car-loan-dp';
 
 export default function CarLoansContent() {
-  const [amount, setAmount] = useState(15000);
-  const [termMonths, setTermMonths] = useState(48);
-  const [downPayment, setDownPayment] = useState(0);
+  // sessionStorage'da kalıcı: sayfalar arası gezinmede hesap makinesi değerleri korunur
+  const [amount, setAmount] = useStoredNumber('session', SS_AMOUNT, 15000);
+  const [termMonths, setTermMonths] = useStoredNumber('session', SS_TERM, 48);
+  const [downPayment, setDownPayment] = useStoredNumber('session', SS_DP, 0);
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
 
@@ -36,21 +38,6 @@ export default function CarLoansContent() {
       .catch(() => { /* canli veri gelmezse statik liste kalir, kartlar "indicative" der */ });
     return () => { cancelled = true; };
   }, []);
-
-  // Restore from sessionStorage on mount
-  useEffect(() => {
-    const a = Number(sessionStorage.getItem(SS_AMOUNT));
-    const t = Number(sessionStorage.getItem(SS_TERM));
-    const d = Number(sessionStorage.getItem(SS_DP));
-    if (a) setAmount(a);
-    if (t) setTermMonths(t);
-    if (d) setDownPayment(d);
-  }, []);
-
-  // Persist to sessionStorage on change
-  useEffect(() => { sessionStorage.setItem(SS_AMOUNT, String(amount)); }, [amount]);
-  useEffect(() => { sessionStorage.setItem(SS_TERM, String(termMonths)); }, [termMonths]);
-  useEffect(() => { sessionStorage.setItem(SS_DP, String(downPayment)); }, [downPayment]);
 
   const netAmount = Math.max(0, amount - downPayment);
 

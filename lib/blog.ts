@@ -6,7 +6,7 @@
 // DİKKAT: createSupabaseServer KULLANMA — cookies() çağırır ve ISR/statik blog
 // sayfalarını runtime'da dynamic'e zorlayıp 500 attırır. Blog okuma anonim;
 // cookie'siz düz client yeterli (db.ts ile aynı desen).
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 /**
  * Markdown gövdesindeki "## FAQ" bölümünü yapılandırılmış soru/cevaba çevirir.
@@ -50,6 +50,8 @@ export interface BlogPost {
 const COLS = 'slug, title, description, content_md, locale, tags, author, published_at';
 
 export async function getPublishedPosts(limit = 50, locale?: 'en' | 'fi' | 'et'): Promise<BlogPost[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
   try {
     let query = supabase
       .from('blog_posts')
@@ -67,8 +69,9 @@ export async function getPublishedPosts(limit = 50, locale?: 'en' | 'fi' | 'et')
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
   try {
-    
     const { data, error } = await supabase
       .from('blog_posts')
       .select(COLS)

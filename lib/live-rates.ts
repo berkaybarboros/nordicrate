@@ -45,6 +45,20 @@ function withinMaxAge(iso: string): boolean {
   return Number.isFinite(t) && Date.now() - t <= MAX_AGE_MS;
 }
 
+export type FeedFreshness = 'fresh' | 'aging' | 'stale';
+
+/**
+ * Bir okumanın tazeliği: FRESH_MS (48 sa) içinde 'fresh', MAX_AGE_MS (7 gün) içinde
+ * 'aging', sonrası 'stale'. Ana sayfa "live" seçimi ve /admin Rate Feed Health aynı
+ * eşikleri buradan okur. Saat okuması server component render'ı dışında kalır
+ * (react-hooks/purity).
+ */
+export function rateFreshness(iso: string): FeedFreshness {
+  const age = Date.now() - new Date(iso).getTime();
+  if (!Number.isFinite(age)) return 'stale';
+  return age <= FRESH_MS ? 'fresh' : age <= MAX_AGE_MS ? 'aging' : 'stale';
+}
+
 /* ─────────────────────────── KREDİ ─────────────────────────── */
 
 /** scraper bank_id → PRODUCTS kurum id'si */

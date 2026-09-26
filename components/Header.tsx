@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Bell, Menu, X, LogIn, UserRound, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { LOCALE_NAMES, type Locale } from '@/locales';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import RateAlertModal from './alerts/RateAlertModal';
 
@@ -25,6 +25,8 @@ export default function Header() {
   const { locale, t, setLocale } = useTranslation();
 
   useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -33,7 +35,7 @@ export default function Header() {
   }, []);
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await getSupabase()?.auth.signOut();
     router.push('/');
     router.refresh();
   }

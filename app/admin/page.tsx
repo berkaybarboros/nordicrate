@@ -12,6 +12,8 @@ import { isAdminAuthed } from '@/lib/admin-auth';
 import { fetchAllRows } from '@/lib/supabase-paginate';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { isBotSessionId } from '@/lib/security';
+import { rateFreshness } from '@/lib/live-rates';
+import { daysUntil } from '@/lib/utils';
 import { createSupabaseServer } from '@/lib/supabase-server';
 import LogoutButton from '@/components/admin/LogoutButton';
 
@@ -241,13 +243,8 @@ export default async function AdminDashboard() {
   const fbNo = feedback.filter((f) => f.helpful === false).length;
   const fbMessages = feedback.filter((f) => f.message);
 
-  // Rate feed health: esikler lib/live-rates.ts ile ayni (48 saat taze, 7 gun ust sinir).
+  // Rate feed health: esikler lib/live-rates.ts'ten (48 saat taze, 7 gun ust sinir).
   // Scraper kendi kendine calisir; bu panel "sessizce bozuldu mu" sorusunu cevaplar.
-  const nowMs = Date.now();
-  const feedStatus = (iso: string) => {
-    const age = nowMs - new Date(iso).getTime();
-    return age <= 48 * 3600000 ? 'fresh' : age <= 7 * 86400000 ? 'aging' : 'stale';
-  };
   const failedKeys = new Set(failedAttempts.map((f) => `${f.bank_id}:${f.product_type}`));
   const feedRows = [
     ...scrapedRates.map((r) => ({
@@ -267,7 +264,7 @@ export default async function AdminDashboard() {
       at: r.scraped_at,
     })),
   ].sort((a, b) => a.bank.localeCompare(b.bank) || a.product.localeCompare(b.product));
-  const feedProblems = feedRows.filter((r) => feedStatus(r.at) !== 'fresh' || failedKeys.has(r.key)).length;
+  const feedProblems = feedRows.filter((r) => rateFreshness(r.at) !== 'fresh' || failedKeys.has(r.key)).length;
 
   const eventCounts = new Map(countBy(events, (e) => e.event_type));
   const pageViews = eventCounts.get('page_view') ?? 0;
@@ -531,9 +528,7 @@ export default async function AdminDashboard() {
               </thead>
               <tbody>
                 {appsOpen.map((a) => {
-                  const days = a.deadline
-                    ? Math.ceil((new Date(a.deadline).getTime() - nowMs) / 86400000)
-                    : null;
+                  const days = a.deadline ? daysUntil(a.deadline) : null;
                   const urgent = days != null && days <= 10;
                   return (
                     <tr key={a.program} className="border-b border-slate-50 last:border-0 align-top">
@@ -648,7 +643,7 @@ export default async function AdminDashboard() {
               </thead>
               <tbody>
                 {feedRows.map((r) => {
-                  const st = feedStatus(r.at);
+                  const st = rateFreshness(r.at);
                   const failed = failedKeys.has(r.key);
                   return (
                     <tr key={r.key} className="border-b border-slate-50 last:border-0">

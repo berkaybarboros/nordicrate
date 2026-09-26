@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { getSupabase, SUPABASE_NOT_CONFIGURED } from '@/lib/supabase';
 
 async function signUpWithGoogle() {
+  const supabase = getSupabase();
+  if (!supabase) return;
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -31,6 +33,11 @@ export default function RegisterPage() {
     }
     if (password.length < 8) {
       setError('Password must be at least 8 characters.');
+      return;
+    }
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError(SUPABASE_NOT_CONFIGURED);
       return;
     }
     setLoading(true);
