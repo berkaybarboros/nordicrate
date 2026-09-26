@@ -177,14 +177,15 @@ example" olarak etiketli.
 
 Claude Code on the web runs this repository in a fresh Linux container. What is true there:
 
-- **Setup:** `.claude/hooks/session-start.sh` runs `npm install` when a cloud session starts
-  (`CLAUDE_CODE_REMOTE=true` only; local checkouts skip it). The hook and its
-  `.claude/settings.json` registration live on branch `claude/cloud-onboard` — merge that PR
-  first, and keep the `.gitignore` exception that lets `.claude/hooks/*` be tracked
-  (`.gitignore` excludes all of `.claude/`).
-- **Checks that work in the cloud:** `npx tsc --noEmit` and `npm run build` (build needs no
-  secrets; pages that call external APIs fall back). `npm run lint` is `eslint` with no config
-  committed — verify before relying on it. There are no tests and no CI workflow.
+- **Setup:** `.claude/hooks/session-start.sh` runs `npm install --prefer-offline` when a cloud
+  session starts (`CLAUDE_CODE_REMOTE=true` only; local checkouts skip it) and sets
+  `NEXT_TELEMETRY_DISABLED=1`. It is registered in `.claude/settings.json`. `.gitignore`
+  ignores `.claude/*` except `settings.json`, `hooks/` and `launch.json`, so personal
+  `settings.local.json` stays out of this public repo while the shared setup is tracked.
+- **Checks that work in the cloud:** `npx tsc --noEmit` (clean), `npm run lint`
+  (`eslint.config.mjs` is committed) and `npm run build` — the build needs no secrets; pages
+  that call external APIs fall back to the static catalogue. There are no tests and no CI
+  workflow, so those three are the whole safety net.
 - **Deploy:** `git push origin main` → SSH to the server → `bash /var/www/nordicrate/deploy/redeploy.sh`
   (git pull, npm install, npm run build, `pm2 restart nordicrate`). The SSH step needs the
   `id_deploy` key that only exists on the Windows machine, so **a cloud session cannot deploy**;

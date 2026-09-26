@@ -1,0 +1,4 @@
+# Shell scripts must keep LF in the repository: they are edited on Windows but run
+# in Linux (the cloud container and the VPS). A CRLF here fails with
+# "$'\r': command not found", which reads like a syntax error and is not one.
+*.sh text eol=lf

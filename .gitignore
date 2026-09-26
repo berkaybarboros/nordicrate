@@ -44,8 +44,15 @@ next-env.d.ts
 ._*
 .DS_Store
 
-# Claude IDE files
-.claude/
+# Claude IDE files — personal settings stay out, shared session setup is tracked.
+# settings.local.json is per-machine (local paths, allowed commands) and this repo
+# is public: keep it ignored. The SessionStart hook must be tracked, otherwise a
+# cloud session starts with no dependencies installed.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/hooks/**
+!.claude/launch.json
 .claire/
 .agents/
 .mcp.json
