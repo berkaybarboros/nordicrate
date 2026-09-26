@@ -24,11 +24,13 @@ set -Eeuo pipefail
 ROOT=/var/www/nordicrate
 BRANCH=main
 APP=nordicrate
-HEALTH_URL=http://localhost:3001/
+# Overridable so the rollback path can be exercised on purpose:
+#   HEALTH_URL=http://localhost:9/ HEALTH_TRIES=1 deploy/release.sh --force
+HEALTH_URL=${HEALTH_URL:-http://localhost:3001/}
 LOCK=/var/lock/nordicrate-release.lock
-BUILD_MEM=1536          # MB; the box has 3.8 GB and seven pm2 apps
-HEALTH_TRIES=10
-HEALTH_WAIT=3
+BUILD_MEM=${BUILD_MEM:-1536}   # MB; the box has 3.8 GB and seven pm2 apps
+HEALTH_TRIES=${HEALTH_TRIES:-10}
+HEALTH_WAIT=${HEALTH_WAIT:-3}
 
 log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 die() { log "ERROR: $*"; exit "${2:-1}"; }
