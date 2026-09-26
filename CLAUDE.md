@@ -160,3 +160,22 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 - `app/api/chat/route.ts`'de `fetchLiveRates()` her mesajda HTTP round-trip yapıyor — caching eklenecek
 - Ürün verileri statik (data.ts) — gerçek banka feed entegrasyonu yok
 - Norges Bank API bazen timeout → fallback devreye giriyor
+
+## Cloud sessions
+
+Claude Code on the web runs this repository in a fresh Linux container. What is true there:
+
+- **Setup:** `.claude/hooks/session-start.sh` runs `npm install` when a cloud session starts.
+  Local checkouts skip it. `.gitignore` ignores `.claude/*` except this hook and
+  `.claude/settings.json`.
+- **Checks that work in the cloud:** `npx eslint <path>`, `npx tsc --noEmit`, `npm run build`.
+  There are no tests and no CI workflow.
+- **Deploy:** push `main`, then on the server run `deploy/redeploy.sh` over SSH
+  (`git pull`, `npm install`, build, `pm2 restart nordicrate`). **This does not work from a
+  cloud session:** the SSH step needs the Windows machine's `id_deploy` key. A cloud session
+  can prepare and commit a change; releasing it still needs someone at a machine with the key.
+- **Not available in the cloud:** `.env.local` values (Norges Bank / chat API keys, `CRON_SECRET`),
+  SSH to the server, a logged-in browser.
+- **Rules:** `git push` and any write to production need an explicit `uygula:` with a target.
+  No secrets in the repository or in the shared cloud environment. Do not add a second deploy
+  path.

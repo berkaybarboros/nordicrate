@@ -45,7 +45,10 @@ next-env.d.ts
 .DS_Store
 
 # Claude IDE files
-.claude/
+.claude/*
+# Shared with cloud sessions: the SessionStart hook and its registration.
+!.claude/settings.json
+!.claude/hooks/
 .claire/
 .agents/
 .mcp.json
