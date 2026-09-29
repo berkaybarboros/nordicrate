@@ -58,6 +58,9 @@ export default async function HomePage() {
       seen.add(k);
       return true;
     });
+  // Server component: this renders once per request, so reading the clock here is
+  // the point — it is what decides which live rates are still fresh.
+  // eslint-disable-next-line react-hooks/purity
   const checkedAt = Date.now();
   const liveOnly = liveProducts.filter(
     (p) => p.isLiveRate && checkedAt - new Date(p.updatedAt).getTime() <= FRESH_MS,

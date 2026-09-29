@@ -243,6 +243,8 @@ export default async function AdminDashboard() {
 
   // Rate feed health: esikler lib/live-rates.ts ile ayni (48 saat taze, 7 gun ust sinir).
   // Scraper kendi kendine calisir; bu panel "sessizce bozuldu mu" sorusunu cevaplar.
+  // Server component: rendered once per request, so the clock read is intentional.
+  // eslint-disable-next-line react-hooks/purity
   const nowMs = Date.now();
   const feedStatus = (iso: string) => {
     const age = nowMs - new Date(iso).getTime();

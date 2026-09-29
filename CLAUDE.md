@@ -16,7 +16,7 @@ NordicRate, 8 ülkede (5 Nordic + 3 Baltic) faaliyet gösteren banka, sigorta ve
 - **CDN/Security**: Cloudflare (Full Strict SSL, Proxied)
 - **Hosting**: Hetzner VPS — `root@46.62.166.105`
 - **Repo**: https://github.com/berkaybarboros/nordicrate
-- **Deploy**: git push → SSH manuel pull+build+pm2 restart
+- **Deploy**: `git push origin main` → sunucudaki cron `deploy/release.sh` (health check + rollback)
 
 ## Klasör Yapısı
 ```
@@ -65,14 +65,18 @@ NordicRate, 8 ülkede (5 Nordic + 3 Baltic) faaliyet gösteren banka, sigorta ve
 
 ## Çalıştırma
 ```bash
-npm run dev     # localhost:3000
-npm run build   # Production build — her deploy öncesi çalıştır
-npm run lint    # ESLint
+npm run dev        # localhost:3000
+npm run typecheck  # tsc --noEmit
+npm run lint       # ESLint
+npm test           # vitest run
+npm run build      # Production build
 
-# Deploy (server)
+# Deploy — push yeterli. Sunucudaki cron 5,15,25,… dakikalarda deploy/release.sh
+# calistirir: pull + install + build + pm2 reload + saglik kontrolu, hata varsa rollback.
 git push origin main
-ssh -i ~/.ssh/id_deploy root@46.62.166.105 \
-  "cd /var/www/nordicrate && git pull && npm install && npm run build && pm2 restart nordicrate --update-env"
+
+# Beklemek istemiyorsan (sadece Windows'tan, SSH gerekiyor):
+ssh -i ~/.ssh/id_deploy root@46.62.166.105 /var/www/nordicrate/deploy/redeploy.sh
 ```
 
 ## Environment Variables
@@ -98,7 +102,8 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 - Tailwind dışında inline style yazma (`style={{ height: '520px' }}` gibi sabit değerler hariç)
 - Veri değişikliği → `lib/data.ts` veya `lib/programs-data.ts` — başka yer yok
 - AI context değişikliği → `lib/ai-context.ts` `buildSystemPrompt()` — başka yer yok
-- Deploy öncesi `npm run build` çalıştır, hata yoksa push et
+- Push öncesi dördünü de çalıştır: `npm run typecheck && npm run lint && npm test && npm run build`
+  — push'tan 10 dakika sonra cron canlıya alır, CI raporundan önce
 
 ## Kurallar — Asla
 - ECB/Norges Bank API URL'lerini değiştirme (kırılgan — test et önce)
@@ -161,11 +166,11 @@ example" olarak etiketli.
   program başvuruları bekliyor) → onaylanan programın satırı `affiliate_links`'e eklenir
 - Canlı kapsam: LV/LT (Bigbank engelliyor), Finlandiya (bankalar oran yayınlamıyor → ECB MIR
   ortalaması), Estonya'da banka dışı sağlayıcılar ve sigorta
-- Deploy modeli kararı (aşağıdaki "Cloud sessions" bölümüne bak)
+- Test kapsamını genişlet: `/api/cron/*` auth'u, `calculateEligibility()`, freshness eşikleri
 
 **Bilinen Issues**
-- **Deploy yalnızca Windows'tan**: SSH + `deploy/redeploy.sh`. Cloud oturumundan deploy edilemez.
-- Test yok, CI workflow yok; `npm run lint` için ESLint config kontrol edilmeli
+- Test kapsamı dar: sadece `lib/supabase-paginate.ts` ve scraper parser'ları. API route'ları,
+  eligibility hesabı ve component'lar test edilmiyor
 - Sigortada gerçek fiyat yok — tüm primler örnek profil (sigortacı fiyat feed'i gerekiyor)
 - Swedbank EE konut kredisi ve Luminor EE oran yayınlamıyor → indicative kalıyor
 - Bigbank LV/LT ve Skandia SE sunucunun IP'sini 403'lüyor (scraper'a eklenmedi)
@@ -182,10 +187,20 @@ Claude Code on the web runs this repository in a fresh Linux container. What is 
   `NEXT_TELEMETRY_DISABLED=1`. It is registered in `.claude/settings.json`. `.gitignore`
   ignores `.claude/*` except `settings.json`, `hooks/` and `launch.json`, so personal
   `settings.local.json` stays out of this public repo while the shared setup is tracked.
-- **Checks that work in the cloud:** `npx tsc --noEmit` (clean), `npm run lint`
-  (`eslint.config.mjs` is committed) and `npm run build` — the build needs no secrets; pages
-  that call external APIs fall back to the static catalogue. There are no tests and no CI
-  workflow, so those three are the whole safety net.
+- **Checks that work in the cloud:** `npm run typecheck`, `npm run lint`, `npm test` and
+  `npm run build` — all four pass with no secrets set; pages that call external APIs fall
+  back to the static catalogue. `.github/workflows/ci.yml` runs the same four on every push
+  and pull request, so a cloud session gets a green/red signal without a server. Run them
+  locally before pushing anyway: the release cron ships `main` within ten minutes, well
+  before CI reports.
+- **Tests:** `tests/` (vitest, node environment). They cover the two things that have
+  produced wrong numbers on the live site: the PostgREST 1000-row cap in
+  `lib/supabase-paginate.ts`, and the bank-page parsers in `deploy/scraper/parsers.mjs`
+  (Swedish *listränta* vs *snittränta*, Icelandic indexed vs non-indexed). The parsers are
+  split out of `scrape-rates.mjs` precisely so they can be imported without Playwright —
+  when adding a bank, put the text→number rule in `parsers.mjs` and pin it with a test.
+- **`.env.example`** lists every variable name with what breaks without it. Names only —
+  never a value, not even an expired one.
 - **Deploy:** `git push origin main` — that is all. A cron on the server runs
   `deploy/release.sh` at minutes 5,15,25,… : it pulls main, installs, builds, reloads pm2 and
   curls the site, and restores the previous commit and build if anything fails. So **a cloud

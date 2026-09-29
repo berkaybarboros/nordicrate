@@ -140,7 +140,7 @@ export default function ProgramsPage() {
             <h2 className="text-lg font-bold text-cyan-900">e-Residency & Digital Business</h2>
           </div>
           <p className="text-sm text-cyan-800 leading-relaxed mb-4">
-            Estonia's e-Residency program lets anyone in the world register an EU company and access banking remotely. Over 100,000 e-residents from 170+ countries use it. Open an LHV or Wise Business account with your digital ID card.
+            Estonia&apos;s e-Residency program lets anyone in the world register an EU company and access banking remotely. Over 100,000 e-residents from 170+ countries use it. Open an LHV or Wise Business account with your digital ID card.
           </p>
           <div className="flex flex-wrap gap-2">
             {['🇪🇪 EU Company', '🏦 LHV Banking', '💳 Wise Business', '🔐 Digital ID', '⚡ Instant'].map((t) => (
