@@ -30,6 +30,10 @@ const BANK_DOMAIN: Record<string, string> = {
   salva: 'salva.ee',
   'lhv-insurance': 'lhv.ee',
   'swedbank-insurance': 'swedbank.ee',
+  'swedbank-life': 'swedbank.ee',
+  'seb-life': 'seb.ee',
+  'ergo-life': 'ergo.ee',
+  'compensa-life': 'compensa.ee',
 };
 
 /** INSTITUTIONS.website → local logo path (dosya yoksa onError fallback devreye girer) */

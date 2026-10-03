@@ -5,6 +5,7 @@ import DeepContentBlock from "@/components/seo/DeepContentBlock";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildFaqJsonLd } from "@/lib/seo";
 import { DEEP_CONTENT } from "@/lib/deep-content";
+import { listedInsurers, lowestExamplePremium, type InsuranceType } from "@/data/insurance";
 
 // Alt sigorta sayfalari CategorySeoBlock ile kendi icerigine sahip;
 // hub burada "hangisi zorunlu, hangisi degil" acisini alir.
@@ -42,7 +43,7 @@ const insuranceTypes = [
     title: "Motor Insurance",
     subtitle: "liikluskindlustus",
     desc: "Mandatory liability for all vehicles",
-    price: "Example: €79/year",
+    type: "motor" as const,
     color: "from-orange-500 to-orange-600",
     badge: "Required by law",
     badgeColor: "bg-red-500",
@@ -53,7 +54,7 @@ const insuranceTypes = [
     title: "CASCO",
     subtitle: "kaskokindlustus",
     desc: "Comprehensive vehicle cover",
-    price: "Example: €240/year",
+    type: "casco" as const,
     color: "from-teal-500 to-teal-600",
     badge: null,
     badgeColor: "",
@@ -64,7 +65,7 @@ const insuranceTypes = [
     title: "Home Insurance",
     subtitle: "kodukindlustus",
     desc: "Property & contents protection",
-    price: "Example: €99/year",
+    type: "home" as const,
     color: "from-green-500 to-green-600",
     badge: null,
     badgeColor: "",
@@ -75,7 +76,7 @@ const insuranceTypes = [
     title: "Health Insurance",
     subtitle: "ravikindlustus",
     desc: "Private healthcare & dental",
-    price: "Example: €150/year",
+    type: "health" as const,
     color: "from-rose-500 to-rose-600",
     badge: null,
     badgeColor: "",
@@ -86,7 +87,7 @@ const insuranceTypes = [
     title: "Travel Insurance",
     subtitle: "reisikindlustus",
     desc: "Medical, cancellation & baggage",
-    price: "Example: €49/year",
+    type: "travel" as const,
     color: "from-sky-500 to-sky-600",
     badge: "Schengen required",
     badgeColor: "bg-sky-500",
@@ -97,22 +98,23 @@ const insuranceTypes = [
     title: "Life Insurance",
     subtitle: "elukindlustus",
     desc: "Term life & death benefit",
-    price: "Example: €11/month",
+    type: "life" as const,
     color: "from-violet-500 to-violet-600",
-    badge: "Mortgage required",
+    badge: "Common for mortgages",
     badgeColor: "bg-violet-500",
   },
 ];
 
-const insurers = [
-  { name: "If P&C", logo: "🔵", types: ["Motor", "CASCO", "Home", "Health", "Travel", "Life"] },
-  { name: "ERGO", logo: "🟠", types: ["Motor", "CASCO", "Home", "Health", "Travel", "Life"] },
-  { name: "Swedbank P&C", logo: "🟡", types: ["Motor", "CASCO", "Home"] },
-  { name: "Gjensidige", logo: "🔴", types: ["Motor", "CASCO", "Travel"] },
-  { name: "LHV Kindlustus", logo: "⚫", types: ["Motor", "CASCO", "Travel"] },
-  { name: "SEB Life", logo: "🟢", types: ["Life"] },
-  { name: "Swedbank Life", logo: "🟡", types: ["Life"] },
-];
+// Elle yazılmış liste veriyle çelişiyordu (ör. If'te hayat ürünü yok); artık katalogdan.
+const TYPE_LABEL: Record<InsuranceType, string> = {
+  motor: "Motor", casco: "CASCO", home: "Home", health: "Health", travel: "Travel", life: "Life",
+};
+const insurers = listedInsurers();
+
+function examplePrice(type: InsuranceType): string {
+  const min = lowestExamplePremium(type);
+  return min == null ? "" : `Examples from €${min}/year`;
+}
 
 export default function InsurancePage() {
   return (
@@ -129,11 +131,11 @@ export default function InsurancePage() {
             <h1 className="text-2xl md:text-3xl font-extrabold">Insurance in Estonia</h1>
           </div>
           <p className="text-white/80 max-w-xl">
-            Compare all insurance types from licensed Estonian insurers — motor, home, health,
+            Compare all insurance types from insurers operating in Estonia — motor, home, health,
             travel, CASCO and life. Example premiums — your real price comes from the insurer.
           </p>
           <div className="flex flex-wrap gap-3 mt-5">
-            {["If P&C", "ERGO", "Swedbank", "LHV", "Gjensidige", "SEB Life"].map((name) => (
+            {insurers.map(({ name }) => (
               <span
                 key={name}
                 className="text-xs bg-white/15 border border-white/20 text-white px-3 py-1 rounded-full font-medium"
@@ -168,9 +170,9 @@ export default function InsurancePage() {
               <p className="text-xs text-gray-400 mb-0.5 font-medium">{ins.subtitle}</p>
               <h2 className="text-lg font-bold text-gray-900 mb-1">{ins.title}</h2>
               <p className="text-gray-500 text-sm mb-1">{ins.desc}</p>
-              <p className="text-[#f97316] font-bold text-sm mb-4">{ins.price}</p>
+              <p className="text-[#f97316] font-bold text-sm mb-4">{examplePrice(ins.type)}</p>
               <div className="flex items-center gap-1 text-[#1a3c6e] text-sm font-semibold group-hover:gap-2 transition-all">
-                Compare quotes <ArrowRight size={14} />
+                Compare insurers <ArrowRight size={14} />
               </div>
             </Link>
           ))}
@@ -179,22 +181,26 @@ export default function InsurancePage() {
         {/* Insurer trust bar */}
         <div className="mt-10 bg-white rounded-2xl border border-gray-100 p-6">
           <h3 className="text-sm font-bold text-[#1a3c6e] mb-4 uppercase tracking-wide">
-            Licensed insurers we compare
+            Insurers we list
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {insurers.map((ins) => (
-              <div key={ins.name} className="flex items-start gap-3">
+              <div key={ins.companyId} className="flex items-start gap-3">
                 <span className="text-2xl">{ins.logo}</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{ins.name}</p>
-                  <p className="text-xs text-gray-400">{ins.types.join(" · ")}</p>
+                  <p className="text-xs text-gray-400">{ins.types.map((t) => TYPE_LABEL[t]).join(" · ")}</p>
                 </div>
               </div>
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-4 pt-4 border-t border-gray-50">
-            All insurers are regulated by Finantsinspektsioon (Estonian Financial Supervision
-            Authority). NordicRate is an independent comparison service.
+            Some insurers operate in Estonia as branches of EU insurers supervised in their home
+            country. Check any insurer&apos;s authorisation in the{" "}
+            <a href="https://www.fi.ee" target="_blank" rel="noopener noreferrer" className="underline">
+              Finantsinspektsioon
+            </a>{" "}
+            register. NordicRate is an independent comparison service.
           </p>
         </div>
 
@@ -207,7 +213,7 @@ export default function InsurancePage() {
               <p>
                 Motor insurance (liikluskindlustus) is the only legally required personal insurance
                 in Estonia. All registered vehicles must hold valid motor liability cover. Driving
-                without it can result in fines of up to €1,200.
+                without it can result in fines.
               </p>
             </div>
             <div>

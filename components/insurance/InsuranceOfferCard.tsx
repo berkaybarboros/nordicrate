@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Tag, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
+import { CheckCircle, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { InsuranceOffer } from "@/data/insurance";
 import BankLogo from "@/components/ui/BankLogo";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -8,6 +8,7 @@ import { useCompare } from "@/contexts/CompareContext";
 import { buildGoLink } from "@/lib/affiliate";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
 import { useProductViewed } from "@/lib/use-product-viewed";
+import RateFreshness from "@/components/RateFreshness";
 
 interface Props {
   offer: InsuranceOffer;
@@ -43,13 +44,18 @@ export default function InsuranceOfferCard({ offer }: Props) {
                 ne fiyat karşılaştırması ne popülerlik verisi var (UCPD). Yerine verinin
                 niteliğini açıkça söyleyen rozet: sigorta primleri kişiye göre fiyatlanır,
                 buradaki rakam örnek profildir, canlı teklif değildir. */}
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
-              title="Insurance is priced individually. This is an example premium for a typical profile, not a quote. We do not read insurer prices live."
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
-              Example premium · not a quote
-            </span>
+            {offer.verifiedAt ? (
+              // Prim sigortacının kaynağından doğrulandıysa kredilerdeki tazelik damgası
+              <RateFreshness checkedAt={offer.verifiedAt} sourceUrl={offer.sourceUrl} />
+            ) : (
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
+                title="Insurance is priced individually. This is an example premium for a typical profile, not a quote. We do not read insurer prices live."
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
+                Example premium · not a quote
+              </span>
+            )}
           </div>
         </div>
 
@@ -76,13 +82,6 @@ export default function InsuranceOfferCard({ offer }: Props) {
             </p>
             <p className="text-xs text-gray-400">deductible</p>
           </div>
-          {offer.onlineDiscount && (
-            <div className="hidden md:block md:flex-1 md:border-l md:border-gray-100 md:pl-5">
-              <p className="text-xs text-gray-400 mb-0.5">{t.insurance.onlineDiscount}</p>
-              <p className="text-xl font-extrabold text-green-600">-{offer.onlineDiscount}%</p>
-              <p className="text-xs text-gray-400">if bought online</p>
-            </div>
-          )}
         </div>
 
         {/* CTA */}
@@ -117,7 +116,6 @@ export default function InsuranceOfferCard({ offer }: Props) {
                     { label: "Annual Premium (example)", value: `~€${offer.representativePremium}` },
                     { label: "Monthly Premium", value: `€${monthly}` },
                     { label: "Excess / Deductible", value: offer.excess === 0 ? "None" : `€${offer.excess}` },
-                    { label: "Online Discount", value: offer.onlineDiscount ? `-${offer.onlineDiscount}%` : "—" },
                     { label: "Payment Options", value: offer.paymentOptions.join(", ") },
                   ],
                 });
@@ -169,12 +167,6 @@ export default function InsuranceOfferCard({ offer }: Props) {
             </div>
           ))}
         </div>
-        {offer.onlineDiscount && (
-          <div className="mt-3 inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full md:hidden">
-            <Tag size={11} />
-            Save {offer.onlineDiscount}% by applying online
-          </div>
-        )}
       </div>
     </div>
   );

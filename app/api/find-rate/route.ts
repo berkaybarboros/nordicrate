@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const catalogText = products.map((p, i) => {
       if (isInsurance) {
         const ins = p as typeof motorInsurance[number];
-        return `${i + 1}. ${ins.companyName} — Annual premium: €${ins.annualPremiumMin}–€${ins.annualPremiumMax} (rep: €${ins.representativePremium}), Excess: €${ins.excess}, Features: ${ins.features.join(', ')}`;
+        return `${i + 1}. ${ins.companyName} — Example annual premium for a typical profile (not a quote): €${ins.annualPremiumMin}–€${ins.annualPremiumMax} (example: €${ins.representativePremium}), Excess: €${ins.excess}, Features: ${ins.features.join(', ')}`;
       } else {
         const loan = p as typeof personalLoans[number];
         return `${i + 1}. ${loan.bankName} — Rate: ${loan.interestRateMin}%–${loan.interestRateMax}% (rep: ${loan.representativeRate}%), Amount: €${loan.minAmount}–€${loan.maxAmount}, Term: ${loan.minTermMonths}–${loan.maxTermMonths}mo, Fee: €${loan.fee}, Processing: ${loan.processingTime}`;
@@ -95,7 +95,7 @@ User context: ${userCtx}
 
 Available products:
 ${catalogText}
-
+${isInsurance ? '\nInsurance premiums above are examples for a typical profile, not quotes. Never present them as the user\'s price; say the insurer gives the actual quote.\n' : ''}
 Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
 {
   "summary": "2-3 sentence personalized summary of the market situation and why these are the best picks",
