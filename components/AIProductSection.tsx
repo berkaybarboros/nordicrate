@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, BarChart2, Lightbulb, ChevronRight } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -28,22 +28,26 @@ function buildPrompt(tab: TabKey, productType: string, country?: string): string
   }
 }
 
+interface StreamResult {
+  prompt: string;
+  text: string;
+  done: boolean;
+  error: boolean;
+}
+
 // ─── Hook: stream AI response ──────────────────────────────────────────────────
 function useAIStream(prompt: string | null) {
-  const [text, setText]       = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(false);
-  const abortRef              = useRef<AbortController | null>(null);
+  // Sonuç, ait olduğu prompt ile birlikte tutulur: prompt değişince eski metin/hata
+  // render'da otomatik "sıfır + loading" olur — effect içinde senkron reset gerekmez.
+  const [result, setResult] = useState<StreamResult | null>(null);
 
   useEffect(() => {
     if (!prompt) return;
-    abortRef.current?.abort();
     const ctrl = new AbortController();
-    abortRef.current = ctrl;
-
-    setText('');
-    setLoading(true);
-    setError(false);
+    const base = (prev: StreamResult | null): StreamResult =>
+      prev?.prompt === prompt ? prev : { prompt, text: '', done: false, error: false };
+    const update = (patch: Partial<Omit<StreamResult, 'prompt'>>) =>
+      setResult(prev => ({ ...base(prev), ...patch }));
 
     fetch('/api/chat', {
       method: 'POST',
@@ -75,25 +79,29 @@ function useAIStream(prompt: string | null) {
                 parsed.text ??
                 parsed.delta?.text ??
                 '';
-              if (chunk) setText(prev => prev + chunk);
+              if (chunk) setResult(prev => { const b = base(prev); return { ...b, text: b.text + chunk }; });
             } catch {
               /* non-JSON line, skip */
             }
           }
         }
-        setLoading(false);
+        update({ done: true });
       })
       .catch(err => {
         if ((err as Error).name !== 'AbortError') {
-          setError(true);
-          setLoading(false);
+          update({ error: true, done: true });
         }
       });
 
     return () => ctrl.abort();
   }, [prompt]);
 
-  return { text, loading, error };
+  const current = prompt && result?.prompt === prompt ? result : null;
+  return {
+    text:    current?.text ?? '',
+    loading: prompt !== null && !current?.done,
+    error:   current?.error ?? false,
+  };
 }
 
 // ─── Tab config ────────────────────────────────────────────────────────────────
@@ -106,22 +114,16 @@ const TABS: { key: TabKey; icon: React.ReactNode; label: string }[] = [
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function AIProductSection({ productType, country, accentGradient = 'from-[#1a3c6e] to-[#2563eb]' }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary');
-  const [triggered, setTriggered] = useState<Partial<Record<TabKey, string>>>({});
+  // Summary her zaman otomatik çalışır; diğer sekmeler ilk tıklamada tetiklenir.
+  // Tetiklenen sekmelerin prompt'u props'tan türetilir → productType/country değişince güncel kalır.
+  const [opened, setOpened] = useState<Set<TabKey>>(() => new Set<TabKey>(['summary']));
+  const activePrompt = opened.has(activeTab) ? buildPrompt(activeTab, productType, country) : null;
 
-  // Fetch summary automatically on mount
-  useEffect(() => {
-    const prompt = buildPrompt('summary', productType, country);
-    setTriggered(prev => ({ ...prev, summary: prompt }));
-  }, [productType, country]);
-
-  const { text, loading, error } = useAIStream(triggered[activeTab] ?? null);
+  const { text, loading, error } = useAIStream(activePrompt);
 
   function activateTab(tab: TabKey) {
     setActiveTab(tab);
-    if (!triggered[tab]) {
-      const prompt = buildPrompt(tab, productType, country);
-      setTriggered(prev => ({ ...prev, [tab]: prompt }));
-    }
+    if (!opened.has(tab)) setOpened(prev => new Set(prev).add(tab));
   }
 
   // Format text: detect numbered lists and render nicely

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { getSupabase, SUPABASE_NOT_CONFIGURED } from '@/lib/supabase';
 
 async function signInWithGoogle() {
+  const supabase = getSupabase();
+  if (!supabase) return;
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -22,6 +24,11 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError(SUPABASE_NOT_CONFIGURED);
+      return;
+    }
     setLoading(true);
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);

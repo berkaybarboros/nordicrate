@@ -239,3 +239,8 @@ export function getCountryStats(countryCode: string) {
     avgBusinessRate,
   };
 }
+
+/** ISO tarihe kalan gün (yukarı yuvarlanır; geçmişse negatif). */
+export function daysUntil(iso: string): number {
+  return Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
+}

@@ -1,9 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import { useStorageItem } from '@/lib/use-client-store';
 import { en, et, fi, type Translations, type Locale } from '@/locales';
 
 const translations: Record<Locale, Translations> = { en, et, fi };
+
+function isLocale(v: string): v is Locale {
+  return v in translations;
+}
 
 interface LanguageContextType {
   locale: Locale;
@@ -18,23 +23,11 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  // Server render ve hydration 'en' ile; kayıtlı dil hydration'dan hemen sonra uygulanır.
+  const [saved, setSaved] = useStorageItem('local', 'nordicrate-locale');
+  const locale: Locale = saved && isLocale(saved) ? saved : 'en';
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('nordicrate-locale') as Locale | null;
-      if (saved && ['en', 'fi', 'et'].includes(saved)) {
-        setLocaleState(saved);
-      }
-    }
-  }, []);
-
-  const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('nordicrate-locale', newLocale);
-    }
-  }, []);
+  const setLocale = useCallback((newLocale: Locale) => setSaved(newLocale), [setSaved]);
 
   return (
     <LanguageContext.Provider value={{ locale, t: translations[locale], setLocale }}>

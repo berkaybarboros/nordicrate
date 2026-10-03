@@ -11,7 +11,8 @@
  * sayfalarında gösterilmez.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useStorageItem } from '@/lib/use-client-store';
 import { usePathname } from 'next/navigation';
 import { ThumbsUp, ThumbsDown, Send } from 'lucide-react';
 import { getSessionContext, track } from '@/lib/tracker';
@@ -40,34 +41,28 @@ async function send(payload: Record<string, unknown>) {
 
 export default function PageFeedback() {
   const pathname = usePathname() || '/';
+  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
+  // key: sayfa değişince form durumu (stage/message/email) sıfırdan başlar
+  return <PageFeedbackForm key={pathname} pathname={pathname} />;
+}
+
+function PageFeedbackForm({ pathname }: { pathname: string }) {
   const [stage, setStage] = useState<Stage>('ask');
-  const [answered, setAnswered] = useState(false);
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
+  // Bu sekmede bu sayfa zaten cevaplandıysa tekrar sorma
+  const [answeredFlag, setAnsweredFlag] = useStorageItem('session', storageKey(pathname));
 
-  useEffect(() => {
-    setStage('ask');
-    setMessage('');
-    setEmail('');
-    try {
-      setAnswered(sessionStorage.getItem(storageKey(pathname)) === '1');
-    } catch {
-      setAnswered(false);
-    }
-  }, [pathname]);
+  if (answeredFlag === '1' && stage === 'ask') return null;
 
-  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
-  if (answered && stage === 'ask') return null;
-
-  const markAnswered = () => {
-    try { sessionStorage.setItem(storageKey(pathname), '1'); } catch { /* yok say */ }
-  };
+  const markAnswered = () => setAnsweredFlag('1');
 
   const answer = (helpful: boolean) => {
+    // Önce stage: bayrak 'ask' durumundayken yazılırsa kart bir anlığına kaybolurdu
+    setStage(helpful ? 'done' : 'details');
     markAnswered();
     void send({ kind: 'page_helpful', page: pathname, helpful });
     void track('feedback', { page: pathname, helpful });
-    setStage(helpful ? 'done' : 'details');
   };
 
   const submitDetails = (e: React.FormEvent) => {

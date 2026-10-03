@@ -9,7 +9,7 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { getUserProfile, type UserProfileInput } from '@/lib/db';
 
 interface UserProfileCtx {
@@ -32,7 +32,8 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
 
   const load = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const supabase = getSupabase();
+      const session = supabase ? (await supabase.auth.getSession()).data.session : null;
       if (!session) { setProfile(null); return; }
       setProfile(await getUserProfile(session.user.id));
     } catch {
@@ -44,6 +45,8 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     load();
+    const supabase = getSupabase();
+    if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
         load();

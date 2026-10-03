@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useFetchJson } from "@/lib/use-fetch-json";
 import { PiggyBank, Lock, TrendingUp, ExternalLink, BarChart2, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { buildGoLink } from "@/lib/affiliate";
@@ -69,29 +70,16 @@ export default function DepositsContent() {
   const { add, remove, has, items, MAX } = useCompare();
   const [amount, setAmount] = useState(10000);
   const [selectedTerm, setSelectedTerm] = useState(12);
-  const [offers, setOffers] = useState<DepositOffer[]>([]);
-  const [allTerms, setAllTerms] = useState<number[]>([]);
-  const [meta, setMeta] = useState<DepositsMeta | null>(null);
-  const [loading, setLoading] = useState(true);
-
   const amountPercent = ((amount - 500) / (1000000 - 500)) * 100;
 
-  const fetchDeposits = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/deposits?amount=${amount}&term=${selectedTerm}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setOffers(data.deposits || []);
-        if (data.allTerms) setAllTerms(data.allTerms);
-        if (data.meta) setMeta(data.meta);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [amount, selectedTerm]);
-
-  useEffect(() => {
-    fetchDeposits();
-  }, [fetchDeposits]);
+  const { data, loading } = useFetchJson<{
+    deposits?: DepositOffer[];
+    allTerms?: number[];
+    meta?: DepositsMeta;
+  }>(`/api/deposits?amount=${amount}&term=${selectedTerm}`);
+  const offers = data?.deposits ?? [];
+  const allTerms = data?.allTerms ?? [];
+  const meta = data?.meta ?? null;
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">

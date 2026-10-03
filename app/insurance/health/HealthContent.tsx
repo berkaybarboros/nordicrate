@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useFetchJson } from "@/lib/use-fetch-json";
 import { ArrowUpDown, Heart } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import AIProductSection from "@/components/AIProductSection";
@@ -42,28 +43,14 @@ function SkeletonInsuranceCard() {
 export default function HealthContent() {
   const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<"price" | "rating">("price");
-  const [offers, setOffers] = useState<InsuranceOffer[]>([]);
-  const [loading, setLoading] = useState(true);
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
     const e3m = rates.find(r => r.key === 'euribor3m');
     if (e3m) setLiveEuribor(e3m.rate);
   }, []);
 
-  const fetchOffers = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/insurance/health?sort=${sortBy === "price" ? "price" : "name"}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setOffers(data.offers || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [sortBy]);
-
-  useEffect(() => {
-    fetchOffers();
-  }, [fetchOffers]);
+  const { data, loading } = useFetchJson<{ offers?: InsuranceOffer[] }>(`/api/insurance/health?sort=${sortBy === "price" ? "price" : "name"}`);
+  const offers = data?.offers ?? [];
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">

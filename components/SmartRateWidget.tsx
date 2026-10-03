@@ -12,9 +12,9 @@
  *  - "Rates changed" toast → öneri güncelleme tetikler
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, RefreshCw, Zap, Bell } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import RateAlertModal from './alerts/RateAlertModal';
 
 export interface RateEntry {
@@ -33,6 +33,13 @@ const RATE_META: Record<string, { label: string; currency: string; group: 'eurib
   policy_rate_no:  { label: 'Norges Bank',   currency: 'NOK', group: 'policy'  },
 };
 
+interface SnapshotRow {
+  key: string;
+  rate: number;
+  delta: number | null;
+  fetched_at: string;
+}
+
 interface Props {
   compact?: boolean;
   onRateChange?: (rates: RateEntry[]) => void;
@@ -42,55 +49,58 @@ interface Props {
 
 export default function SmartRateWidget({ compact = false, onRateChange, className = '', showAlertCta = true }: Props) {
   const [rates, setRates] = useState<Map<string, RateEntry>>(new Map());
-  const [loading, setLoading] = useState(true);
+  // Supabase env'i yoksa (cloud oturumu / CI build) yüklenecek bir şey yok — spinner'da takılma
+  const [loading, setLoading] = useState(() => getSupabase() !== null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [justChanged, setJustChanged] = useState(false);
   const [realtimeActive, setRealtimeActive] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
 
-  // İlk yükleme: son rates'leri çek
-  const fetchInitialRates = useCallback(async () => {
-    const { data } = await supabase
+  // İlk yükleme + Realtime subscription
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    let cancelled = false;
+
+    // İlk yükleme: son rates'leri çek
+    supabase
       .from('rate_snapshots')
       .select('key, rate, delta, fetched_at')
       .in('key', Object.keys(RATE_META))
       .order('fetched_at', { ascending: false })
-      .limit(20);
+      .limit(20)
+      .then(({ data }: { data: SnapshotRow[] | null }) => {
+        if (cancelled) return;
+        if (!data) { setLoading(false); return; }
 
-    if (!data) { setLoading(false); return; }
-
-    const map = new Map<string, RateEntry>();
-    for (const row of data) {
-      if (!map.has(row.key) && RATE_META[row.key]) {
-        map.set(row.key, {
-          key:        row.key,
-          rate:       row.rate,
-          delta:      row.delta,
-          fetched_at: row.fetched_at,
-          label:      RATE_META[row.key].label,
-          currency:   RATE_META[row.key].currency,
-        });
-      }
-    }
-    setRates(map);
-    setLoading(false);
-    if (map.size > 0) {
-      setLastUpdate(new Date());
-      onRateChange?.(Array.from(map.values()));
-    }
-  }, [onRateChange]);
-
-  // Realtime subscription
-  useEffect(() => {
-    fetchInitialRates();
+        const map = new Map<string, RateEntry>();
+        for (const row of data) {
+          if (!map.has(row.key) && RATE_META[row.key]) {
+            map.set(row.key, {
+              key:        row.key,
+              rate:       row.rate,
+              delta:      row.delta,
+              fetched_at: row.fetched_at,
+              label:      RATE_META[row.key].label,
+              currency:   RATE_META[row.key].currency,
+            });
+          }
+        }
+        setRates(map);
+        setLoading(false);
+        if (map.size > 0) {
+          setLastUpdate(new Date());
+          onRateChange?.(Array.from(map.values()));
+        }
+      });
 
     const channel = supabase
       .channel('rate-snapshots-live')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'rate_snapshots' },
-        (payload) => {
-          const row = payload.new as { key: string; rate: number; delta: number | null; fetched_at: string };
+        (payload: { new: unknown }) => {
+          const row = payload.new as SnapshotRow;
           if (!RATE_META[row.key]) return;
 
           setRates(prev => {
@@ -112,12 +122,15 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
           setTimeout(() => setJustChanged(false), 4000);
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         setRealtimeActive(status === 'SUBSCRIBED');
       });
 
-    return () => { supabase.removeChannel(channel); };
-  }, [fetchInitialRates, onRateChange]);
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [onRateChange]);
 
   // ─── Compact mode: sadece EURIBOR 3M chip ─────────────────────────────────
   if (compact) {
