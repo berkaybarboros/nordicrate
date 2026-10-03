@@ -1,0 +1,48 @@
+# The whole safety net for this repo: there is no staging environment, and a push
+# to main is released to production by a cron on the server within ten minutes.
+# So these four checks are what stands between a bad commit and the live site.
+#
+# No secrets are configured here on purpose. The build must pass without them —
+# pages that call external APIs fall back to the static catalogue — which is also
+# what makes a cloud session able to verify its own work.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Last, because it is the slowest and the three above catch most of what breaks.
+      - name: Build
+        run: npm run build
