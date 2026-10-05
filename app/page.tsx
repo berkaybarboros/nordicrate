@@ -30,11 +30,11 @@ import CountryCard from '@/components/CountryCard';
 import CountryFlag from '@/components/CountryFlag';
 import LiveRatesBanner from '@/components/LiveRatesBanner';
 import LoanCalculator from '@/components/LoanCalculator';
+import RateFreshness from '@/components/RateFreshness';
 import HeroCta from '@/components/home/HeroCta';
 import WelcomeBack from '@/components/home/WelcomeBack';
 import InstitutionMarquee from '@/components/home/InstitutionMarquee';
 import { logoFromWebsite, monogram } from '@/lib/logos';
-import EditorialPicks from '@/components/EditorialPicks';
 import FaqSection from '@/components/FaqSection';
 
 export default async function HomePage() {
@@ -96,10 +96,12 @@ export default async function HomePage() {
   ).map(({ type, href, desc }) => {
     const prods = liveProducts.filter((p) => p.type === type);
     // "from X%" once canli oranlardan; o tipte canli yoksa gosterge oran (etiketsiz Live degil)
-    const liveProds = prods.filter((p) => p.isLiveRate);
+    // Canlı sayılması için 48 saatten taze olmalı — featured blokla aynı kural
+    const liveProds = prods.filter((p) => p.isLiveRate && rateFreshness(p.updatedAt) === 'fresh');
     const best = [...(liveProds.length ? liveProds : prods)].sort((a, b) => a.rateMin - b.rateMin)[0];
+    const bestIsLive = Boolean(best && liveProds.includes(best));
     const inst = best ? getInstitution(best.institutionId) : null;
-    return { type, href, desc, count: prods.length, best, inst };
+    return { type, href, desc, count: prods.length, best, bestIsLive, inst };
   });
 
   return (
@@ -117,8 +119,8 @@ export default async function HomePage() {
             {/* Left — kısa mesaj + somut değer maddeleri + tek CTA */}
             <div>
               <div className="inline-flex items-center gap-2 bg-white border border-sky-200 text-sky-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-5 shadow-sm">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                Live EURIBOR &amp; central bank data
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                Bank rates read daily · EURIBOR from the ECB
               </div>
 
               <h1 className="text-4xl xl:text-[2.9rem] font-extrabold leading-[1.1] text-slate-900 mb-5">
@@ -130,9 +132,9 @@ export default async function HomePage() {
               {/* Lendo tarzı somut bullet'lar — pazarlama paragrafı yerine */}
               <ul className="space-y-2.5 mb-7">
                 {[
-                  `${totalProducts}+ offers from ${totalInstitutions}+ banks in one view`,
+                  `${totalProducts} offers from ${totalInstitutions} institutions in one view`,
                   `${totalCountries} Nordic & Baltic countries covered`,
-                  'Free & independent — no credit check, no sign-up',
+                  'Free, no sign-up — comparing does not affect your credit score',
                   'Rates read daily from bank websites — anything else is marked indicative',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-slate-700">
@@ -166,14 +168,14 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900">What do you need financing for?</h2>
-              <p className="text-slate-500 text-sm mt-1">Lowest rate read from bank websites today, per loan type — marked when only indicative</p>
+              <p className="text-slate-500 text-sm mt-1">Lowest rate read from a bank website in the last 48 hours, per loan type — otherwise marked indicative</p>
             </div>
             <Link href="/loans" className="text-sky-600 hover:text-sky-800 font-semibold text-sm hidden sm:block">
               View all {totalProducts} products →
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {typeStats.map(({ type, href, desc, count, best, inst }) => (
+            {typeStats.map(({ type, href, desc, count, best, bestIsLive, inst }) => (
               <Link
                 key={type}
                 href={href}
@@ -181,10 +183,10 @@ export default async function HomePage() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-3xl">{LOAN_TYPE_ICONS[type]}</span>
-                  {best?.isLiveRate && (
+                  {bestIsLive && (
                     <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
-                      <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                      Live rate
+                      <span className="w-1 h-1 bg-emerald-500 rounded-full" />
+                      Bank rate
                     </span>
                   )}
                 </div>
@@ -197,9 +199,12 @@ export default async function HomePage() {
                     <p className="text-3xl font-extrabold text-sky-600 leading-none">
                       {formatRate(best.rateMin)}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1 mb-3">
-                      {best.isLiveRate ? 'from' : 'indicative, from'} · {inst?.shortName}
+                    <p className="text-xs text-slate-500 mt-1">
+                      {bestIsLive ? 'from' : 'indicative, from'} · {inst?.shortName}
                     </p>
+                    <div className="mb-3 mt-1">
+                      <RateFreshness checkedAt={bestIsLive ? best.updatedAt : null} />
+                    </div>
                   </>
                 )}
                 <p className="text-sm font-bold text-sky-600 group-hover:underline">
@@ -224,8 +229,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               { step: 1, Icon: Calculator, title: 'Calculate', desc: 'Enter your loan amount and term in our free calculator to see estimated monthly payments instantly.' },
-              { step: 2, Icon: BarChart3, title: 'Compare', desc: 'Browse and filter 100+ loan products from 50+ banks, sorted by lowest APR, highest limit, or most recent.' },
-              { step: 3, Icon: CheckCircle2, title: 'Apply', desc: 'Click directly through to your chosen bank. No middleman, no hidden fees — we are 100% free to use.' },
+              { step: 2, Icon: BarChart3, title: 'Compare', desc: `Browse and filter ${totalProducts} loan products from ${totalInstitutions} institutions, sorted by lowest APR, highest limit, or most recent.` },
+              { step: 3, Icon: CheckCircle2, title: 'Apply', desc: 'Apply on the bank’s own site. NordicRate is free for you; some banks pay us a referral fee, which never changes the order we show.' },
             ].map(({ step, Icon, title, desc }) => (
               <div key={step} className="bg-white rounded-2xl border border-slate-200 p-6 text-center relative overflow-hidden">
                 <div className="absolute top-3 right-3 w-7 h-7 bg-slate-100 text-slate-500 rounded-full text-sm font-bold flex items-center justify-center">
@@ -244,9 +249,6 @@ export default async function HomePage() {
 
       {/* ========== KURUM LOGO MARQUEE ========== */}
       <InstitutionMarquee items={marqueeItems} countryCount={totalCountries} />
-
-      {/* ========== EDITORIAL PICKS ========== */}
-      <EditorialPicks />
 
       {/* ========== FEATURED OFFERS ========== */}
       <section className="py-14 px-4 bg-white">

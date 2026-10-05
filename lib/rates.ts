@@ -3,20 +3,20 @@ import type { LiveRatesData } from '@/lib/types';
 // Fallback rates (used if all APIs fail)
 export const FALLBACK_RATES: LiveRatesData = {
   success: false,
-  note: 'Using cached fallback rates — live data unavailable',
+  note: 'Static reference rates — live data unavailable',
   euribor: {
-    euribor3m: { label: 'EURIBOR 3M', rate: 2.011, period: '2026-02' },
-    euribor6m: { label: 'EURIBOR 6M', rate: 2.144, period: '2026-02' },
-    euribor12m: { label: 'EURIBOR 12M', rate: 2.221, period: '2026-02' },
+    euribor3m: { label: 'EURIBOR 3M', rate: 2.011, period: '2026-02', source: 'fallback' },
+    euribor6m: { label: 'EURIBOR 6M', rate: 2.144, period: '2026-02', source: 'fallback' },
+    euribor12m: { label: 'EURIBOR 12M', rate: 2.221, period: '2026-02', source: 'fallback' },
   },
   centralBankRates: {
-    ecb: { label: 'ECB Deposit Rate', rate: 2.5, currency: 'EUR', period: '2025-12-18' },
-    norges: { label: 'Norges Bank', rate: 4.5, currency: 'NOK', period: '2025-12-19' },
-    riksbank: { label: 'Riksbank (Sweden)', rate: 2.5, currency: 'SEK', period: '2025-11-07' },
-    nationalbank: { label: 'Danmarks Nationalbank', rate: 2.85, currency: 'DKK', period: '2025-12-18' },
-    centralbank_is: { label: 'Central Bank of Iceland', rate: 9.0, currency: 'ISK', period: '2025-11-06' },
+    ecb: { label: 'ECB Deposit Rate', rate: 2.5, currency: 'EUR', period: '2025-12-18', source: 'fallback' },
+    norges: { label: 'Norges Bank', rate: 4.5, currency: 'NOK', period: '2025-12-19', source: 'fallback' },
+    riksbank: { label: 'Riksbank (Sweden)', rate: 2.5, currency: 'SEK', period: '2025-11-07', source: 'fallback' },
+    nationalbank: { label: 'Danmarks Nationalbank', rate: 2.85, currency: 'DKK', period: '2025-12-18', source: 'fallback' },
+    centralbank_is: { label: 'Central Bank of Iceland', rate: 9.0, currency: 'ISK', period: '2025-11-06', source: 'fallback' },
   },
-  fetchedAt: new Date().toISOString(),
+  fetchedAt: null,
 };
 
 /** Parse ECB / Norges Bank SDMX-JSON response */
@@ -34,7 +34,7 @@ function parseSDMXResponse(json: Record<string, unknown>, label: string) {
     const lastKey = obsKeys[obsKeys.length - 1];
     const rate = observations[lastKey][0];
     const period = structure.dimensions.observation[0].values[lastKey]?.id ?? 'N/A';
-    return { label, rate: Math.round(rate * 1000) / 1000, period };
+    return { label, rate: Math.round(rate * 1000) / 1000, period, source: 'live' as const };
   } catch {
     return null;
   }
@@ -71,7 +71,7 @@ async function fetchNorgesBank() {
 export async function fetchAllRates(): Promise<LiveRatesData> {
   const result: LiveRatesData = {
     ...FALLBACK_RATES,
-    fetchedAt: new Date().toISOString(),
+    fetchedAt: null,
     success: false,
   };
 
@@ -84,6 +84,7 @@ export async function fetchAllRates(): Promise<LiveRatesData> {
     ]);
     result.euribor = { euribor3m, euribor6m, euribor12m };
     result.success = true;
+    result.fetchedAt = new Date().toISOString();
   } catch (err) {
     console.warn('[rates] ECB EURIBOR fetch failed:', err);
   }
@@ -94,12 +95,42 @@ export async function fetchAllRates(): Promise<LiveRatesData> {
     if (norges) {
       result.centralBankRates = {
         ...result.centralBankRates,
-        norges: { label: 'Norges Bank', rate: norges.rate, currency: 'NOK', period: norges.period },
+        norges: { label: 'Norges Bank', rate: norges.rate, currency: 'NOK', period: norges.period, source: 'live' },
       };
+      result.fetchedAt ??= new Date().toISOString();
     }
   } catch (err) {
     console.warn('[rates] Norges Bank fetch failed:', err);
   }
 
   return result;
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * "2026-09" → "Sep 2026"; günlük dönemler ("2025-12-18") → "18 Dec 2025".
+ * Intl kullanılmıyor: ICU sürümüne göre "Sep"/"Sept" değişiyor — server ile tarayıcı
+ * farklı ICU taşırsa hydration uyuşmazlığı olur.
+ */
+export function formatPeriod(period: string | undefined): string {
+  if (!period) return '';
+  const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(period);
+  if (!m) return period;
+  const month = MONTHS[Number(m[2]) - 1];
+  if (!month) return period;
+  return m[3] ? `${Number(m[3])} ${month} ${m[1]}` : `${month} ${m[1]}`;
+}
+
+/**
+ * Referans oran rozetlerinin tek metni. Verinin ait olduğu dönemi söyler, çekim saatini
+ * değil: ECB EURIBOR serisi aylık ortalamadır, "updated 5m ago" ona uymaz.
+ */
+export function describeEuribor(data: Pick<LiveRatesData, 'euribor'>): { text: string; live: boolean } {
+  const r = data.euribor.euribor3m;
+  const live = r.source === 'live';
+  const when = formatPeriod(r.period);
+  return live
+    ? { text: `EURIBOR 3M ${r.rate.toFixed(2)}% · ${when} · ECB`, live }
+    : { text: `Reference EURIBOR as of ${when} · static`, live };
 }

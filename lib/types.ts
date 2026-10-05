@@ -110,8 +110,11 @@ export interface GovernmentProgram {
 export interface LiveRate {
   label: string;
   rate: number;
+  /** Gözlem dönemi (ECB aylık seri: "2026-09"); "as of" bilgisi budur, çekim saati değil */
   period?: string;
   currency?: string;
+  /** 'live' = bu istekte kaynaktan okundu; 'fallback' = koddaki sabit referans */
+  source?: 'live' | 'fallback';
 }
 
 export interface LiveRatesData {
@@ -121,7 +124,9 @@ export interface LiveRatesData {
     euribor12m: LiveRate;
   };
   centralBankRates: Record<string, LiveRate & { currency: string }>;
-  fetchedAt: string;
+  /** Kaynaktan en az bir oran gerçekten okunduysa o an; hiçbiri okunmadıysa null.
+   *  Eskiden fallback'te bile new Date() idi → "updated just now" yalanı. */
+  fetchedAt: string | null;
   success: boolean;
   note?: string;
 }

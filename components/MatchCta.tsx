@@ -13,7 +13,7 @@ export default function MatchCta({ country, tone = 'dark' }: { country?: string;
       <div className="flex-1">
         <p className={`font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>Not sure which bank will lend to you?</p>
         <p className={`text-sm ${dark ? 'text-slate-400' : 'text-slate-600'}`}>
-          4 quick questions, no sign-up, no credit check — we show offers that fit your situation.
+          4 quick questions, no sign-up, no effect on your credit score — we show offers that fit your situation.
         </p>
       </div>
       <Link

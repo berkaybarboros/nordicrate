@@ -5,6 +5,7 @@ import { useFetchJson } from "@/lib/use-fetch-json";
 import { PiggyBank, Lock, TrendingUp, ExternalLink, BarChart2, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { buildGoLink } from "@/lib/affiliate";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
 import { trackApplyClick, trackCompareAdd, trackCompareRemove } from "@/lib/tracker";
@@ -92,6 +93,7 @@ export default function DepositsContent() {
           </nav>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-2">{t.deposits.title}</h1>
           <p className="text-white/80">{t.deposits.subtitle}</p>
+          <AffiliateDisclosure className="mt-2 !text-white/70 [&_a]:text-white/90" />
           {/* 2026-09-13: Oranlar artik bankalarin kendi sitesinden gunluk okunuyor.
               Onceki "dogrulanmamis" uyari bandi kaldirildi; yerine gercek tazelik. */}
           {meta?.newestCheckedAt && (

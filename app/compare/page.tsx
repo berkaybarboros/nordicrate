@@ -577,7 +577,7 @@ export default function ComparePage() {
 
         {/* Disclaimer */}
         <p className="text-xs text-gray-400 text-center mt-8 leading-relaxed max-w-2xl mx-auto">
-          Rates and premiums shown are representative examples. Final rates depend on your credit
+          Rates and premiums shown are examples. Final rates depend on your credit
           profile and the provider&apos;s assessment. NordicRate is a comparison service — we do not
           provide financial products directly.
         </p>

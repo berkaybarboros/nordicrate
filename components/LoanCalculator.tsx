@@ -10,7 +10,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { PRODUCTS } from '@/lib/data';
-import { calculateAPR } from '@/lib/utils';
 
 type CalcLoanType = 'personal' | 'mortgage' | 'business';
 
@@ -20,10 +19,13 @@ function monthlyPayment(principal: number, annualRate: number, months: number): 
   return (principal * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
 }
 
+// Hesaplayıcı € ile çalışıyor: yalnız EUR ürünler. Eskiden NOK/DKK/ISK oranları da
+// aralığa giriyordu ve orta nokta "effective APR · real market data" diye sunuluyordu.
 function getRateRange(type: CalcLoanType) {
-  const rates = PRODUCTS.filter(p => p.type === type).map(p => p.rateMin);
+  const ofType = PRODUCTS.filter(p => p.type === type);
+  const rates = ofType.filter(p => p.currency === 'EUR').map(p => p.rateMin);
   if (rates.length === 0) return null;
-  return { min: Math.min(...rates), max: Math.max(...rates), count: rates.length };
+  return { min: Math.min(...rates), max: Math.max(...rates), count: ofType.length };
 }
 
 const TYPE_CONFIG = {
@@ -52,7 +54,6 @@ export default function LoanCalculator() {
 
   const monthly = monthlyPayment(amount, representativeRate, term);
   const totalPaid = monthly * term;
-  const effectiveAPR = calculateAPR(amount, representativeRate, term, 0);
 
   const termYears = term >= 12 ? `${Math.round(term / 12)} yr${Math.round(term / 12) > 1 ? 's' : ''}` : `${term} mo`;
 
@@ -119,7 +120,7 @@ export default function LoanCalculator() {
               </p>
             </div>
             <div className="text-right text-xs text-slate-500 space-y-1">
-              <p><strong className="text-slate-700">{effectiveAPR}%</strong> effective APR</p>
+              <p>at <strong className="text-slate-700">{representativeRate}%</strong> illustrative rate</p>
               <p><strong className="text-slate-700">€{Math.round(totalPaid).toLocaleString()}</strong> total cost</p>
             </div>
           </div>
@@ -132,8 +133,8 @@ export default function LoanCalculator() {
         </Link>
         <p className="text-xs text-slate-500 mt-2.5 text-center">
           {rateRange ? (
-            <>Rates from <strong className="text-slate-600">{rateRange.min}%</strong> APR · real market data · always verify with bank</>
-          ) : 'Indicative rates · always verify with bank'}
+            <>Illustrative rate: midpoint of listed EUR offers ({rateRange.min}%–{rateRange.max}%), no fees included. Your rate comes from the bank.</>
+          ) : 'Illustrative rate, no fees included. Your rate comes from the bank.'}
         </p>
       </div>
     </div>

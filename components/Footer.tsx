@@ -120,8 +120,8 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm leading-relaxed">
-              The leading credit comparison platform for Nordic &amp; Baltic markets.
-              Compare rates from 50+ banks and insurers.
+              Free comparison of loans, deposits and insurance across the Nordic &amp; Baltic
+              markets. Bank rates are read daily from each bank&rsquo;s own website.
             </p>
             {/* Real flag images — clickable shortcut to each country */}
             <div className="flex gap-1.5 mt-4 flex-wrap items-center">

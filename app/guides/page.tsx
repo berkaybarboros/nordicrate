@@ -74,7 +74,7 @@ export default function GuidesHubPage() {
           <div>
             <p className="font-extrabold text-slate-900">Ready to put it into practice?</p>
             <p className="text-sm text-slate-500 mt-1">
-              Compare live loan offers from 50+ Nordic &amp; Baltic banks — free, no credit check.
+              Compare loan offers from Nordic &amp; Baltic banks — free, and comparing does not affect your credit score.
             </p>
           </div>
           <Link

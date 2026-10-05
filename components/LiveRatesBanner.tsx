@@ -1,4 +1,4 @@
-import { fetchAllRates } from '@/lib/rates';
+import { fetchAllRates, formatPeriod } from '@/lib/rates';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,30 +8,28 @@ export default async function LiveRatesBanner() {
 
   const euriborRates = [data.euribor.euribor3m, data.euribor.euribor6m, data.euribor.euribor12m];
   const centralRates = Object.values(data.centralBankRates);
-  const fetchedAt = new Date(data.fetchedAt);
   const isLive = data.success;
 
   return (
     <div className="bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        {/* 2026-10: Eskiden "Live Market Rates · Updated HH:MM" — saat sayfanın render
+            anıydı ve Riksbank / Danmarks Nationalbank / Seðlabanki hiç çekilmeyen sabit
+            değerlerdi. Artık her oran kendi dönemini ve canlı/statik durumunu gösterir. */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
               <span
-                className={`w-2 h-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}
+                className={`w-2 h-2 rounded-full ${isLive ? 'bg-emerald-400' : 'bg-amber-400'}`}
               />
-              {isLive ? 'Live Market Rates' : 'Reference Rates'}
+              Reference Rates
             </span>
             <span className="text-xs text-slate-400">
-              via ECB Data Portal & Norges Bank API
+              EURIBOR via ECB Data Portal · Norges Bank via its API · others static
             </span>
           </div>
-          <span className="text-xs text-slate-400">
-            Updated:{' '}
-            {fetchedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}{' '}
-            {fetchedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-          </span>
+          <span className="text-xs text-slate-400">Each rate shows the period it refers to</span>
         </div>
 
         {/* EURIBOR */}
@@ -47,7 +45,10 @@ export default async function LiveRatesBanner() {
               >
                 <div>
                   <p className="text-xs text-slate-400">{r.label}</p>
-                  <p className="text-xs text-slate-400">{r.period}</p>
+                  <p className="text-xs text-slate-400">
+                    {formatPeriod(r.period)}
+                    {r.source !== 'live' && ' · static'}
+                  </p>
                 </div>
                 <p
                   className={`text-xl font-bold ${
@@ -88,7 +89,10 @@ export default async function LiveRatesBanner() {
                 >
                   {r.rate.toFixed(2)}%
                 </p>
-                <p className="text-xs text-slate-400">{r.currency}</p>
+                <p className="text-xs text-slate-400">
+                  {r.currency} · {formatPeriod(r.period)}
+                  {r.source !== 'live' && ' · static'}
+                </p>
               </div>
             ))}
           </div>
@@ -96,7 +100,7 @@ export default async function LiveRatesBanner() {
 
         {!isLive && (
           <p className="text-xs text-amber-400 mt-2">
-            ⚠️ Showing cached reference rates. Live API data temporarily unavailable.
+            ⚠️ Showing static reference rates — the ECB data portal could not be reached.
           </p>
         )}
       </div>

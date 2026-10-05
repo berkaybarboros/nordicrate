@@ -114,7 +114,7 @@ export default function RegisterPage() {
               Create your account
             </h1>
             <p className="text-slate-400 text-sm mt-1">
-              Free forever. No credit check required.
+              Free to use. Creating an account does not affect your credit score.
             </p>
           </div>
 

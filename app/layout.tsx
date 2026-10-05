@@ -10,6 +10,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompareProvider } from '@/contexts/CompareContext';
 import { UserProfileProvider } from '@/contexts/UserProfileContext';
 import PageViewTracker from '@/components/PageViewTracker';
+import { INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import PageFeedback from '@/components/PageFeedback';
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     template: '%s | NordicRate',
   },
   description:
-    'Compare personal loans, mortgages and business credit from 50+ banks across 8 Nordic & Baltic countries. Free, instant, no credit check.',
+    'Compare personal loans, mortgages and business credit from banks across 8 Nordic & Baltic countries. Free to use, rates read daily from bank websites, no effect on your credit score.',
   keywords: [
     'nordic loans', 'baltic credit', 'mortgage rates', 'personal loan comparison',
     'Scandinavia finance', 'Estonia loan', 'Finland bank', 'Norway mortgage',
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     siteName: 'NordicRate',
     title: 'NordicRate – Compare Loan Rates in Nordic & Baltic Countries',
     description:
-      'Free loan comparison across 8 Nordic & Baltic countries. 50+ banks, 100+ products. Find the lowest APR in seconds.',
+      `Free loan comparison across 8 Nordic & Baltic countries — ${INSTITUTIONS.length} institutions, ${PRODUCTS.length} products, rates read daily from bank websites.`,
     images: [
       {
         url: '/og-image.png',
@@ -67,7 +68,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'NordicRate – Compare Loan Rates in Nordic & Baltic Countries',
     description:
-      'Free loan comparison across 8 Nordic & Baltic countries. 50+ banks, 100+ products.',
+      `Free loan comparison across 8 Nordic & Baltic countries — ${INSTITUTIONS.length} institutions, ${PRODUCTS.length} products.`,
     images: ['/og-image.png'],
     creator: '@nordicrate',
   },

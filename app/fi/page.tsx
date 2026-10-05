@@ -5,6 +5,9 @@ import { HOME_DICTS } from '@/lib/home-i18n';
 
 const dict = HOME_DICTS.fi;
 
+// Oranlar banka sitelerinden günlük okunuyor — EN ana sayfayla aynı ISR süresi
+export const revalidate = 1800;
+
 export const metadata: Metadata = {
   title: dict.metaTitle,
   description: dict.metaDescription,

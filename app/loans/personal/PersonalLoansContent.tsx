@@ -268,8 +268,9 @@ function PersonalLoansInner() {
 
             {!loading && offers.length > 0 && (
               <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-                Representative example: Borrowing {formatCurrency(amount)} over {termMonths} months
-                at {bestRate}% p.a. gives a monthly payment of {formatCurrency(bestMonthly)}. Total
+                Example at the lowest representative rate listed ({bestRate}% p.a.): borrowing{" "}
+                {formatCurrency(amount)} over {termMonths} months gives a monthly payment of{" "}
+                {formatCurrency(bestMonthly)}, fees excluded. Total
                 repayable: {formatCurrency(bestMonthly * termMonths)}. Rates subject to individual
                 creditworthiness assessment. NordicRate is a comparison service — we do not provide
                 loans directly.

@@ -89,7 +89,9 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
         setRates(map);
         setLoading(false);
         if (map.size > 0) {
-          setLastUpdate(new Date());
+          // En yeni snapshot'ın gerçek çekim zamanı — eskiden sayfanın açılış anıydı
+          const newest = Math.max(...Array.from(map.values()).map((r) => new Date(r.fetched_at).getTime()));
+          setLastUpdate(new Date(newest));
           onRateChange?.(Array.from(map.values()));
         }
       });
@@ -117,7 +119,7 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
             return next;
           });
 
-          setLastUpdate(new Date());
+          setLastUpdate(new Date(row.fetched_at));
           setJustChanged(true);
           setTimeout(() => setJustChanged(false), 4000);
         }
@@ -187,7 +189,7 @@ export default function SmartRateWidget({ compact = false, onRateChange, classNa
         </div>
         {lastUpdate && (
           <span className="text-[10px] text-white/30">
-            {lastUpdate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+            fetched {lastUpdate.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
       </div>
