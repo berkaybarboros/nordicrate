@@ -270,3 +270,63 @@ export {
   APRC_PATTERNS,
   MIN_AMOUNT,
 };
+
+/* ─── Kaynak denetimi (source-audit.mjs) ───────────────────────────────────── */
+
+// Kanıt aranacak kelimeler — iddia İngilizce, sayfa yerel dilde. Bu liste yalnız
+// "hangi cümleyi rapora alalım" kararını verir; eşleşme doğrulama DEĞİLDİR.
+export const EVIDENCE_TERMS = {
+  speed: [
+    // en
+    'instant', 'immediately', 'minute', 'same day', 'same-day', 'within 24', 'working day', 'business day', 'decision',
+    // et
+    'kohe', 'koheselt', 'minuti', 'sama päev', 'tööpäev', 'otsus', 'vastus',
+    // lv
+    'uzreiz', 'minūt', 'tās pašas dienas', 'darba dien', 'lēmum',
+    // lt
+    'iš karto', 'minut', 'tą pačią dieną', 'darbo dien', 'sprendim',
+    // fi / sv / da / no / is
+    'heti', 'minuu', 'samana päivänä', 'päätös', 'direkt', 'samma dag', 'beslut', 'straks', 'samme dag', 'svar', 'strax', 'samdægurs',
+  ],
+  fee: [
+    // en
+    'fee', 'commission', 'charge', 'free of charge', 'no cost',
+    // et
+    'lepingutasu', 'tasu', 'haldustasu', 'tasuta', 'hinnakiri',
+    // lv
+    'komisij', 'maksa', 'bez maksas', 'cenrād',
+    // lt
+    'mokest', 'komisin', 'nemokam', 'įkain',
+    // fi / sv / da / no / is
+    'palkkio', 'kulu', 'maksuton', 'avgift', 'gebyr', 'gratis', 'kostnad', 'gjald',
+  ],
+};
+
+/** Sayfa metninden, terimlerden birini içeren cümleleri (±160 karakter) çıkarır. */
+export function evidenceSnippets(text, terms, max = 6) {
+  const flat = text.replace(/\s+/g, ' ');
+  const lower = flat.toLowerCase();
+  const hits = [];
+  for (const term of terms) {
+    let from = 0;
+    while (hits.length < max * 3) {
+      const at = lower.indexOf(term.toLowerCase(), from);
+      if (at === -1) break;
+      hits.push(at);
+      from = at + term.length;
+    }
+  }
+  hits.sort((a, b) => a - b);
+  const snippets = [];
+  let lastEnd = -1;
+  for (const at of hits) {
+    const start = Math.max(0, at - 160);
+    if (start < lastEnd) continue; // örtüşen pencereleri tekrar yazma
+    const end = Math.min(flat.length, at + 160);
+    snippets.push(flat.slice(start, end).trim());
+    lastEnd = end;
+    if (snippets.length >= max) break;
+  }
+  return snippets;
+}
+

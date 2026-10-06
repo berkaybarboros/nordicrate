@@ -1,0 +1,1046 @@
+[
+  {
+    "productId": "arion-is-b1",
+    "institution": "Arion banki",
+    "sourceUrl": "https://www.arionbanki.is",
+    "id": "arion-is-b1:feature:fast-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast decision"
+  },
+  {
+    "productId": "arion-is-p1",
+    "institution": "Arion banki",
+    "sourceUrl": "https://www.arionbanki.is",
+    "id": "arion-is-p1:feature:quick-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick approval"
+  },
+  {
+    "productId": "bank-norwegian-p1",
+    "institution": "Bank Norwegian",
+    "sourceUrl": "https://www.banknorwegian.no",
+    "id": "bank-norwegian-p1:feature:instant-credit-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant credit decision"
+  },
+  {
+    "productId": "bank-norwegian-p1",
+    "institution": "Bank Norwegian",
+    "sourceUrl": "https://www.banknorwegian.no",
+    "id": "bank-norwegian-p1:feature:no-fees",
+    "kind": "fee",
+    "field": "feature",
+    "text": "No fees"
+  },
+  {
+    "productId": "banknorwegian-personal",
+    "institution": "Bank Norwegian",
+    "sourceUrl": "https://www.banknorwegian.no/lan/",
+    "id": "banknorwegian-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "banknorwegian-personal",
+    "institution": "Bank Norwegian",
+    "sourceUrl": "https://www.banknorwegian.no/lan/",
+    "id": "banknorwegian-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "bigbank-car",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/autolaen/",
+    "id": "bigbank-car:feature:instant-online-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant online decision"
+  },
+  {
+    "productId": "bigbank-car",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/autolaen/",
+    "id": "bigbank-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "bigbank-car",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/autolaen/",
+    "id": "bigbank-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "bigbank-ee-a1",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee",
+    "id": "bigbank-ee-a1:feature:fast-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast approval"
+  },
+  {
+    "productId": "bigbank-ee-p1",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee",
+    "id": "bigbank-ee-p1:feature:instant-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant decision"
+  },
+  {
+    "productId": "bigbank-personal-lv",
+    "institution": "Bigbank Latvia",
+    "sourceUrl": "https://www.bigbank.lv/privatpersonam/paterina-kredits/",
+    "id": "bigbank-personal-lv:feature:fast-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast approval"
+  },
+  {
+    "productId": "bigbank-personal-lv",
+    "institution": "Bigbank Latvia",
+    "sourceUrl": "https://www.bigbank.lv/privatpersonam/paterina-kredits/",
+    "id": "bigbank-personal-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "bigbank-personal-lv",
+    "institution": "Bigbank Latvia",
+    "sourceUrl": "https://www.bigbank.lv/privatpersonam/paterina-kredits/",
+    "id": "bigbank-personal-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "bigbank-personal",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/",
+    "id": "bigbank-personal:feature:quick-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick approval"
+  },
+  {
+    "productId": "bigbank-personal",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/",
+    "id": "bigbank-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "bigbank-personal",
+    "institution": "Bigbank",
+    "sourceUrl": "https://www.bigbank.ee/",
+    "id": "bigbank-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "bluor-lv-p1",
+    "institution": "BluOr Bank",
+    "sourceUrl": "https://www.bluorbank.lv",
+    "id": "bluor-lv-p1:feature:quick-online-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick online approval"
+  },
+  {
+    "productId": "citadele-car-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/autocredit/",
+    "id": "citadele-car-lv:feature:same-day-payout",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Same-day payout"
+  },
+  {
+    "productId": "citadele-car-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/autocredit/",
+    "id": "citadele-car-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "citadele-car-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/autocredit/",
+    "id": "citadele-car-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "citadele-lv-p1",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv",
+    "id": "citadele-lv-p1:feature:fast-processing",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast processing"
+  },
+  {
+    "productId": "citadele-mortgage-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/mortgage",
+    "id": "citadele-mortgage-lv:feature:free-valuation",
+    "kind": "fee",
+    "field": "feature",
+    "text": "Free valuation"
+  },
+  {
+    "productId": "citadele-mortgage-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/mortgage",
+    "id": "citadele-mortgage-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €175"
+  },
+  {
+    "productId": "citadele-mortgage-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/mortgage",
+    "id": "citadele-mortgage-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-10 days"
+  },
+  {
+    "productId": "citadele-personal-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/consumer/",
+    "id": "citadele-personal-lv:feature:quick-online-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick online approval"
+  },
+  {
+    "productId": "citadele-personal-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/consumer/",
+    "id": "citadele-personal-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "citadele-personal-lv",
+    "institution": "Citadele banka",
+    "sourceUrl": "https://www.citadele.lv/en/private/consumer/",
+    "id": "citadele-personal-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "coop-mortgage",
+    "institution": "Coop Pank",
+    "sourceUrl": "https://www.cooppank.ee/en/private/home/home-loan",
+    "id": "coop-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €200"
+  },
+  {
+    "productId": "coop-mortgage",
+    "institution": "Coop Pank",
+    "sourceUrl": "https://www.cooppank.ee/en/private/home/home-loan",
+    "id": "coop-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-14 days"
+  },
+  {
+    "productId": "coop-personal",
+    "institution": "Coop Pank",
+    "sourceUrl": "https://www.cooppank.ee/en/private/small-loan",
+    "id": "coop-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "coop-personal",
+    "institution": "Coop Pank",
+    "sourceUrl": "https://www.cooppank.ee/en/private/small-loan",
+    "id": "coop-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-2 days"
+  },
+  {
+    "productId": "credit24-personal",
+    "institution": "Credit24",
+    "sourceUrl": "https://www.credit24.ee",
+    "id": "credit24-personal:feature:fast-online-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast online decision"
+  },
+  {
+    "productId": "credit24-personal",
+    "institution": "Credit24",
+    "sourceUrl": "https://www.credit24.ee",
+    "id": "credit24-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "credit24-personal",
+    "institution": "Credit24",
+    "sourceUrl": "https://www.credit24.ee",
+    "id": "credit24-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "danske-dk-b1",
+    "institution": "Danske Bank",
+    "sourceUrl": "https://www.danskebank.dk",
+    "id": "danske-dk-b1:feature:quick-disbursement",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick disbursement"
+  },
+  {
+    "productId": "danske-dk-p1",
+    "institution": "Danske Bank",
+    "sourceUrl": "https://www.danskebank.dk",
+    "id": "danske-dk-p1:feature:24h-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "24h approval"
+  },
+  {
+    "productId": "dnb-no-p1",
+    "institution": "DNB Bank",
+    "sourceUrl": "https://www.dnb.no",
+    "id": "dnb-no-p1:feature:instant-digital-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant digital approval"
+  },
+  {
+    "productId": "ferratum-personal",
+    "institution": "Ferratum Bank",
+    "sourceUrl": "https://www.ferratum.ee",
+    "id": "ferratum-personal:feature:same-day-payout",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Same-day payout"
+  },
+  {
+    "productId": "ferratum-personal",
+    "institution": "Ferratum Bank",
+    "sourceUrl": "https://www.ferratum.ee",
+    "id": "ferratum-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "ferratum-personal",
+    "institution": "Ferratum Bank",
+    "sourceUrl": "https://www.ferratum.ee",
+    "id": "ferratum-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "if-fi-p1",
+    "institution": "If Vahinkovakuutus",
+    "sourceUrl": "https://www.if.fi",
+    "id": "if-fi-p1:feature:quick-online-process",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick online process"
+  },
+  {
+    "productId": "inbank-car",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/car-loan",
+    "id": "inbank-car:feature:fast-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast approval"
+  },
+  {
+    "productId": "inbank-car",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/car-loan",
+    "id": "inbank-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "inbank-car",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/car-loan",
+    "id": "inbank-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "inbank-ee-a1",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee",
+    "id": "inbank-ee-a1:feature:fast-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast approval"
+  },
+  {
+    "productId": "inbank-mortgage",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
+    "id": "inbank-mortgage:feature:pre-approval-in-24h",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Pre-approval in 24h"
+  },
+  {
+    "productId": "inbank-mortgage",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
+    "id": "inbank-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €150"
+  },
+  {
+    "productId": "inbank-mortgage",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
+    "id": "inbank-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "5-10 days"
+  },
+  {
+    "productId": "inbank-personal-lt",
+    "institution": "Inbank Lithuania",
+    "sourceUrl": "https://www.inbank.lt/en/loan/personal-loan",
+    "id": "inbank-personal-lt:feature:quick-payout",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick payout"
+  },
+  {
+    "productId": "inbank-personal-lt",
+    "institution": "Inbank Lithuania",
+    "sourceUrl": "https://www.inbank.lt/en/loan/personal-loan",
+    "id": "inbank-personal-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "inbank-personal-lt",
+    "institution": "Inbank Lithuania",
+    "sourceUrl": "https://www.inbank.lt/en/loan/personal-loan",
+    "id": "inbank-personal-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "inbank-personal-lv",
+    "institution": "Inbank Latvia",
+    "sourceUrl": "https://www.inbank.lv/en/loan/small-loan",
+    "id": "inbank-personal-lv:feature:instant-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant decision"
+  },
+  {
+    "productId": "inbank-personal-lv",
+    "institution": "Inbank Latvia",
+    "sourceUrl": "https://www.inbank.lv/en/loan/small-loan",
+    "id": "inbank-personal-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "inbank-personal-lv",
+    "institution": "Inbank Latvia",
+    "sourceUrl": "https://www.inbank.lv/en/loan/small-loan",
+    "id": "inbank-personal-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "inbank-personal",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/personal-loan",
+    "id": "inbank-personal:feature:instant-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant decision"
+  },
+  {
+    "productId": "inbank-personal",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/personal-loan",
+    "id": "inbank-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "inbank-personal",
+    "institution": "Inbank",
+    "sourceUrl": "https://www.inbank.ee/en/loan/personal-loan",
+    "id": "inbank-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "jyske-dk-p1",
+    "institution": "Jyske Bank",
+    "sourceUrl": "https://www.jyskebank.dk",
+    "id": "jyske-dk-p1:feature:fast-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast decision"
+  },
+  {
+    "productId": "lhv-car",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/car-loan",
+    "id": "lhv-car:feature:quick-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick approval"
+  },
+  {
+    "productId": "lhv-car",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/car-loan",
+    "id": "lhv-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €100"
+  },
+  {
+    "productId": "lhv-car",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/car-loan",
+    "id": "lhv-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-2 days"
+  },
+  {
+    "productId": "lhv-ee-b1",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee",
+    "id": "lhv-ee-b1:feature:fast-growing-companies-focus",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast-growing companies focus"
+  },
+  {
+    "productId": "lhv-mortgage",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/home-loan",
+    "id": "lhv-mortgage:feature:free-property-valuation",
+    "kind": "fee",
+    "field": "feature",
+    "text": "Free property valuation"
+  },
+  {
+    "productId": "lhv-mortgage",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/home-loan",
+    "id": "lhv-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €300"
+  },
+  {
+    "productId": "lhv-mortgage",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/home-loan",
+    "id": "lhv-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "5-10 days"
+  },
+  {
+    "productId": "lhv-personal",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
+    "id": "lhv-personal:feature:instant-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant decision"
+  },
+  {
+    "productId": "lhv-personal",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
+    "id": "lhv-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "lhv-personal",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
+    "id": "lhv-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Instant"
+  },
+  {
+    "productId": "luminor-car",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/consumer-loan",
+    "id": "luminor-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "luminor-car",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/consumer-loan",
+    "id": "luminor-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-3 days"
+  },
+  {
+    "productId": "luminor-lv-p1",
+    "institution": "Luminor Latvia",
+    "sourceUrl": "https://www.luminor.lv",
+    "id": "luminor-lv-p1:feature:quick-disbursement",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick disbursement"
+  },
+  {
+    "productId": "luminor-mortgage-lt",
+    "institution": "Luminor Lithuania",
+    "sourceUrl": "https://www.luminor.lt/en/private/housing-loan",
+    "id": "luminor-mortgage-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €150"
+  },
+  {
+    "productId": "luminor-mortgage-lt",
+    "institution": "Luminor Lithuania",
+    "sourceUrl": "https://www.luminor.lt/en/private/housing-loan",
+    "id": "luminor-mortgage-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-14 days"
+  },
+  {
+    "productId": "luminor-mortgage-lv",
+    "institution": "Luminor Latvia",
+    "sourceUrl": "https://www.luminor.lv/en/private/housing-loan",
+    "id": "luminor-mortgage-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €150"
+  },
+  {
+    "productId": "luminor-mortgage-lv",
+    "institution": "Luminor Latvia",
+    "sourceUrl": "https://www.luminor.lv/en/private/housing-loan",
+    "id": "luminor-mortgage-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-14 days"
+  },
+  {
+    "productId": "luminor-mortgage",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/housing-loans",
+    "id": "luminor-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €150"
+  },
+  {
+    "productId": "luminor-mortgage",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/housing-loans",
+    "id": "luminor-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-10 days"
+  },
+  {
+    "productId": "luminor-personal-lt",
+    "institution": "Luminor Lithuania",
+    "sourceUrl": "https://www.luminor.lt/en/private/consumer-loan",
+    "id": "luminor-personal-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "luminor-personal-lt",
+    "institution": "Luminor Lithuania",
+    "sourceUrl": "https://www.luminor.lt/en/private/consumer-loan",
+    "id": "luminor-personal-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-2 days"
+  },
+  {
+    "productId": "luminor-personal",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/consumer-loan",
+    "id": "luminor-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "luminor-personal",
+    "institution": "Luminor Bank",
+    "sourceUrl": "https://www.luminor.ee/en/private/consumer-loan",
+    "id": "luminor-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-3 days"
+  },
+  {
+    "productId": "nordea-dk-p1",
+    "institution": "Nordea Bank Danmark",
+    "sourceUrl": "https://www.nordea.dk",
+    "id": "nordea-dk-p1:feature:fast-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Fast approval"
+  },
+  {
+    "productId": "nordea-se-p1",
+    "institution": "Nordea Sverige",
+    "sourceUrl": "https://www.nordea.se",
+    "id": "nordea-se-p1:feature:no-fees",
+    "kind": "fee",
+    "field": "feature",
+    "text": "No fees"
+  },
+  {
+    "productId": "nordea-se-p1",
+    "institution": "Nordea Sverige",
+    "sourceUrl": "https://www.nordea.se",
+    "id": "nordea-se-p1:feature:same-day-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Same-day decision"
+  },
+  {
+    "productId": "op-fi-b1",
+    "institution": "OP Financial Group",
+    "sourceUrl": "https://www.op.fi",
+    "id": "op-fi-b1:feature:quick-processing",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick processing"
+  },
+  {
+    "productId": "resurs-personal",
+    "institution": "Resurs Bank",
+    "sourceUrl": "https://www.resursbank.se/lan",
+    "id": "resurs-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No one-time fee"
+  },
+  {
+    "productId": "resurs-personal",
+    "institution": "Resurs Bank",
+    "sourceUrl": "https://www.resursbank.se/lan",
+    "id": "resurs-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "resurs-se-p1",
+    "institution": "Resurs Bank",
+    "sourceUrl": "https://www.resursbank.se",
+    "id": "resurs-se-p1:feature:quick-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick decision"
+  },
+  {
+    "productId": "revolut-lt-b1",
+    "institution": "Revolut Bank UAB",
+    "sourceUrl": "https://www.revolut.com",
+    "id": "revolut-lt-b1:feature:instant-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Instant decision"
+  },
+  {
+    "productId": "seb-car",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/car-loan",
+    "id": "seb-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €50"
+  },
+  {
+    "productId": "seb-car",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/car-loan",
+    "id": "seb-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "seb-mortgage-lv",
+    "institution": "SEB Latvia",
+    "sourceUrl": "https://www.seb.lv/en/private/loans/home-loan",
+    "id": "seb-mortgage-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €200"
+  },
+  {
+    "productId": "seb-mortgage-lv",
+    "institution": "SEB Latvia",
+    "sourceUrl": "https://www.seb.lv/en/private/loans/home-loan",
+    "id": "seb-mortgage-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "5-10 days"
+  },
+  {
+    "productId": "seb-mortgage",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/home-loan",
+    "id": "seb-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €200"
+  },
+  {
+    "productId": "seb-mortgage",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/home-loan",
+    "id": "seb-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "5-10 days"
+  },
+  {
+    "productId": "seb-personal-lt",
+    "institution": "SEB Bankas Lithuania",
+    "sourceUrl": "https://www.seb.lt/en/private/loans",
+    "id": "seb-personal-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €25"
+  },
+  {
+    "productId": "seb-personal-lt",
+    "institution": "SEB Bankas Lithuania",
+    "sourceUrl": "https://www.seb.lt/en/private/loans",
+    "id": "seb-personal-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "seb-personal",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/consumer-loan",
+    "id": "seb-personal:feature:quick-online-process",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick online process"
+  },
+  {
+    "productId": "seb-personal",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/consumer-loan",
+    "id": "seb-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €30"
+  },
+  {
+    "productId": "seb-personal",
+    "institution": "SEB Bank",
+    "sourceUrl": "https://www.seb.ee/en/private/loans/consumer-loan",
+    "id": "seb-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "siauliu-mortgage-lt",
+    "institution": "Šiaulių bankas",
+    "sourceUrl": "https://www.artea.lt/en/private/credits-leasing/mortage-loans/mortgage-loan",
+    "id": "siauliu-mortgage-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €150"
+  },
+  {
+    "productId": "siauliu-mortgage-lt",
+    "institution": "Šiaulių bankas",
+    "sourceUrl": "https://www.artea.lt/en/private/credits-leasing/mortage-loans/mortgage-loan",
+    "id": "siauliu-mortgage-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-14 days"
+  },
+  {
+    "productId": "siauliu-personal-lt",
+    "institution": "Šiaulių bankas",
+    "sourceUrl": "https://www.artea.lt/en/private/credits-leasing/credits/consumer-credit",
+    "id": "siauliu-personal-lt:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €30"
+  },
+  {
+    "productId": "siauliu-personal-lt",
+    "institution": "Šiaulių bankas",
+    "sourceUrl": "https://www.artea.lt/en/private/credits-leasing/credits/consumer-credit",
+    "id": "siauliu-personal-lt:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "swedbank-car",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/leasing/car",
+    "id": "swedbank-car:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee 1.5%"
+  },
+  {
+    "productId": "swedbank-car",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/leasing/car",
+    "id": "swedbank-car:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "Same day"
+  },
+  {
+    "productId": "swedbank-ee-p1",
+    "institution": "Swedbank Eesti",
+    "sourceUrl": "https://www.swedbank.ee",
+    "id": "swedbank-ee-p1:feature:same-day-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Same-day decision"
+  },
+  {
+    "productId": "swedbank-lt-p1",
+    "institution": "Swedbank Lietuva",
+    "sourceUrl": "https://www.swedbank.lt",
+    "id": "swedbank-lt-p1:feature:quick-approval",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick approval"
+  },
+  {
+    "productId": "swedbank-mortgage",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/loans/home",
+    "id": "swedbank-mortgage:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €250"
+  },
+  {
+    "productId": "swedbank-mortgage",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/loans/home",
+    "id": "swedbank-mortgage:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "7-14 days"
+  },
+  {
+    "productId": "swedbank-personal-lv",
+    "institution": "Swedbank Latvia",
+    "sourceUrl": "https://www.swedbank.lv/private/credit/loans/consumer?language=ENG",
+    "id": "swedbank-personal-lv:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €40"
+  },
+  {
+    "productId": "swedbank-personal-lv",
+    "institution": "Swedbank Latvia",
+    "sourceUrl": "https://www.swedbank.lv/private/credit/loans/consumer?language=ENG",
+    "id": "swedbank-personal-lv:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-2 days"
+  },
+  {
+    "productId": "swedbank-personal",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/loans/personal",
+    "id": "swedbank-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "One-time fee €50"
+  },
+  {
+    "productId": "swedbank-personal",
+    "institution": "Swedbank",
+    "sourceUrl": "https://www.swedbank.ee/private/credit/loans/personal",
+    "id": "swedbank-personal:processingTime",
+    "kind": "speed",
+    "field": "processingTime",
+    "text": "1-2 days"
+  },
+  {
+    "productId": "tapiola-fi-p1",
+    "institution": "LähiTapiola",
+    "sourceUrl": "https://www.lahitapiola.fi",
+    "id": "tapiola-fi-p1:feature:quick-decision",
+    "kind": "speed",
+    "field": "feature",
+    "text": "Quick decision"
+  }
+]
