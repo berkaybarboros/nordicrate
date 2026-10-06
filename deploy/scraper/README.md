@@ -52,10 +52,18 @@ tek seferlik ücret) ile Finantsinspektsioon kurum listesini bankaların kendi
 sayfalarına karşı kontrol etmek için **kanıt toplar**. Veritabanına yazmaz, veriyi
 değiştirmez, hiçbir iddiayı "doğrulandı" saymaz — yalnız markdown rapor üretir.
 
+**Otomatik:** `scrape-rates.mjs` (günlük 06:30 cron) son kayıt 7 günden eskiyse `.ee`
+denetimini kendisi çalıştırır ve sonucu `source_audits` tablosuna yazar — SSH gerekmez,
+rapor cloud oturumundan Supabase üzerinden okunur. Tablo: `schema-source-audit.sql`
+(kurulmadıysa adım sessizce atlanır). Denetim hatası oranları ve çıkış kodunu etkilemez.
+
+**Elle (isteğe bağlı):**
+
 ```bash
 cd /var/www/nordicrate/deploy/scraper
 node source-audit.mjs --tld ee          # Estonya kaynakları + fi.ee sicili
 node source-audit.mjs                   # tüm ülkeler
+node --env-file=/var/www/nordicrate/.env.local source-audit.mjs --tld ee --save
 # rapor: deploy/scraper/out/source-audit-YYYY-MM-DD.md (git'e girmez)
 ```
 

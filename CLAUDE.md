@@ -214,6 +214,15 @@ Claude Code on the web runs this repository in a fresh Linux container. What is 
   refuses (401), and live rates fall back to the static catalogue. Also missing: SSH to the
   server (so no scraper run, no pm2, no logs), a logged-in browser, and the Playwright scraper
   (it reads bank sites from the server's IP; some banks 403 other IPs).
+- **Supabase MCP (when connected):** project `sdbwlyncpjssxxcuxbhp` ("HangiKredi Clone -
+  NordicRate"). Read-only queries need no approval and replace the missing SSH for checks:
+  scraper health (`scraped_rates` by `scraped_at`), and `source_audits`. Migrations and any
+  insert/update are production writes — `uygula:` first.
+- **Source audit without SSH:** `deploy/scraper/scrape-rates.mjs` (daily cron) runs
+  `source-audit.mjs` for `.ee` sources weekly and stores the report in `source_audits`
+  (`schema-source-audit.sql`). Read it with
+  `select run_at, pages_failed, report_md from source_audits order by run_at desc limit 1`.
+  Snippets are evidence, not verdicts: product data still changes only after reading them.
 - **Rules:** `git push` and any write to production need an explicit `uygula:` with a target.
   No secrets in the repository or in the shared cloud environment. Do not add a second deploy
   path.

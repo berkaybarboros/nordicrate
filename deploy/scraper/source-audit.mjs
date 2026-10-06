@@ -4,8 +4,9 @@
  * siteleri ve fi.ee cloud oturumundan erişilemiyor (egress politikası), bazı bankalar
  * da sunucu dışındaki IP'leri 403'lüyor.
  *
- * Ne YAPMAZ: veritabanına yazmaz, veriyi değiştirmez, hiçbir iddiayı "doğrulandı" diye
- * işaretlemez. Yalnız her kaynak sayfadan ilgili cümleleri çıkarıp markdown rapora
+ * Ne YAPMAZ: ürün verisine (lib/data.ts, data/loans.ts, oran tabloları) dokunmaz,
+ * hiçbir iddiayı "doğrulandı" diye işaretlemez. Tek yazdığı yer, --save ile kendi
+ * source_audits tablosu. Yalnız her kaynak sayfadan ilgili cümleleri çıkarıp markdown rapora
  * yazar; karar (tut / düzelt / sil) insan incelemesiyle lib/data.ts / data/loans.ts'e
  * yansır. CLAUDE.md kuralı: ürün verisi banka sitesi doğrulaması olmadan değişmez.
  *
@@ -15,6 +16,10 @@
  *   node source-audit.mjs --no-register       # sicili atla
  *   node source-audit.mjs --out /tmp/audit.md
  *   node source-audit.mjs --claims my-claims.json   # başka bir iddia listesi
+ *   node --env-file=../../.env.local source-audit.mjs --tld ee --save   # Supabase'e de yaz
+ *
+ * Elle çalıştırmaya gerek yok: scrape-rates.mjs (günlük cron) son kayıt 7 günden eskiyse
+ * `.ee` denetimini kendisi çalıştırıp source_audits'e yazar.
  *   CHROMIUM_PATH=/usr/bin/chromium node source-audit.mjs   # tarayıcı sürümü uyuşmazsa
  *
  * Girdi: claims-to-verify.json (lib/claims.ts'ten üretilir; tests/claims.test.ts senkron tutar)
@@ -43,6 +48,7 @@ function parseArgs(argv) {
     else if (argv[i] === '--no-register') args.register = false;
     else if (argv[i] === '--out') args.out = resolve(argv[++i]);
     else if (argv[i] === '--claims') args.claims = resolve(argv[++i]);
+    else if (argv[i] === '--save') args.save = true;
   }
   return args;
 }
@@ -64,6 +70,7 @@ async function auditClaims(page, claims) {
     byUrl.get(c.sourceUrl).push(c);
   }
   const sections = [];
+  let failedPages = 0;
   for (const [url, group] of byUrl) {
     let result;
     try {
@@ -77,6 +84,7 @@ async function auditClaims(page, claims) {
     if (result.finalUrl !== url) lines.push(`Redirected to: ${result.finalUrl}`, '');
     const failed = Boolean(result.error) || result.status >= 400 || !result.text;
     if (failed) {
+      failedPages++;
       lines.push(`**fetch-failed** — HTTP ${result.status}${result.error ? ` · ${result.error}` : ''}`, '');
     }
     const kinds = [...new Set(group.map((c) => c.kind))];
@@ -97,7 +105,7 @@ async function auditClaims(page, claims) {
     console.error(`[audit] ${url} → HTTP ${result.status}, ${group.length} claim(s)`);
     await sleep(DELAY_MS);
   }
-  return sections;
+  return { sections, pages: byUrl.size, failedPages };
 }
 
 async function auditRegister(page) {
@@ -128,34 +136,103 @@ async function auditRegister(page) {
     await sleep(1500);
   }
   lines.push(`Pages read: ${pages}`, '', ...[...seen].map((l) => `- ${l}`), '');
-  return lines.join('\n');
+  return { markdown: lines.join('\n'), entries: seen.size };
+}
+
+export function loadClaims(file, tld) {
+  const all = JSON.parse(readFileSync(file, 'utf8'));
+  return tld
+    ? all.filter((c) => c.sourceUrl && new URL(c.sourceUrl).hostname.endsWith(`.${tld}`))
+    : all.filter((c) => c.sourceUrl);
+}
+
+/** Tek koşu: verilen tarayıcıyla iddiaları (ve istenirse sicili) denetler, raporu döner. */
+export async function runAudit(browser, { tld = null, register = true, claimsFile = resolve(HERE, 'claims-to-verify.json') } = {}) {
+  const claims = loadClaims(claimsFile, tld);
+  const page = await browser.newPage({ userAgent: UA });
+  try {
+    const claimRun = await auditClaims(page, claims);
+    const reg = register ? await auditRegister(page) : null;
+    const markdown = [
+      `# Source audit — ${new Date().toISOString()}`,
+      '',
+      `Claims: ${claims.length}${tld ? ` (.${tld} sources only)` : ''} on ${claimRun.pages} page(s), ${claimRun.failedPages} could not be read.`,
+      'A snippet is evidence to read, not a verdict: decide keep / correct / remove per claim,',
+      'then edit lib/data.ts or data/loans.ts.',
+      '',
+      '## Claims by source page',
+      '',
+      ...claimRun.sections,
+      ...(reg ? [reg.markdown] : []),
+    ].join('\n');
+    return {
+      scope: tld ? `.${tld}` : 'all',
+      claimsTotal: claims.length,
+      pagesTotal: claimRun.pages,
+      pagesFailed: claimRun.failedPages,
+      registerEntries: reg ? reg.entries : null,
+      markdown,
+    };
+  } finally {
+    await page.close();
+  }
+}
+
+/*
+ * Sonuç Supabase'e (source_audits, bkz. schema-source-audit.sql): sunucuya SSH olmadan
+ * rapor cloud oturumundan salt-okunur sorguyla okunabilsin. Yalnız bu denetim tablosuna
+ * yazılır — ürün verisine dokunulmaz.
+ */
+export async function saveAudit(url, key, result) {
+  const res = await fetch(`${url}/rest/v1/source_audits`, {
+    method: 'POST',
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({
+      scope: result.scope,
+      claims_total: result.claimsTotal,
+      pages_total: result.pagesTotal,
+      pages_failed: result.pagesFailed,
+      register_entries: result.registerEntries,
+      report_md: result.markdown,
+    }),
+  });
+  if (!res.ok) throw new Error(`source_audits insert: HTTP ${res.status} — ${await res.text()}`);
+}
+
+/** Son denetim `days` günden eskiyse (ya da hiç yoksa) true. Tablo yoksa false — sessizce atla. */
+export async function auditDue(url, key, days = 7) {
+  let res;
+  try {
+    res = await fetch(`${url}/rest/v1/source_audits?select=run_at&order=run_at.desc&limit=1`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    });
+  } catch {
+    return false; // Supabase'e ulaşılamıyor — denetimi bir sonraki koşuya bırak
+  }
+  if (!res.ok) return false; // tablo henüz kurulmadıysa scraper'ı yorma
+  const rows = await res.json();
+  if (!rows.length) return true;
+  return Date.now() - new Date(rows[0].run_at).getTime() > days * 86400000;
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const all = JSON.parse(readFileSync(args.claims, 'utf8'));
-  const claims = args.tld
-    ? all.filter((c) => c.sourceUrl && new URL(c.sourceUrl).hostname.endsWith(`.${args.tld}`))
-    : all.filter((c) => c.sourceUrl);
-
   // CHROMIUM_PATH: paketlenmiş tarayıcı Playwright sürümüyle uyuşmazsa sistemdekini kullan
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-  const page = await browser.newPage({ userAgent: UA });
   try {
-    const out = [
-      `# Source audit — ${new Date().toISOString()}`,
-      '',
-      `Claims: ${claims.length}${args.tld ? ` (.${args.tld} sources only)` : ''}. A snippet is evidence to read, not a verdict:`,
-      'decide keep / correct / remove per claim, then edit lib/data.ts or data/loans.ts.',
-      '',
-      '## Claims by source page',
-      '',
-      ...(await auditClaims(page, claims)),
-    ];
-    if (args.register) out.push(await auditRegister(page));
+    const result = await runAudit(browser, { tld: args.tld, register: args.register, claimsFile: args.claims });
     mkdirSync(dirname(args.out), { recursive: true });
-    writeFileSync(args.out, out.join('\n'));
+    writeFileSync(args.out, result.markdown);
     console.error(`[audit] report → ${args.out}`);
+    if (args.save) {
+      await saveAudit(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, result);
+      console.error('[audit] saved to source_audits');
+    }
   } finally {
     await browser.close();
   }
