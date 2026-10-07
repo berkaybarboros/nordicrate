@@ -1,155 +1,148 @@
 # PROJECT BRIEF: NordicRate
 
+> Claude Project / yeni oturum için bağlam dosyası. Kod tarafındaki kurallar ve cloud oturumu
+> ayrıntıları `CLAUDE.md`'de; bu dosya ürünü, durumu ve çalışma şeklini özetler.
+> Rakamlar 2026-10-07'de kodla ve canlı veritabanıyla kontrol edildi — elle güncelleme yerine
+> `/api/cron/founder-facts` ve `lib/company-profile.ts` tek kaynak.
+
 ## 1. Ne Bu?
-NordicRate, Nordic ve Baltic bölgesindeki 8 ülkede (Danimarka, Finlandiya, İzlanda, Norveç, İsveç, Estonya, Letonya, Litvanya) faaliyet gösteren 50+ bankanın kredi, mortgage ve iş kredisi oranlarını karşılaştıran bir fintech platform. Expat, digital nomad, e-resident ve girişimcilerin doğru ülkede doğru bankayı seçmesine yardımcı oluyor. Rakiplerden farkı: AI destekli kişisel uygunluk analizi (DTI, risk skoru), kurumsal mod (startup/KOBİ programları), ve e-Residency/dijital göçmen rehberliği.
+NordicRate (nordicrate.com) — Nordic ve Baltic bölgesinde (EE, LV, LT, FI, SE, NO, DK, IS) kredi,
+konut kredisi, vadeli mevduat ve sigorta tekliflerini karşılaştıran bir **fintech — finansal
+ürün karşılaştırma** platformu. Hedef: bölgeye taşınan expat, digital nomad, e-resident ve
+startup/KOBİ'ler — İngilizce, yerel kredi geçmişi olmayan kullanıcıya uygun kurumlara yönlendirme.
+
+**Fark:** oranlar bankaların kendi sayfalarından günlük okunuyor ve her rakam ya "checked X ago ·
+kaynak" damgası taşıyor ya da "indicative / example" diye etiketli; ikamet durumuna göre uygunluk
+eşleştirme; AI asistan; kurumsal mod (devlet/EU programları).
+
+**Ne değil:** lisanslı kredi aracısı değil, kredi değerliliği puanlamıyor (karar bankada) — bu
+yüzden EU AI Act yüksek-risk kategorisinin dışında. Sigortada gerçek fiyat yok; primler örnek profil.
 
 ## 2. Stack
-- **Frontend**: Next.js 16.1.6 App Router, TypeScript strict, Tailwind CSS v4
-- **AI**: Groq API — llama-3.3-70b-versatile (streaming SSE, ücretsiz)
-- **Live Data**: ECB SDMX API (EURIBOR 3M/6M/12M), Norges Bank API
-- **Backend**: Next.js API Routes (server-side, Node.js runtime)
-- **Database**: Statik seed data (lib/data.ts) — Supabase lead DB planlanıyor
-- **Auth**: Yok (gelecekte lead form için minimal auth)
-- **Hosting**: Hetzner VPS `46.62.166.105` — Ubuntu 22.04, PM2 cluster, port 3001
-- **Reverse Proxy**: Nginx Proxy Manager (Docker) + Let's Encrypt SSL
-- **CDN/DDoS**: Cloudflare (Full Strict, Proxied A record)
-- **Repo**: https://github.com/berkaybarboros/nordicrate
-- **Live URL**: https://nordicrate.berkaybarboros.com (test subdomain)
-- **Target domain**: nordicrate.com (domain taşıması planlanıyor)
+- **Frontend/Backend**: Next.js 16.1.6 App Router, TypeScript strict, Tailwind CSS v4
+- **DB**: Supabase (`sdbwlyncpjssxxcuxbhp`) — scraped_rates, scraped_deposit_rates, events, leads,
+  user_profiles, affiliate_links, blog_posts, user_feedback, company_profile, startup_applications
+- **Canlı veri**: Playwright scraper (`deploy/scraper/scrape-rates.mjs`, cron 06:30) + ECB SDMX
+  (EURIBOR) + Norges Bank API
+- **AI**: Groq — llama-3.3-70b-versatile (streaming SSE)
+- **Hosting**: Hetzner VPS `46.62.166.105`, PM2 cluster (port 3001), Nginx Proxy Manager + Let's
+  Encrypt, Cloudflare (Full Strict)
+- **Test/CI**: vitest (`tests/`), GitHub Actions `ci.yml` — typecheck, lint, test, build
+- **Repo**: https://github.com/berkaybarboros/nordicrate (public)
 
-## 3. Klasör Yapısı
+## 3. Klasör Yapısı (özet)
 ```
-/app
-  /api/chat          → Groq AI streaming endpoint
-  /api/rates         → ECB + Norges Bank live rates
-  /api/profile       → Konuşmadan kullanıcı profili çıkarma (Groq)
-  /loans             → Personal loan listing
-  /mortgage          → Mortgage listing
-  /business          → Business loan listing
-  /countries         → Ülke karşılaştırma sayfası
-  /programs          → Hükümet programları ve EU fonları
-  layout.tsx         → Global layout (Header, Footer, AIAssistant)
-  page.tsx           → Homepage
-
-/components
-  AIAssistant.tsx    → Floating AI chat widget
-  RateCard.tsx       → Ürün kartı
-  ProductListPage.tsx → Filter/sort/list wrapper
-  DataFreshnessBadge.tsx → "Live rates · updated X ago" badge
-  Header.tsx         → Nav + EN/FI/ET dil seçici
-  FilterSidebar.tsx  → Ülke/tür/tutar filtresi
-
-/lib
-  data.ts            → Static seed: COUNTRIES, INSTITUTIONS, PRODUCTS
-  programs-data.ts   → 30+ government/EU programs
-  types.ts           → TypeScript interfaces
-  ai-context.ts      → buildSystemPrompt() — live data + katalog inject
-  profile.ts         → UserProfile + calculateEligibility() (DTI, risk)
-  rates.ts           → fetchAllRates() — ECB/Norges SDMX parser
-  utils.ts           → formatAmount, buildUTMLink, calculateMonthlyPayment
-
-/locales
-  en.ts / fi.ts / et.ts → i18n (EN/FI/ET aktif)
-
-/deploy
-  redeploy.sh        → git pull + build + pm2 restart
-  setup.sh           → Fresh server kurulum scripti
+/app            sayfalar + /api (chat, rates, loans, insurance, deposits, find-rate, recommend,
+                go, cron/*, feedback, alerts) · /admin (ADMIN_TOKEN) · /fi /et yerel ana sayfalar
+/components     RateCard, ProductListPage, RateFreshness, AffiliateDisclosure, insurance/*, …
+/data           loans.ts (Estonya ağırlıklı canlı katalog), insurance.ts (örnek primler)
+/lib            data.ts (8 ülke kataloğu), live-rates.ts (canlı oran okuma + tazelik eşikleri),
+                rates.ts (ECB/Norges), claims.ts (doğrulanacak iddialar), company-profile.ts,
+                ai-context.ts, security.ts, use-fetch-json.ts, use-client-store.ts
+/deploy         release.sh (cron deploy + rollback), scraper/ (scrape-rates, parsers, source-audit)
+/tests          data-layer, scraper-parsers, insurance-data, trust, claims
 ```
 
 ## 4. Environment Variables
-```bash
-# .env.local (local dev)
-NEXT_PUBLIC_BASE_URL=http://localhost:3001
-
-# Server: /var/www/nordicrate/.env.local
-NEXT_PUBLIC_BASE_URL=https://nordicrate.berkaybarboros.com
-GROQ_API_KEY=gsk_...
-ANTHROPIC_API_KEY=sk-ant-...   # Yedek, şu an kullanılmıyor
-```
+İsimler ve eksik olunca ne bozulduğu: `.env.example`. Sunucuda `/var/www/nordicrate/.env.local`.
+Değer asla repoya ya da cloud ortamına yazılmaz.
 
 ## 5. Dev Workflow
 ```bash
-npm run dev       # localhost:3000
-npm run build     # Production build — hata yoksa push et
-npm run lint      # ESLint
+npm run typecheck && npm run lint && npm test && npm run build   # push öncesi dördü de
 
-# Deploy
+# Deploy: main'e push yeterli — sunucu cron'u 5,15,25… dakikalarda deploy/release.sh çalıştırır
+# (pull, install, build, pm2 reload, sağlık kontrolü, hata varsa rollback). SSH gerekmez.
 git push origin main
-ssh -i ~/.ssh/id_deploy root@46.62.166.105 \
-  "cd /var/www/nordicrate && git pull && npm install && npm run build && pm2 restart nordicrate --update-env"
 ```
+- **Cloud oturumu** deploy edebilir (push), sunucuyu izleyemez. Supabase MCP bağlıysa salt-okunur
+  sorgular SSH'ın yerini tutar: scraper sağlığı, `source_audits` raporu.
+- **Komut protokolü**: "hazırla:" üret · "doğrula:" yalnız oku · "uygula:" yalnız hedef ve kapsam
+  söylenmişse. Push, merge, migration ve canlı veritabanı yazımı her biri ayrı `uygula:` ister.
+- **Windows makinesi** (tek SSH anahtarı) Kasım 2026'ya kadar erişilemez → her şey cloud + cron.
 
-## 6. Mevcut Durum
+## 6. Mevcut Durum (2026-10-07)
 
-### Yapılanlar ✅
-- ECB EURIBOR canlı veri (RT series key, 3M/6M/12M)
-- Norges Bank canlı faiz oranı
-- 50+ kurum, 100+ ürün statik veri (data.ts)
-- 30+ hükümet/EU programı (programs-data.ts)
-- Groq AI asistan — streaming, personal + corporate mod
-- AI context: live rates + tüm ürün kataloğu her konuşmada inject
-- DataFreshnessBadge (live/cache durumu göstergesi)
-- RateCard badge'leri (tarih, 📱 Online, 🌐 e-Resident OK)
-- Günlük cron job (06:00, rates cache warm-up)
-- Let's Encrypt SSL (NPM + Cloudflare Full Strict)
-- EN/FI/ET dil desteği
-- `lib/profile.ts` — DTI hesabı + EligibilityScore + ürün eşleştirme
-- `app/api/profile/route.ts` — Groq ile konuşmadan profil çıkarımı
-- sitemap.xml + robots.txt
+### Rakamlar (kod + canlı DB)
+- Katalog: 8 ülke, 58 kurum, 110 ürün (`lib/data.ts`) + Estonya canlı katalogu 37 kredi teklifi
+  (`data/loans.ts`); 12 sigortacı / 37 örnek prim; 30+ devlet/EU programı
+- Canlı feed: 27 kredi feed'i son 48 saatte başarılı + 6 bankanın vadeli mevduatı; scraper
+  2026-07-03'ten beri çalışıyor
+- 71 yayınlanmış blog yazısı · `affiliate_links` boş → henüz affiliate geliri yok
 
-### Devam Eden 🔄
-- Katman 2: `EligibilityPanel` UI component'ı
-- Katman 2: `AIAssistant.tsx`'e profil tracking + panel entegrasyonu
+### 2026-09 / 10'da tamamlananlar ✅
+- Dürüstlük katmanı: kanıtsız rozetler, sahte tazelik ("updated just now"), "No middleman",
+  "Editor's Picks", uydurma hesaplayıcı ve sigorta formları kaldırıldı; affiliate açıklaması
+  başvuru butonlarının yanında; ana sayfa ve FI/ET "live" etiketleri 48 sa tazelik kuralına bağlı
+- Sigorta: kimlik çakışmaları düzeltildi, `verifiedAt`/`sourceUrl` alanları, hub rakamları veriden
+- Build env'siz geçiyor (lazy Supabase client), React 19 lint hataları 0, CI + 5 test dosyası
+- Kaynak denetimi: 116 hız/ücret iddiası `claims-to-verify.json`'da; `source-audit.mjs` haftalık
+  scraper cron'unda çalışıp raporu `source_audits`'e yazar (tablo migration'ı onay bekliyor)
+- Sunucu deploy'u cron + rollback ile otomatik (`deploy/release.sh`)
 
-### Planlanmış 📋
-- Katman 3: Kurumsal program matching derinleştirme
-- Katman 4: Oturum hafızası (localStorage) + lead form
-- Katman 5: Supabase lead DB + email capture
-- Domain taşıması: nordicrate.com
-- GitHub Actions CI/CD (otomatik deploy)
+### Sıradaki 📋
+1. PR #2 merge → canlı; `source_audits` migration'ı; ilk denetim raporu → hız/ücret iddialarında
+   tut/düzelt/sil, fi.ee sicilinden eksik Estonya bankaları (TBB, Holm, Luminor adayları — doğrulanmadı)
+2. İlk gelir: Adtraction/Awin banka programları → onaylanınca `affiliate_links` satırı
+3. Canlı kapsam: LV/LT, Finlandiya (ECB MIR ortalaması), Estonya'da banka dışı sağlayıcılar
+4. Sigorta: kapsam karşılaştırması (prim yok) + sigortacı fiyat feed'i görüşmeleri
+5. Test: `/api/cron/*` auth, `calculateEligibility()`
 
-### Bilinen Issues / Tech Debt 🔴
-- `app/api/chat/route.ts`: fetchLiveRates() her mesajda HTTP round-trip — Next.js cache eklenecek
-- Ürün verileri statik — gerçek banka feed/scraping entegrasyonu yok
-- Norges Bank API intermittent timeout → fallback devreye giriyor
-- `app/api/chat/route.ts`'de model `localhost:3001` URL — server dışında çağrılırsa kırılır
+### Bilinen Issues 🔴
+- **Bigbank EE konut kredisi**: 2026-10-06'dan beri parse edilemiyor (sayfa yapısı değişti) →
+  48 sa sonra otomatik "indicative"e düştü; parser güncellemesi sayfayı görmeyi gerektiriyor
+- Cloud ortamının ağ politikası `.ee` alan adlarını ve fi.ee'yi engelliyor (allowlist uygulanmadı)
+- 116 hız/ücret iddiası ("Instant decision", "No fees"…) banka sayfasında doğrulanmadı
+- "Editor's pick" bandı 13 üründe — yazılı editoryal ölçütü yok (karar bekliyor)
+- Swedbank EE konut kredisi ve Luminor EE oran yayınlamıyor; Bigbank LV/LT, Skandia SE sunucu IP'sini 403'lüyor
+- İşletme kredisi ve devlet programları statik; Imprint'te işyeri adresi yok
+- Sunucu: 3.8 GB RAM'de 7 pm2 uygulaması, disk %82 — build'ler bu kutuda
 
 ## 7. Business Context
-- **Hedef kullanıcı**: Nordic/Baltic'e taşınan expat, digital nomad, e-resident, startup kurucusu
-- **Gelir modeli**: Affiliate (banka tıklama başı komisyon) + lead satışı (form doldurma başı)
-- **Başarı metrikleri**: Aylık unique visitor, "Apply Now" tıklama oranı, AI konuşma başına lead dönüşümü
-- **Rekabet**: Compricer (SE), Lendo (SE/NO/FI), Finance.dk — hiçbiri 8 ülke kapsıyor veya AI uygunluk analizi sunmuyor
+- **Sektör** (başvuru formları için): Fintech — financial product comparison. Alt etiket gerekiyorsa:
+  consumer finance marketplace / comparison. "Lending" seçme: kredi vermiyoruz, aracı lisansımız yok.
+- **Şirket**: NordicRate, şahıs şirketi (Türkiye), kuruluş 2026-02-26 — ayrıntılar `company_profile`
+- **Pazar**: EE, LV, LT, FI, SE, NO, DK, IS — İngilizce konuşan göçmen/e-resident kitlesi
+- **Gelir modeli**: affiliate (bankaya yönlendirme) + lead generation; ücret ne oranı ne varsayılan
+  sıralamayı değiştirir (Listing Policy)
+- **Metrikler**: oturum → teklif görüntüleme → bankaya tıklama hunisi (`/admin`, `founder-facts`)
+- **Rekabet**: Compricer (SE), Lendo (SE/NO/FI — Clar 2026'da satın aldı), Finance.dk — yerel dilde,
+  tek ülke; İngilizce ve 8 ülkeyi birlikte sunan yok
 
 ## 8. Design System
-- **Primary**: Sky-600 (#0284c7) — butonlar, aktif state
-- **Background**: Slate-50 (#f8fafc) — sayfa zemini
-- **Card**: White + slate-200 border + shadow-sm
-- **Promoted card**: sky-300 border + ring-2 ring-sky-100
-- **Font**: Geist Sans (next/font/google)
-- **Border radius**: rounded-xl (12px) cards, rounded-2xl chat
-- **Dark mode**: Yok
-- **Badge system**: rounded-full, color-coded (emerald=live, amber=cache, sky=online, violet=e-resident)
+- Primary sky-600 (#0284c7), zemin slate-50, kart beyaz + slate-200 border + shadow-sm
+- Font Geist Sans; rounded-xl kart, rounded-full rozet; dark mode yok
+- Rozet renkleri: emerald = bankadan okunmuş oran (damgalı), amber = örnek / indicative / statik,
+  sky = online başvuru, violet = e-resident
 
 ## 9. Claude'a Özel Talimatlar
 
-### Asla:
-- "Ben bir AI'yım, finansal tavsiye veremem" tarzı disclaimer yazma — kullanıcı bunu biliyor
-- Yeni npm paketi ekleme (lucide-react, tailwind, next zaten var — yeterli)
-- `lib/data.ts`'deki oranları doğrulamadan değiştirme
-- `.env.local` dosyasına gerçek değer yazma — sadece KEY_NAME=
+### Her zaman
+- Kısa, madde madde, Türkçe; teknik terimler İngilizce kalabilir. Hata: neden → nasıl düzelir → başka nereyi etkiler
+- Kalıcı çözüm; push öncesi dört kontrol; ürün verisi yalnız banka sitesi doğrulamasıyla değişir
+- Gösterilen her rakam ya kaynak + kontrol zamanı taşır ya da "indicative / example" etiketi
+- Rakamı elle yazma — veriden türet (hub fiyatları, kurum/ürün sayıları, founder-facts)
 
-### Roller:
-- **Kod yazarken**: Senior fullstack engineer — minimal diff, TypeScript strict
-- **Mimari kararında**: Tech lead — tradeoff'ları açıkla, karar ver
-- **Deployment'ta**: DevOps — her adımı sırala, rollback planı ver
-- **Ürün kararında**: Founding engineer — kullanıcı değeri + gelir modeli odağında
+### Asla
+- Kaynaksız sıralama/üstünlük iddiası ("best", "largest", "market leader"), sahte tazelik, uydurma sosyal kanıt
+- "Ben bir AI'yım" disclaimer'ı
+- Gerekçesiz yeni npm paketi; ECB/Norges Bank URL'lerini değiştirmek
+- Secret'ı repoya, cloud ortamına ya da `.env.example`'a yazmak
+- `uygula:` olmadan push, merge, migration veya canlı DB yazımı
+
+### Roller
+- Kod: senior fullstack — minimal diff, TypeScript strict, test ile sabitle
+- Mimari: tech lead — tradeoff'u söyle, karar ver
+- Deploy: DevOps — cron/rollback yolunu kullan, ikinci deploy yolu ekleme
+- Ürün: founding engineer — kullanıcı güveni + gelir modeli
 
 ## 10. Aktif Bağlam
-**Son güncelleme**: 2026-04-12
-**Bu hafta odak**: AI Katman 2 tamamlama — EligibilityPanel + profil tracking
-**Blocker'lar**: Yok
+**Son güncelleme**: 2026-10-07
+**Odak**: güven/dürüstlük katmanını kaynak doğrulamasıyla kapatmak; ilk affiliate geliri
+**Açık PR**: #2 (`claude/festive-davinci-149bqn`) — build/lint düzeltmeleri, sigorta ve site
+dürüstlük turu, kaynak denetimi; CI yeşil, merge bekliyor
+**Blocker'lar**: cloud ağ allowlist'i; SSH Kasım'a kadar yok; affiliate programı onayları
 **Son kararlar**:
-- Anthropic → Groq geçişi (ücretsiz, llama-3.3-70b)
-- Port çakışması: nordicrate=3001, nutriscan=3000
-- SSL: Cloudflare origin cert yerine Let's Encrypt (NPM üzerinden)
-**Sonraki milestone**: Katman 2 canlıda → lead form → Katman 4
+- Deploy yalnız `main` → cron `release.sh` (rollback'li); SSH gerekmez
+- Kaynak denetimi sunucuda cron ile, rapor Supabase'de; karar insanda
+- Sigortada prim gösterilecekse kaynak (`verifiedAt` + `sourceUrl`) şart
