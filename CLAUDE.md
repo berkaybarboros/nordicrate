@@ -166,11 +166,11 @@ example" olarak etiketli.
   program başvuruları bekliyor) → onaylanan programın satırı `affiliate_links`'e eklenir
 - Canlı kapsam: LV/LT (Bigbank engelliyor), Finlandiya (bankalar oran yayınlamıyor → ECB MIR
   ortalaması), Estonya'da banka dışı sağlayıcılar ve sigorta
-- Test kapsamını genişlet: `/api/cron/*` auth'u, `calculateEligibility()`, freshness eşikleri
+- Test kapsamı: API route'larının iş mantığı (find-rate, recommend, /go) ve component'lar
 
 **Bilinen Issues**
-- Test kapsamı dar: sadece `lib/supabase-paginate.ts` ve scraper parser'ları. API route'ları,
-  eligibility hesabı ve component'lar test edilmiyor
+- Test kapsamı: cron auth, eligibility, veri dürüstlüğü, tazelik etiketleri ve parser'lar
+  test ediliyor; API route'larının iş mantığı ve component'lar henüz değil
 - Sigortada gerçek fiyat yok — tüm primler örnek profil (sigortacı fiyat feed'i gerekiyor)
 - Swedbank EE konut kredisi ve Luminor EE oran yayınlamıyor → indicative kalıyor
 - Bigbank LV/LT ve Skandia SE sunucunun IP'sini 403'lüyor (scraper'a eklenmedi)
@@ -193,10 +193,14 @@ Claude Code on the web runs this repository in a fresh Linux container. What is 
   and pull request, so a cloud session gets a green/red signal without a server. Run them
   locally before pushing anyway: the release cron ships `main` within ten minutes, well
   before CI reports.
-- **Tests:** `tests/` (vitest, node environment). They cover the two things that have
-  produced wrong numbers on the live site: the PostgREST 1000-row cap in
-  `lib/supabase-paginate.ts`, and the bank-page parsers in `deploy/scraper/parsers.mjs`
-  (Swedish *listränta* vs *snittränta*, Icelandic indexed vs non-indexed). The parsers are
+- **Tests:** `tests/` (vitest, node environment, `@/` alias as in tsconfig). Each file pins a
+  failure that reached users or could: the PostgREST 1000-row cap (`data-layer`), the
+  bank-page parsers (`scraper-parsers`: Swedish *listränta* vs *snittränta*, Icelandic
+  indexed vs non-indexed), no unsourced ranking claims in loan/insurance data (`trust`,
+  `insurance-data`), fallback rates never claiming a fetch time (`trust`), the claims list
+  in sync with the catalogue (`claims`), every `/api/cron/*` handler returning 401 without
+  the secret (`cron-auth` — imports each route, so new routes are covered automatically),
+  and no eligibility score without income and amount (`eligibility`). The parsers are
   split out of `scrape-rates.mjs` precisely so they can be imported without Playwright —
   when adding a bank, put the text→number rule in `parsers.mjs` and pin it with a test.
 - **`.env.example`** lists every variable name with what breaks without it. Names only —
