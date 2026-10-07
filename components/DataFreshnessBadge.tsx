@@ -1,36 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { describeEuribor } from '@/lib/rates';
+import type { LiveRatesData } from '@/lib/types';
 
-interface BadgeData {
-  fetchedAt: string;
-  success: boolean;
-}
-
-function timeAgo(iso: string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
-
+// 2026-10: Eskiden "Live rates · updated just now" — /api/rates fallback'te bile çekim
+// saatini "şimdi" diye dönüyordu ve rozet statik ürün oranlarının üstünde duruyordu.
+// Artık yalnız neyin referans olduğunu ve hangi döneme ait olduğunu söyler.
 export default function DataFreshnessBadge() {
-  const [data, setData] = useState<BadgeData | null>(null);
+  const [data, setData] = useState<LiveRatesData | null>(null);
 
   useEffect(() => {
     fetch('/api/rates')
       .then(r => r.json())
-      .then((d: BadgeData) => setData(d))
+      .then((d: LiveRatesData) => setData(d))
       .catch(() => null);
   }, []);
 
   if (!data) return null;
 
-  const isLive = data.success;
-  const label = isLive
-    ? `Live rates · updated ${timeAgo(data.fetchedAt)}`
-    : `Reference rates · last verified ${timeAgo(data.fetchedAt)}`;
+  const { text, live: isLive } = describeEuribor(data);
+  const label = `Rates checked per product · ${text}`;
 
   return (
     <span

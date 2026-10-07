@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
     const productLines = top3.map((item, i) => {
       if (isInsurance) {
         const ins = item.product as typeof motorInsurance[number];
-        return `#${i + 1} ${ins.companyName}: annual premium €${ins.representativePremium}, excess €${ins.excess}, features: ${ins.features.slice(0, 3).join(', ')}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
+        return `#${i + 1} ${ins.companyName}: example annual premium €${ins.representativePremium} (typical profile, not a quote), excess €${ins.excess}, features: ${ins.features.slice(0, 3).join(', ')}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
       }
       const loan = item.product as typeof personalLoans[number];
       return `#${i + 1} ${loan.bankName}: rate ${loan.representativeRate}%, processing ${loan.processingTime}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
@@ -211,7 +211,7 @@ User context: ${userCtx || 'No specific requirements'}
 Top 3 ${productType} recommendations (ranked by user behavior data + live rates):
 ${productLines}
 
-Write 1-2 sentences for each product explaining WHY it's recommended for this specific user right now, considering market conditions. Be concrete, reference the rate or premium. Output valid JSON only:
+Write 1-2 sentences for each product explaining WHY it's recommended for this specific user right now, considering market conditions. Be concrete, reference the rate or premium.${isInsurance ? ' Insurance premiums are examples for a typical profile, not quotes — never call them the user\'s price.' : ''} Output valid JSON only:
 {"recommendations": [{"rank": 1, "why": "..."}, {"rank": 2, "why": "..."}, {"rank": 3, "why": "..."}], "marketSummary": "1 sentence about current market conditions"}`;
 
     // ── Step 5: Non-streaming Groq call for explanations ────────────────────

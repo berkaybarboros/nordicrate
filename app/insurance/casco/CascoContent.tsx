@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useFetchJson } from "@/lib/use-fetch-json";
 import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
+import InsuranceDisclaimer from "@/components/insurance/InsuranceDisclaimer";
 import AIProductSection from "@/components/AIProductSection";
 import AIPageBanner from "@/components/AIPageBanner";
-import InsurancePremiumCalc from "@/components/calculators/InsurancePremiumCalc";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
 import type { InsuranceOffer } from "@/data/insurance";
@@ -41,29 +42,15 @@ function SkeletonInsuranceCard() {
 
 export default function CascoContent() {
   const { t } = useTranslation();
-  const [sortBy, setSortBy] = useState<"price" | "rating">("price");
-  const [offers, setOffers] = useState<InsuranceOffer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<"price" | "name">("price");
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
   const handleRateChange = useCallback((rates: import("@/components/SmartRateWidget").RateEntry[]) => {
     const e3m = rates.find(r => r.key === 'euribor3m');
     if (e3m) setLiveEuribor(e3m.rate);
   }, []);
 
-  const fetchOffers = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/insurance/casco?sort=${sortBy === "price" ? "price" : "name"}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setOffers(data.offers || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [sortBy]);
-
-  useEffect(() => {
-    fetchOffers();
-  }, [fetchOffers]);
+  const { data, loading } = useFetchJson<{ offers?: InsuranceOffer[] }>(`/api/insurance/casco?sort=${sortBy}`);
+  const offers = data?.offers ?? [];
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">
@@ -98,7 +85,6 @@ export default function CascoContent() {
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
           {/* Sidebar — below on mobile */}
           <div className="space-y-4 order-2 lg:order-1">
-            <InsurancePremiumCalc kind="casco" />
             <SmartRateWidget onRateChange={handleRateChange} />
             <PersonalizedRecs
               productType="casco"
@@ -125,11 +111,11 @@ export default function CascoContent() {
                 <ArrowUpDown size={14} className="text-gray-400" />
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as "price" | "rating")}
+                  onChange={(e) => setSortBy(e.target.value as "price" | "name")}
                   className="text-sm font-medium text-[#1a3c6e] border-0 bg-transparent cursor-pointer focus:outline-none"
                 >
                   <option value="price">Lowest Price</option>
-                  <option value="rating">Highest Rated</option>
+                  <option value="name">Company (A–Z)</option>
                 </select>
               </div>
             </div>
@@ -149,11 +135,7 @@ export default function CascoContent() {
 
             {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
 
-            <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-              CASCO insurance is optional but provides comprehensive protection for your vehicle beyond
-              mandatory liability. Premiums shown are indicative — final price depends on vehicle value,
-              age and your driving history. All insurers licensed by Finantsinspektsioon.
-            </p>
+            <InsuranceDisclaimer factors="vehicle value and age, and your driving history" />
           </div>
         </div>
       </div>

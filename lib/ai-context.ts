@@ -1,6 +1,7 @@
 import { PRODUCTS, INSTITUTIONS, COUNTRIES } from '@/lib/data';
 import { PROGRAMS } from '@/lib/programs-data';
 import type { LiveRatesData } from '@/lib/types';
+import { formatPeriod } from '@/lib/rates';
 
 export type AssistantMode = 'personal' | 'corporate';
 
@@ -35,10 +36,10 @@ function buildDataContext(mode: AssistantMode, liveRates?: LiveRatesData): strin
   if (liveRates?.success) {
     const { euribor3m, euribor6m, euribor12m } = liveRates.euribor;
     const cbRates = Object.values(liveRates.centralBankRates)
-      .map(r => `  ${r.label}: ${r.rate}% ${r.currency} (${r.period ?? ''})`)
+      .map(r => `  ${r.label}: ${r.rate}% ${r.currency} (${formatPeriod(r.period)}${r.source === 'live' ? '' : ', static reference'})`)
       .join('\n');
     liveRatesBlock = `
-LIVE MARKET RATES (as of ${new Date(liveRates.fetchedAt).toLocaleDateString('en-GB')}):
+REFERENCE RATES (EURIBOR monthly average for ${formatPeriod(euribor3m.period)}, ECB):
   EURIBOR 3M: ${euribor3m.rate}% | 6M: ${euribor6m.rate}% | 12M: ${euribor12m.rate}%
 CENTRAL BANK RATES:
 ${cbRates}

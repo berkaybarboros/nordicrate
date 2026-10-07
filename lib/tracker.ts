@@ -7,7 +7,7 @@
  *   track('apply_click', { product_id: 'lhv-personal', product_type: 'personal', amount: 15000 });
  */
 
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 export type EventType =
   | 'page_view'
@@ -173,6 +173,8 @@ export async function track(
   } catch { /* analytics asla UI'yı bozmaz */ }
 
   if (!firstPartyAllowed()) return;
+  const supabase = getSupabase();
+  if (!supabase) return;
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -224,6 +226,8 @@ async function flushProductViews(): Promise<void> {
 
   const batch = viewQueue.splice(0, viewQueue.length);
   if (!firstPartyAllowed()) return;
+  const supabase = getSupabase();
+  if (!supabase) return;
   try {
     const { data: { user } } = await supabase.auth.getUser();
     const sid = getSessionId();

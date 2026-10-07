@@ -10,23 +10,35 @@ import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { getInstitution, getCountry, formatRate } from '@/lib/utils';
 import CountryFlag from '@/components/CountryFlag';
+import RateFreshness from '@/components/RateFreshness';
+import { applyScrapedOverrides } from '@/lib/scraped-overrides';
+import { rateFreshness } from '@/lib/live-rates';
 import type { HomeDict } from '@/lib/home-i18n';
 
 const STEP_ICONS = [Calculator, BarChart3, CheckCircle2];
 
-export default function LocalizedHome({ dict }: { dict: HomeDict }) {
+export default async function LocalizedHome({ dict }: { dict: HomeDict }) {
+  // EN ana sayfayla aynı kaynak: banka sitelerinden okunan oranlar statik kataloğun üstüne
+  const products = await applyScrapedOverrides(PRODUCTS);
+
   const subtitle = dict.subtitle
     .replace('{products}', String(PRODUCTS.length))
     .replace('{institutions}', String(INSTITUTIONS.length))
     .replace('{countries}', String(COUNTRIES.length));
 
-  const best = (type: 'personal' | 'mortgage' | 'business') =>
-    [...PRODUCTS].filter((p) => p.type === type).sort((a, b) => a.rateMin - b.rateMin)[0];
+  // Eskiden statik PRODUCTS'ı sıralayıp "Today's Best… updated daily" diyordu. Artık 48 sa
+  // içinde okunmuş oran varsa o, yoksa en düşük gösterge oran — kartta "indicative" yazar.
+  const best = (type: 'personal' | 'mortgage' | 'business') => {
+    const ofType = products.filter((p) => p.type === type);
+    const live = ofType.filter((p) => p.isLiveRate && rateFreshness(p.updatedAt) === 'fresh');
+    const pick = [...(live.length ? live : ofType)].sort((a, b) => a.rateMin - b.rateMin)[0];
+    return pick ? { product: pick, isLive: live.includes(pick) } : null;
+  };
 
   const bestCards = [
-    { product: best('personal'), label: dict.bestPersonal, border: 'border-sky-100 hover:border-sky-300', text: 'text-sky-600' },
-    { product: best('mortgage'), label: dict.bestMortgage, border: 'border-emerald-100 hover:border-emerald-300', text: 'text-emerald-600' },
-    { product: best('business'), label: dict.bestBusiness, border: 'border-purple-100 hover:border-purple-300', text: 'text-purple-600' },
+    { pick: best('personal'), label: dict.bestPersonal, border: 'border-sky-100 hover:border-sky-300', text: 'text-sky-600' },
+    { pick: best('mortgage'), label: dict.bestMortgage, border: 'border-emerald-100 hover:border-emerald-300', text: 'text-emerald-600' },
+    { pick: best('business'), label: dict.bestBusiness, border: 'border-purple-100 hover:border-purple-300', text: 'text-purple-600' },
   ];
 
   return (
@@ -39,7 +51,7 @@ export default function LocalizedHome({ dict }: { dict: HomeDict }) {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
               {dict.badge}
             </div>
             <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-[1.08] mb-5">
@@ -74,8 +86,8 @@ export default function LocalizedHome({ dict }: { dict: HomeDict }) {
             <div className="flex flex-wrap gap-8 text-sm">
               {[
                 { value: `${COUNTRIES.length}`, label: dict.statCountries },
-                { value: `${INSTITUTIONS.length}+`, label: dict.statInstitutions },
-                { value: `${PRODUCTS.length}+`, label: dict.statProducts },
+                { value: `${INSTITUTIONS.length}`, label: dict.statInstitutions },
+                { value: `${PRODUCTS.length}`, label: dict.statProducts },
               ].map(({ value, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-extrabold text-white leading-none">{value}</p>
@@ -95,8 +107,9 @@ export default function LocalizedHome({ dict }: { dict: HomeDict }) {
             <p className="text-slate-500 text-sm mt-1">{dict.bestRatesSubtitle}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {bestCards.map(({ product, label, border, text }) => {
-              if (!product) return null;
+            {bestCards.map(({ pick, label, border, text }) => {
+              if (!pick) return null;
+              const { product, isLive } = pick;
               const inst = getInstitution(product.institutionId);
               const country = inst ? getCountry(inst.country) : null;
               return (
@@ -106,8 +119,14 @@ export default function LocalizedHome({ dict }: { dict: HomeDict }) {
                     {country && <CountryFlag code={country.code} size={32} rounded="sm" />}
                   </div>
                   <p className={`text-4xl font-extrabold ${text} mb-1`}>{formatRate(product.rateMin)}</p>
-                  <p className="text-xs text-slate-500 mb-3">{dict.aprFrom}</p>
+                  <p className="text-xs text-slate-500 mb-3">
+                    {dict.aprFrom}
+                    {!isLive && ` · ${dict.indicative}`}
+                  </p>
                   <p className="text-sm font-bold text-slate-800">{inst?.shortName}</p>
+                  <div className="mt-1">
+                    <RateFreshness checkedAt={isLive ? product.updatedAt : null} />
+                  </div>
                   <p className={`text-xs font-semibold ${text} group-hover:underline mt-3`}>{dict.compareAll}</p>
                 </Link>
               );

@@ -44,3 +44,34 @@ crontab -e
 ## İzleme
 - `parse_ok=false` satırlar = sayfa yapısı değişti (selector drift) → pattern güncelle
 - Tüm hedefler patlarsa script exit 1 döner → cron MAILTO ile haber verir
+
+## Kaynak denetimi (source-audit.mjs)
+
+Katalogdaki hız ve ücret iddiaları ("Instant decision", "No fees", `processingTime`,
+tek seferlik ücret) ile Finantsinspektsioon kurum listesini bankaların kendi
+sayfalarına karşı kontrol etmek için **kanıt toplar**. Veritabanına yazmaz, veriyi
+değiştirmez, hiçbir iddiayı "doğrulandı" saymaz — yalnız markdown rapor üretir.
+
+**Otomatik:** `scrape-rates.mjs` (günlük 06:30 cron) son kayıt 7 günden eskiyse `.ee`
+denetimini kendisi çalıştırır ve sonucu `source_audits` tablosuna yazar — SSH gerekmez,
+rapor cloud oturumundan Supabase üzerinden okunur. Tablo: `schema-source-audit.sql`
+(kurulmadıysa adım sessizce atlanır). Denetim hatası oranları ve çıkış kodunu etkilemez.
+
+**Elle (isteğe bağlı):**
+
+```bash
+cd /var/www/nordicrate/deploy/scraper
+node source-audit.mjs --tld ee          # Estonya kaynakları + fi.ee sicili
+node source-audit.mjs                   # tüm ülkeler
+node --env-file=/var/www/nordicrate/.env.local source-audit.mjs --tld ee --save
+# rapor: deploy/scraper/out/source-audit-YYYY-MM-DD.md (git'e girmez)
+```
+
+- Girdi `claims-to-verify.json`, `lib/claims.ts`'ten üretilir. Ürün verisi değişince
+  `UPDATE_CLAIMS=1 npm test` ile yenile; yenilenmezse CI kırılır.
+- Rapordaki her iddia için karar insanda: **tut** (sayfadaki cümle iddiayı söylüyor),
+  **düzelt** (sayfa farklı söylüyor), **sil** (sayfada yok). Karar `lib/data.ts` /
+  `data/loans.ts`'e işlenir — CLAUDE.md: ürün verisi banka sitesi doğrulaması olmadan değişmez.
+- `fetch-failed` = sayfa okunamadı (403, yönlendirme, zaman aşımı); "kanıt yok" demek değildir.
+- Sicil bölümü fi.ee'nin ham metninden kurum türü kelimeleri içeren satırlardır; HTML
+  yapısı cloud oturumundan görülemediği için ayrıştırılmadı.

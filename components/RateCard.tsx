@@ -15,6 +15,7 @@ import {
   INSTITUTION_TYPE_LABELS,
   LOAN_TYPE_ICONS,
   calculateMonthlyPayment,
+  formatCurrency,
 } from '@/lib/utils';
 import { buildGoLink } from '@/lib/affiliate';
 import { Smartphone, Globe2, AlertTriangle, UserCheck } from 'lucide-react';
@@ -144,14 +145,19 @@ export default function RateCard({ product, institution, country }: RateCardProp
           </div>
         </div>
 
-        {/* Representative example */}
+        {/* Örnek hesap. "Representative Example" tüketici kredisi mevzuatında belirli bir
+            anlamı olan bir terim; en düşük ilan oranıyla yapılan hesap o değildir. Tutarlar
+            eskiden ürün NOK/ISK olsa bile "€" ile yazılıyordu. */}
         <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 mb-4">
-          <p className="text-xs font-bold text-emerald-800 mb-1">Representative Example</p>
+          <p className="text-xs font-bold text-emerald-800 mb-1">Illustrative example</p>
           <p className="text-xs text-emerald-700 leading-relaxed">
             {formatAmount(repPrincipal, product.currency)} over {formatTerm(repMonths)} ={' '}
-            <strong>€{Math.round(repMonthly)}/mo</strong> · Total: €{Math.round(repTotal).toLocaleString()}
+            <strong>{formatCurrency(repMonthly, product.currency)}/mo</strong> · Total:{' '}
+            {formatCurrency(repTotal, product.currency)}
           </p>
-          <p className="text-xs text-emerald-700 mt-1">at {formatRate(product.rateMin)} APR</p>
+          <p className="text-xs text-emerald-700 mt-1">
+            at the lowest advertised rate, {formatRate(product.rateMin)}, fees excluded
+          </p>
         </div>
 
         {/* Features */}

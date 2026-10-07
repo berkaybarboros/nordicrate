@@ -8,6 +8,7 @@ import { getInstitution, getCountry } from '@/lib/utils';
 import RateCard from './RateCard';
 import FilterSidebar, { type FilterState } from './FilterSidebar';
 import DataFreshnessBadge from './DataFreshnessBadge';
+import AffiliateDisclosure from './AffiliateDisclosure';
 import RateAlertModal from './alerts/RateAlertModal';
 
 interface ProductListPageProps {
@@ -111,6 +112,7 @@ export default function ProductListPage({
           <p className="text-slate-500">{subtitle}</p>
           <DataFreshnessBadge />
         </div>
+        <AffiliateDisclosure className="mt-2" />
       </div>
 
       {/* Mobile filter toggle */}

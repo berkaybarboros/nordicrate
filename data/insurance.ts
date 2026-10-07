@@ -9,12 +9,18 @@ export interface InsuranceOffer {
   representativePremium: number;
   coverage: string[];
   excess: number; // deductible €
+  /** Nesnel ürün özellikleri. Sıralama/üstünlük iddiası ("largest", "best price",
+   *  "most affordable") ve kaynaksız rakam YOK — tests/insurance-data.test.ts korur. */
   features: string[];
   badge?: string;
   paymentOptions: string[];
-  onlineDiscount?: number; // % discount if bought online
   applyUrl: string;
   websiteUrl: string;
+  /** Prim sigortacının kendi kaynağından en son ne zaman doğrulandı (ISO). Yoksa prim
+   *  örnek profildir ve UI "Example premium · not a quote" gösterir. */
+  verifiedAt?: string;
+  /** verifiedAt'in dayandığı sayfa / feed */
+  sourceUrl?: string;
 }
 
 export const motorInsurance: InsuranceOffer[] = [
@@ -35,9 +41,8 @@ export const motorInsurance: InsuranceOffer[] = [
       "Green card included",
     ],
     excess: 0,
-    features: ["Largest insurer in Estonia", "Instant policy issuance", "Online management"],
+    features: ["Instant policy issuance", "Online management"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://www.if.ee/en/eraklient/kindlustused/liikluskindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
@@ -57,9 +62,8 @@ export const motorInsurance: InsuranceOffer[] = [
       "European coverage",
     ],
     excess: 0,
-    features: ["Competitive pricing", "Fast claims", "Mobile app"],
+    features: ["Fast claims", "Mobile app"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.ergo.ee/en/private-clients/motor-tpl-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
@@ -81,7 +85,6 @@ export const motorInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["Bundled with bank account discounts", "Easy claims via app", "24/7 helpline"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 5,
     applyUrl: "https://www.swedbank.ee/private/insurance/vehicle/motor",
     websiteUrl: "https://www.swedbank.ee/private/insurance",
   },
@@ -101,9 +104,8 @@ export const motorInsurance: InsuranceOffer[] = [
       "Roadside recovery",
     ],
     excess: 0,
-    features: ["Nordic reliability", "Fast online quote", "No-claims bonus"],
+    features: ["Fast online quote", "No-claims bonus"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 7,
     applyUrl: "https://www.gjensidige.ee/eraklient/soidukite-kindlustamine/liikluskindlustus",
     websiteUrl: "https://www.gjensidige.ee/",
   },
@@ -125,7 +127,6 @@ export const motorInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["Estonian-owned insurer", "LHV bank customer discount", "Digital policy"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 12,
     applyUrl: "https://www.lhv.ee/en/motor-third-party-liability-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
@@ -148,7 +149,6 @@ export const motorInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["Pan-Baltic insurer (EE/LV/LT)", "Vienna Insurance Group member", "Fast claims settlement", "Multi-country coverage"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.bta.ee/en/private/mtpl-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
@@ -168,9 +168,8 @@ export const motorInsurance: InsuranceOffer[] = [
       "Travel assistance",
     ],
     excess: 0,
-    features: ["Vienna Insurance Group backing", "Competitive Baltic pricing", "Online claim reporting", "Available EE/LV/LT"],
+    features: ["Vienna Insurance Group backing", "Online claim reporting", "Available EE/LV/LT"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
@@ -190,9 +189,8 @@ export const motorInsurance: InsuranceOffer[] = [
       "Legal assistance",
     ],
     excess: 0,
-    features: ["Estonian insurer since 1999", "Paperless claims", "Quick online quote", "Loyal customer discounts"],
+    features: ["Estonian insurer", "Paperless claims", "Quick online quote", "Loyal customer discounts"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 9,
     applyUrl: "https://www.salva.ee/en/motor",
     websiteUrl: "https://www.salva.ee/en",
   },
@@ -216,9 +214,8 @@ export const cascoInsurance: InsuranceOffer[] = [
       "Roadside assistance",
     ],
     excess: 200,
-    features: ["Market leader", "Replacement car", "24/7 claims"],
+    features: ["Replacement car", "24/7 claims"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://www.if.ee/en/eraklient/kindlustused/kaskokindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
@@ -238,9 +235,8 @@ export const cascoInsurance: InsuranceOffer[] = [
       "Windscreen replacement",
     ],
     excess: 300,
-    features: ["Competitive rates", "Online claim submission", "Fast settlement"],
+    features: ["Online claim submission", "Fast settlement"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.ergo.ee/en/private-clients/motor-hull-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
@@ -262,7 +258,6 @@ export const cascoInsurance: InsuranceOffer[] = [
     excess: 150,
     features: ["Low excess option", "LHV customer discount", "Digital claims"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 12,
     applyUrl: "https://www.lhv.ee/en/casco-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
@@ -286,7 +281,6 @@ export const cascoInsurance: InsuranceOffer[] = [
     excess: 200,
     features: ["Pan-Baltic coverage", "24/7 claims hotline", "Mobile claims app", "Courtesy car arrangement"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.bta.ee/en/private/casco-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
@@ -307,9 +301,8 @@ export const cascoInsurance: InsuranceOffer[] = [
       "Roadside recovery",
     ],
     excess: 300,
-    features: ["Vienna Insurance Group", "Most competitive casco pricing", "Easy online claims", "Baltic-wide service network"],
+    features: ["Vienna Insurance Group", "Easy online claims", "Baltic-wide service network"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
@@ -331,9 +324,8 @@ export const cascoInsurance: InsuranceOffer[] = [
       "Pan-Nordic & Baltic network",
     ],
     excess: 200,
-    features: ["Nordic reliability", "No-claims bonus up to 75%", "Replacement car included", "App-based claims"],
+    features: ["No-claims bonus", "Replacement car included", "App-based claims"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 7,
     applyUrl: "https://www.gjensidige.ee/eraklient/soidukite-kindlustamine/kaskokindlustus",
     websiteUrl: "https://www.gjensidige.ee/",
   },
@@ -357,9 +349,8 @@ export const homeInsurance: InsuranceOffer[] = [
       "Theft & break-in",
     ],
     excess: 100,
-    features: ["Market leader", "Flexible coverage", "Quick claims"],
+    features: ["Flexible coverage", "Quick claims"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://www.if.ee/en/eraklient/kindlustused/kodukindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
@@ -379,9 +370,8 @@ export const homeInsurance: InsuranceOffer[] = [
       "Personal liability",
     ],
     excess: 150,
-    features: ["Great value", "Online management", "24/7 assistance"],
+    features: ["Online management", "24/7 assistance"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.ergo.ee/en/private-clients/home-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
@@ -402,9 +392,8 @@ export const homeInsurance: InsuranceOffer[] = [
       "Identity theft",
     ],
     excess: 100,
-    features: ["Nordic expertise", "No-claims bonus", "Comprehensive coverage"],
+    features: ["No-claims bonus", "Comprehensive coverage"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 7,
     applyUrl: "https://www.gjensidige.ee/eraklient/kodukindlustus/mis-on-kodukindlustus",
     websiteUrl: "https://www.gjensidige.ee/",
   },
@@ -427,7 +416,6 @@ export const homeInsurance: InsuranceOffer[] = [
     excess: 100,
     features: ["Estonian insurer", "LHV mortgage customer bundle", "Digital claims", "Paperless policy"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 12,
     applyUrl: "https://www.lhv.ee/en/home-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
@@ -451,7 +439,6 @@ export const homeInsurance: InsuranceOffer[] = [
     excess: 120,
     features: ["Pan-Baltic coverage", "Vienna Insurance Group", "Fast claim payout", "Discount for security systems"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.bta.ee/en/private/home-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
@@ -472,9 +459,8 @@ export const homeInsurance: InsuranceOffer[] = [
       "Key & lock replacement",
     ],
     excess: 150,
-    features: ["Most affordable in Baltic", "Online management", "24/7 emergency line", "Baltic-wide service"],
+    features: ["Online management", "24/7 emergency line", "Baltic-wide service"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
@@ -497,7 +483,6 @@ export const homeInsurance: InsuranceOffer[] = [
     excess: 100,
     features: ["Estonian local insurer", "Quick online quote", "No-claim reward", "Simple online claims"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 9,
     applyUrl: "https://www.salva.ee/en/home-insurance",
     websiteUrl: "https://www.salva.ee/en",
   },
@@ -523,7 +508,6 @@ export const healthInsurance: InsuranceOffer[] = [
     excess: 50,
     features: ["No waiting period", "Private clinic network", "Telemedicine"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 5,
     applyUrl: "https://www.if.ee/en/ariklient/kindlustused/tervisekindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
@@ -545,7 +529,6 @@ export const healthInsurance: InsuranceOffer[] = [
     excess: 100,
     features: ["Mental health included", "Wide clinic network", "Fast reimbursement"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://www.ergo.ee/en/private-clients/health-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
@@ -567,9 +550,8 @@ export const healthInsurance: InsuranceOffer[] = [
       "Rehabilitation services",
     ],
     excess: 50,
-    features: ["Pan-Baltic health network", "Vienna Insurance Group", "Short waiting times", "Mobile claims app"],
+    features: ["Pan-Baltic health network", "Vienna Insurance Group", "Mobile claims app"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 5,
     applyUrl: "https://www.bta.ee/en/private/health-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
@@ -590,9 +572,8 @@ export const healthInsurance: InsuranceOffer[] = [
       "Mental health (basic)",
     ],
     excess: 75,
-    features: ["Affordable entry-level plan", "Wide clinic network in Baltics", "Online reimbursement", "Expat-friendly English service"],
+    features: ["Entry-level plan", "Wide clinic network in Baltics", "Online reimbursement", "Expat-friendly English service"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 8,
     applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
@@ -616,7 +597,6 @@ export const healthInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["No excess option", "LHV bank integration", "Telemedicine included", "Digital policy management"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 10,
     applyUrl: "https://www.lhv.ee/en/health-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
@@ -641,9 +621,8 @@ export const travelInsurance: InsuranceOffer[] = [
       "Legal assistance abroad",
     ],
     excess: 0,
-    features: ["Largest insurer in Nordics", "Schengen & worldwide plans", "Instant policy issuance", "App-based claims"],
+    features: ["Schengen & worldwide plans", "Instant policy issuance", "App-based claims"],
     paymentOptions: ["Annual", "Per trip"],
-    onlineDiscount: 10,
     applyUrl: "https://www.if.ee/en/eraklient/kindlustused/reisikindlustus",
     websiteUrl: "https://www.if.ee/en",
   },
@@ -664,15 +643,14 @@ export const travelInsurance: InsuranceOffer[] = [
       "Personal liability abroad",
     ],
     excess: 50,
-    features: ["Best price on single trips", "Family plans available", "Sports activities included", "Fast online claims"],
+    features: ["Single-trip plans", "Family plans available", "Sports activities included", "Fast online claims"],
     paymentOptions: ["Annual", "Per trip", "Monthly"],
-    onlineDiscount: 8,
     applyUrl: "https://www.ergo.ee/en/private-clients/travel-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
   {
     id: "lhv-travel",
-    companyId: "lhv",
+    companyId: "lhv-insurance",
     companyName: "LHV Kindlustus",
     companyLogo: "🇪🇪",
     type: "travel",
@@ -690,7 +668,6 @@ export const travelInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["Estonian bank-backed", "No excess option", "Digital nomad annual plan", "Travel app with SOS button"],
     paymentOptions: ["Annual", "Per trip"],
-    onlineDiscount: 5,
     applyUrl: "https://www.lhv.ee/en/travel-insurance",
     websiteUrl: "https://www.lhv.ee/en/insurance",
   },
@@ -712,9 +689,8 @@ export const travelInsurance: InsuranceOffer[] = [
       "Repatriation & burial costs",
     ],
     excess: 0,
-    features: ["Nordic market leader", "Premium worldwide cover", "Adventure & extreme sports", "24/7 multilingual support"],
+    features: ["Premium worldwide cover", "Adventure & extreme sports", "24/7 multilingual support"],
     paymentOptions: ["Annual", "Monthly"],
-    onlineDiscount: 7,
     applyUrl: "https://www.gjensidige.ee/eraklient/reisikindlustus",
     websiteUrl: "https://www.gjensidige.ee/",
   },
@@ -736,9 +712,8 @@ export const travelInsurance: InsuranceOffer[] = [
       "24/7 Baltic & international assistance",
     ],
     excess: 30,
-    features: ["Pan-Baltic insurer", "Competitive annual multi-trip plan", "Family plan available", "Vienna Insurance Group backing"],
+    features: ["Pan-Baltic insurer", "Annual multi-trip plan", "Family plan available", "Vienna Insurance Group backing"],
     paymentOptions: ["Annual", "Per trip"],
-    onlineDiscount: 8,
     applyUrl: "https://www.bta.ee/en/private/travel-insurance",
     websiteUrl: "https://www.bta.ee/en",
   },
@@ -759,9 +734,8 @@ export const travelInsurance: InsuranceOffer[] = [
       "Personal liability abroad",
     ],
     excess: 50,
-    features: ["Most affordable annual plan", "Schengen visa compliant", "Quick online purchase", "Baltic-wide offices"],
+    features: ["Annual plan", "Schengen visa compliant", "Quick online purchase", "Baltic-wide offices"],
     paymentOptions: ["Annual", "Per trip"],
-    onlineDiscount: 10,
     applyUrl: "https://compensa.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
@@ -784,7 +758,6 @@ export const travelInsurance: InsuranceOffer[] = [
     excess: 0,
     features: ["Estonian insurer", "No excess option", "Instant policy", "Estonian-language support"],
     paymentOptions: ["Annual", "Per trip", "Monthly"],
-    onlineDiscount: 9,
     applyUrl: "https://www.salva.ee/en/travel-insurance",
     websiteUrl: "https://www.salva.ee/en",
   },
@@ -793,7 +766,7 @@ export const travelInsurance: InsuranceOffer[] = [
 export const lifeInsurance: InsuranceOffer[] = [
   {
     id: "seb-life",
-    companyId: "seb",
+    companyId: "seb-life",
     companyName: "SEB Life",
     companyLogo: "🏛️",
     type: "life",
@@ -808,15 +781,14 @@ export const lifeInsurance: InsuranceOffer[] = [
       "Children's education cover",
     ],
     excess: 0,
-    features: ["Swedish banking reliability", "Bundled with SEB mortgage", "Online policy management", "Premium waiver on disability"],
+    features: ["Bundled with SEB mortgage", "Online policy management", "Premium waiver on disability"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 0,
     applyUrl: "https://www.seb.ee/en/private/insurance/life-and-health-insurance",
     websiteUrl: "https://www.seb.ee/en/insurance",
   },
   {
     id: "swedbank-life",
-    companyId: "swedbank",
+    companyId: "swedbank-life",
     companyName: "Swedbank Life",
     companyLogo: "🏦",
     type: "life",
@@ -831,15 +803,14 @@ export const lifeInsurance: InsuranceOffer[] = [
       "Funeral expenses covered",
     ],
     excess: 0,
-    features: ["Largest bank in Baltics", "Linked savings component", "Tax-advantaged option", "Family protection bundles"],
+    features: ["Linked savings component", "Tax-advantaged option", "Family protection bundles"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 0,
     applyUrl: "https://www.swedbank.ee/private/insurance/life",
     websiteUrl: "https://www.swedbank.ee/private/insurance",
   },
   {
     id: "ergo-life",
-    companyId: "ergo",
+    companyId: "ergo-life",
     companyName: "ERGO Life",
     companyLogo: "🟢",
     type: "life",
@@ -853,9 +824,8 @@ export const lifeInsurance: InsuranceOffer[] = [
       "Disability income replacement",
     ],
     excess: 0,
-    features: ["German-backed insurer", "Competitive premiums", "Flexible sum assured", "No medical exam under €250k"],
+    features: ["German-backed insurer", "Flexible sum assured"],
     paymentOptions: ["Monthly", "Quarterly", "Annual"],
-    onlineDiscount: 5,
     applyUrl: "https://www.ergo.ee/en/private-clients/life-insurance",
     websiteUrl: "https://www.ergo.ee/en",
   },
@@ -863,7 +833,7 @@ export const lifeInsurance: InsuranceOffer[] = [
 
   {
     id: "compensa-life",
-    companyId: "compensa",
+    companyId: "compensa-life",
     companyName: "Compensa Life Vienna Insurance",
     companyLogo: "🟡",
     type: "life",
@@ -878,14 +848,44 @@ export const lifeInsurance: InsuranceOffer[] = [
       "Savings-linked option",
     ],
     excess: 0,
-    features: ["Most affordable in Baltic", "Investment-linked option available", "Tax deductible in LT/LV", "Unit-linked savings component"],
+    features: ["Investment-linked option available", "Unit-linked savings component"],
     paymentOptions: ["Monthly", "Annual"],
-    onlineDiscount: 5,
     applyUrl: "https://www.compensalife.ee/",
     websiteUrl: "https://www.compensa.ee/en",
   },
 
 ];
+
+export type InsuranceType = InsuranceOffer["type"];
+
+/** Tüm sigorta katalogları tek yerde — API route'u, hub sayfası ve testler buradan okur. */
+export const INSURANCE_BY_TYPE: Record<InsuranceType, InsuranceOffer[]> = {
+  motor:  motorInsurance,
+  casco:  cascoInsurance,
+  home:   homeInsurance,
+  health: healthInsurance,
+  travel: travelInsurance,
+  life:   lifeInsurance,
+};
+
+/** Bir ürün tipindeki en düşük örnek prim (€/yıl). Hub kartları elle yazılmasın diye. */
+export function lowestExamplePremium(type: InsuranceType): number | null {
+  const offers = INSURANCE_BY_TYPE[type];
+  return offers.length ? Math.min(...offers.map((o) => o.representativePremium)) : null;
+}
+
+/** Listelenen sigortacılar ve gerçekten ürünü olan tipler (companyId bazında). */
+export function listedInsurers(): { companyId: string; name: string; logo: string; types: InsuranceType[] }[] {
+  const byId = new Map<string, { companyId: string; name: string; logo: string; types: InsuranceType[] }>();
+  for (const [type, offers] of Object.entries(INSURANCE_BY_TYPE) as [InsuranceType, InsuranceOffer[]][]) {
+    for (const o of offers) {
+      const entry = byId.get(o.companyId) ?? { companyId: o.companyId, name: o.companyName, logo: o.companyLogo, types: [] };
+      if (!entry.types.includes(type)) entry.types.push(type);
+      byId.set(o.companyId, entry);
+    }
+  }
+  return [...byId.values()].sort((a, b) => b.types.length - a.types.length || a.name.localeCompare(b.name));
+}
 
 /**
  * Vadeli mevduat kataloğu — YALNIZCA meta veri (banka adı, linkler, koşullar).

@@ -58,3 +58,7 @@ next-env.d.ts
 .agents/
 .mcp.json
 skills-lock.json
+
+# source-audit.mjs raporları (sunucuda üretilir, repo dışı)
+deploy/scraper/out/
+deploy/scraper/node_modules/

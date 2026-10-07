@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useFetchJson } from "@/lib/use-fetch-json";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Info, ArrowUpDown, Bell } from "lucide-react";
@@ -102,10 +103,6 @@ function PersonalLoansInner() {
   };
 
   const [sortBy, setSortBy] = useState<"rate" | "monthly" | "total">("rate");
-  const [offers, setOffers] = useState<LoanOffer[]>([]);
-  // Kaç teklifin oranı bugün bankanın sitesinden okundu — "Updated today" sahte iddiasının yerine
-  const [liveCount, setLiveCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
   const [liveEuribor, setLiveEuribor] = useState<number | null>(null);
 
@@ -114,21 +111,12 @@ function PersonalLoansInner() {
     if (e3m) setLiveEuribor(e3m.rate);
   }, []);
 
-  const fetchOffers = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/loans/personal?amount=${amount}&term=${termMonths}&sort=${sortBy}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setOffers(data.loans || []);
-        setLiveCount(typeof data.meta?.liveCount === "number" ? data.meta.liveCount : null);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [amount, termMonths, sortBy]);
-
-  useEffect(() => {
-    fetchOffers();
-  }, [fetchOffers]);
+  const { data, loading } = useFetchJson<{ loans?: LoanOffer[]; meta?: { liveCount?: unknown } }>(
+    `/api/loans/personal?amount=${amount}&term=${termMonths}&sort=${sortBy}`
+  );
+  const offers = data?.loans ?? [];
+  // Kaç teklifin oranı bugün bankanın sitesinden okundu — "Updated today" sahte iddiasının yerine
+  const liveCount = typeof data?.meta?.liveCount === "number" ? data.meta.liveCount : null;
 
   const bestRate = offers.length > 0 ? Math.min(...offers.map((l) => l.representativeRate)) : 0;
   const bestMonthly = bestRate > 0 ? calculateMonthlyPayment(amount, bestRate, termMonths) : 0;
@@ -280,8 +268,9 @@ function PersonalLoansInner() {
 
             {!loading && offers.length > 0 && (
               <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
-                Representative example: Borrowing {formatCurrency(amount)} over {termMonths} months
-                at {bestRate}% p.a. gives a monthly payment of {formatCurrency(bestMonthly)}. Total
+                Example at the lowest representative rate listed ({bestRate}% p.a.): borrowing{" "}
+                {formatCurrency(amount)} over {termMonths} months gives a monthly payment of{" "}
+                {formatCurrency(bestMonthly)}, fees excluded. Total
                 repayable: {formatCurrency(bestMonthly * termMonths)}. Rates subject to individual
                 creditworthiness assessment. NordicRate is a comparison service — we do not provide
                 loans directly.

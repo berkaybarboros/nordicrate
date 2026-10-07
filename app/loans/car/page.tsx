@@ -7,10 +7,12 @@ import { DEEP_CONTENT } from "@/lib/deep-content";
 
 const deep = DEEP_CONTENT.car.en;
 
+// NOT: Meta'da sabit oran YOK — "from 8.9%" yazıyordu, veride Swedbank 6.9% iken.
+// Oranlar günlük canlı veriyle değişiyor; rakamı sayfa gövdesi damgasıyla gösterir.
 export const metadata: Metadata = {
-  title: "Car Loans Estonia | Finance New & Used Vehicles from 8.9%",
+  title: "Car Loans Estonia | Compare New & Used Vehicle Finance",
   description:
-    "Compare car loan offers in Estonia. Finance new or used vehicles €3,000–€60,000. Rates from 8.9% p.a., repay over up to 84 months. LHV, Swedbank, SEB, Luminor. No hidden fees.",
+    "Compare car loan offers in Estonia from LHV, Swedbank, SEB, Luminor, Inbank, Bigbank and Citadele. Rates read daily from bank websites; anything else is marked indicative.",
   keywords: [
     "car loan Estonia",
     "autolaen",
@@ -22,9 +24,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://nordicrate.com/loans/car" },
   openGraph: {
-    title: "Car Loans Estonia | From 8.9% p.a. | NordicRate",
+    title: "Car Loans Estonia | NordicRate",
     description:
-      "Compare car finance from Estonian banks. €3,000–€60,000, up to 84 months. Rates from 8.9%.",
+      "Compare car finance from Estonian banks — rates read daily from bank websites.",
     url: "https://nordicrate.com/loans/car",
     type: "website",
   },

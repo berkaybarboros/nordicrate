@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, ExternalLink, ChevronRight, CheckCircle, ArrowLeft } from 'lucide-react';
 import { COUNTRIES } from '@/lib/data';
 import { buildGoLink } from '@/lib/affiliate';
+import AffiliateDisclosure from '@/components/AffiliateDisclosure';
 import { track, trackFindRateSubmit, trackRecommendationClick } from '@/lib/tracker';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -177,7 +178,7 @@ export default function FindBestRateModal({ open, onClose }: Props) {
             </div>
             <div>
               <p className="text-white font-extrabold text-base">Find Your Best Rate</p>
-              <p className="text-white/50 text-xs">AI-powered · Free · No credit check</p>
+              <p className="text-white/50 text-xs">AI-powered · Free · No effect on your credit score</p>
             </div>
           </div>
           <button
@@ -406,6 +407,7 @@ export default function FindBestRateModal({ open, onClose }: Props) {
 
                   {/* Recommendation cards */}
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Top {result.recommendations.length} Picks For You</p>
+                  <AffiliateDisclosure />
 
                   {result.recommendations.map((rec, i) => (
                     <div

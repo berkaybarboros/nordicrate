@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { upsertUserProfile } from '@/lib/db';
 import { COUNTRIES } from '@/lib/data';
 import { buildGoLink } from '@/lib/affiliate';
+import AffiliateDisclosure from '@/components/AffiliateDisclosure';
 import { calculateEligibility, type EligibilityResult } from '@/lib/profile';
 import { useUserProfile } from '@/contexts/UserProfileContext';
 import { calculateMonthlyPayment } from '@/lib/utils';
@@ -149,7 +150,7 @@ export default function OnboardingPage() {
   const sessionId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setHasSession(!!data.session));
+    getSupabase()?.auth.getSession().then(({ data }) => setHasSession(!!data.session));
     // Ülke/blog sayfasındaki MatchCta ülkeyi ön-seçili gönderir
     const qs = new URLSearchParams(window.location.search);
     const qc = qs.get('country')?.toUpperCase();
@@ -204,7 +205,7 @@ export default function OnboardingPage() {
   async function handleFinish() {
     setError('');
     setSaving(true);
-    const { data: { session } } = await supabase.auth.getSession();
+    const session = (await getSupabase()?.auth.getSession())?.data.session ?? null;
 
     if (session) {
     const { error: dbError } = await upsertUserProfile({
@@ -346,6 +347,7 @@ export default function OnboardingPage() {
             </div>
           ) : (
             <div className="space-y-3">
+              <AffiliateDisclosure />
               {recs.recommendations.map(rec => {
                 const monthly = amount && rec.representativeRate
                   ? calculateMonthlyPayment(amount, rec.representativeRate, termMonths)
@@ -407,7 +409,7 @@ export default function OnboardingPage() {
                           pl: 'onboarding',
                         })}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel="noopener noreferrer sponsored"
                         onClick={() => trackRecommendationClick(rec.rank, rec.productId, recs.leadId)}
                         className="flex-shrink-0 bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold rounded-xl px-4 py-2.5 transition-colors self-center"
                       >

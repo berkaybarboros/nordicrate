@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useStorageItem } from '@/lib/use-client-store';
 import Link from 'next/link';
 
 function pushConsent(granted: boolean) {
@@ -25,23 +26,23 @@ function pushConsent(granted: boolean) {
 }
 
 export default function ConsentBanner() {
-  const [visible, setVisible] = useState(false);
+  // undefined = hydration öncesi (server'da banner render edilmez), null = seçim yapılmamış
+  const [consent, setConsent] = useStorageItem('local', 'nr-consent');
+  const [reopened, setReopened] = useState(false);
 
   useEffect(() => {
-    try {
-      if (!localStorage.getItem('nr-consent')) setVisible(true);
-    } catch { /* ignore */ }
-
-    const reopen = () => setVisible(true);
+    const reopen = () => setReopened(true);
     window.addEventListener('nr-open-consent', reopen);
     return () => window.removeEventListener('nr-open-consent', reopen);
   }, []);
 
   const choose = (granted: boolean) => {
-    try { localStorage.setItem('nr-consent', granted ? 'granted' : 'denied'); } catch { /* ignore */ }
+    setConsent(granted ? 'granted' : 'denied');
     pushConsent(granted);
-    setVisible(false);
+    setReopened(false);
   };
+
+  const visible = reopened || consent === null;
 
   if (!visible) return null;
 

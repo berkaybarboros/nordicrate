@@ -16,7 +16,7 @@ export default function NewsletterCTA() {
         <div>
           <p className="font-extrabold text-slate-900">The Nordic Rate Digest</p>
           <p className="text-sm text-slate-500 mt-0.5">
-            Once a month: EURIBOR direction, the best loan &amp; deposit rates across 8 countries,
+            Once a month: EURIBOR direction, the lowest loan &amp; deposit rates we read across 8 countries,
             and what changed. No spam, ever.
           </p>
         </div>

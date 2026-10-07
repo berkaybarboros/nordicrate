@@ -20,6 +20,7 @@
 
 import { chromium } from 'playwright';
 import { pathToFileURL } from 'node:url';
+import { auditDue, runAudit, saveAudit } from './source-audit.mjs';
 import {
   extract,
   extractDepositRates,
@@ -503,6 +504,22 @@ async function main() {
     ? await scrapeIsMortgages(url, key, dryRun)
     : { ok: 0, total: 0 };
   const dep = (seOnly || isOnly) ? { ok: 0, total: 0 } : await scrapeDeposits(page, url, key, dryRun);
+
+  // Haftalık kaynak denetimi (hız/ücret iddiaları + fi.ee sicili) — sunucuya SSH olmadan
+  // çalışsın diye günlük cron'a bağlı. Oranlardan SONRA ve ayrı try içinde: denetimin
+  // hatası ne canlı oranları ne bu koşunun çıkış kodunu etkiler.
+  if (!dryRun && !depositsOnly && !seOnly && !isOnly) {
+    try {
+      if (await auditDue(url, key, 7)) {
+        console.log('[scraper] source audit due — running .ee audit');
+        const result = await runAudit(browser, { tld: 'ee', register: true });
+        await saveAudit(url, key, result);
+        console.log(`[scraper] source audit saved — ${result.claimsTotal} claims, ${result.pagesFailed}/${result.pagesTotal} pages unreadable`);
+      }
+    } catch (err) {
+      console.error('[scraper] source audit failed (rates unaffected):', err instanceof Error ? err.message : err);
+    }
+  }
 
   await browser.close();
   console.log(`[scraper] Done — loans ${total - failures}/${total} OK, SE ${se.ok}/${se.total}, IS ${is.ok}/${is.total}, deposits ${dep.ok}/${dep.total} OK`);
