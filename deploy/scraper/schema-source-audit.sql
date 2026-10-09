@@ -22,3 +22,7 @@ create table if not exists source_audits (
 create index if not exists source_audits_run_at on source_audits (run_at desc);
 
 alter table source_audits enable row level security;
+
+-- RLS'e ek olarak istemci rollerinin tablo yetkisi de kaldırılır (company_profile,
+-- affiliate_links gibi diğer iç tablolarla aynı): policy eklense bile anon okuyamasın.
+revoke all on table source_audits from anon, authenticated;

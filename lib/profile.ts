@@ -76,9 +76,11 @@ export function calculateEligibility(profile: UserProfile): EligibilityResult {
   products = products.sort((a, b) => a.rateMin - b.rateMin).slice(0, 5);
 
   // DTI Calculation
+  // Skor yalnız DTI hesaplanabildiğinde (gelir + tutar) verilir. Eskiden varsayılan 'good'
+  // idi: onboarding'de geliri boş bırakan kullanıcı "Estimated eligibility: Good" görüyordu.
   let dti: number | undefined;
   let maxLoanDTI: number | undefined;
-  let score: EligibilityScore = 'good';
+  let score: EligibilityScore = 'insufficient_data';
 
   if (profile.monthlyIncome && profile.loanAmount) {
     const termMonths = profile.loanTermMonths ?? 60;
@@ -92,7 +94,11 @@ export function calculateEligibility(profile: UserProfile): EligibilityResult {
     const maxMonthly = profile.monthlyIncome * 0.35 - existingDebt;
     if (maxMonthly > 0) {
       const r = representativeRate / 100 / 12;
-      maxLoanDTI = Math.round(maxMonthly * (Math.pow(1 + r, termMonths) - 1) / (r * Math.pow(1 + r, termMonths)));
+      maxLoanDTI = Math.round(
+        r === 0
+          ? maxMonthly * termMonths // faizsiz: annüite formülü 0/0 olurdu
+          : maxMonthly * (Math.pow(1 + r, termMonths) - 1) / (r * Math.pow(1 + r, termMonths)),
+      );
     }
 
     if (dti < 25) {
@@ -120,6 +126,7 @@ export function calculateEligibility(profile: UserProfile): EligibilityResult {
     reasons.push('Self-employed/freelancer — banks require 2+ years tax returns');
     recommendations.push('Prepare 2 years of tax declarations for application');
   } else if (profile.employmentType === 'unemployed') {
+    // Gelir/tutar olmasa da anlamlı sinyal — DTI'dan bağımsız 'poor'
     score = 'poor';
     reasons.push('No current income — most banks will decline');
     recommendations.push('Consider government social loan programs or guarantors');
