@@ -330,3 +330,79 @@ export function evidenceSnippets(text, terms, max = 6) {
   return snippets;
 }
 
+
+/* ─── Bozulan feed'in kanıtı (scrape-rates.mjs) ────────────────────────────── */
+
+const FAILURE_TERMS = ['%', 'intress', 'interest', 'marginaal', 'margin', 'euribor', 'ränta', 'vextir'];
+
+/**
+ * Oran okunamadığında scraped_rates.raw_snippet'e yazılan metin. Eskiden sayfanın ilk
+ * 300 karakteri yazılıyordu — çoğu zaman çerez bandı; SSH'sız oturum parser'ı neden
+ * bozulduğunu göremiyordu (Bigbank kodulaen, 2026-10-06). Artık oran cümleleri.
+ * parse_ok=false satırları latest_scraped_rates'e girmez: canlı orana etkisi yok.
+ */
+export function failureSnippet(text, max = 1500) {
+  const parts = evidenceSnippets(text, FAILURE_TERMS, 8);
+  const body = parts.length ? parts.join(' | ') : text.replace(/\s+/g, ' ').trim().slice(0, 600);
+  return `[parse failed] ${body}`.slice(0, max);
+}
+
+/**
+ * HTML'de dosya adı `filePattern`'e uyan PDF linki — mutlak, göreli (href="/..."),
+ * ya da JSON içinde kaçışlı (https:\/\/...). Sayfa URL'sine göre çözülür.
+ * Bulunamazsa null; `pdfLinks` sayfadaki tüm PDF adlarını hata mesajı için verir.
+ */
+export function findPdfLink(html, pageUrl, filePattern) {
+  const candidates = pdfLinks(html, pageUrl);
+  return candidates.find((u) => filePattern.test(u.split(/[?#]/)[0])) ?? null;
+}
+
+export function pdfLinks(html, pageUrl) {
+  const flat = html.replace(/\\\//g, '/');
+  const out = [];
+  for (const m of flat.matchAll(/(?:href|src|url)\s*[=:]\s*["']([^"']+?\.pdf(?:\?[^"']*)?)["']|(https?:\/\/[^"'\s<>]+?\.pdf)/gi)) {
+    try {
+      const u = new URL(m[1] ?? m[2], pageUrl).toString();
+      if (!out.includes(u)) out.push(u);
+    } catch {
+      // bozuk href — atla
+    }
+  }
+  return out;
+}
+
+/* ─── fi.ee sicili (source-audit.mjs) ──────────────────────────────────────── */
+
+// Ana sayfadaki kategori linkleri; sıra rapordaki sıradır. Yalnız kredi kuruluşları ve
+// sigortacılar — aracılar/acenteler karşılaştırma kataloğunun konusu değil.
+export const REGISTER_CATEGORIES = [
+  /^licensed credit institutions in estonia$/i,
+  /^affiliated branches of foreign credit institutions$/i,
+  /^insurance companies$/i,
+  /^(?:affiliated )?branches of foreign insurance (?:companies|undertakings|insurers)$/i,
+];
+
+/** {text, href}[] → sicilde izlenecek kategori sayfaları (href'e göre tekil) */
+export function pickRegisterCategories(links) {
+  const out = [];
+  for (const re of REGISTER_CATEGORIES) {
+    const hit = links.find((l) => re.test(l.text.trim()) && !out.some((o) => o.href === l.href));
+    if (hit) out.push({ label: hit.text.trim(), href: hit.href });
+  }
+  return out;
+}
+
+// Tüzel kişilik eki — DOM'a değil metne bakar: kurum adı her düzende bu eki taşır.
+// Büyük/küçük harf duyarlı: "AS" bir ek, "as" bir kelime.
+const LEGAL_FORM = /(?:^|[\s(])(AS|AAS|ADB|UAB|AB|Abp|ASA|A\/S|plc|p\.l\.c\.|SE|Ltd|GmbH|S\.A\.|N\.V\.|AG|Oyj|filiaal|Branch|branch)(?=[\s,.)]|$)/;
+
+/** Kategori sayfasının metninden kurum adları (satır başına bir ad) */
+export function registerEntities(text) {
+  const out = [];
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (line.length < 4 || line.length > 120 || /https?:|@|©/.test(line)) continue;
+    if (LEGAL_FORM.test(line) && !out.includes(line)) out.push(line);
+  }
+  return out;
+}

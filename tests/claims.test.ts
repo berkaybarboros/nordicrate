@@ -33,6 +33,11 @@ describe('claims-to-verify.json', () => {
     expect(texts('speed')).toContain('Instant decision');
     expect(texts('fee')).toContain('No fees');
   });
+
+  // "Fast-growing companies focus" (LHV business) was audited as a speed claim
+  it('does not read compound adjectives as speed claims', () => {
+    expect(claims.filter((c) => /fast-growing/i.test(c.text))).toEqual([]);
+  });
 });
 
 // Mechanics only (synthetic text): the real-page parser cases live in

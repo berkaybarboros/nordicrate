@@ -32,7 +32,9 @@ export interface VerifiableClaim {
   sourceUrl: string | null;
 }
 
-const SPEED = /\b(instant|immediate|same[- ]day|24 ?h|minutes?|quick|fast|rapid|express)\b/i;
+// "Fast-growing companies focus" hız iddiası değil (2026-10-08 raporu): birleşik sıfat
+// içindeki fast/quick/rapid sayılmaz
+const SPEED = /\b(instant|immediate|same[- ]day|24 ?h|minutes?|quick|fast|rapid|express)\b(?!-(?:growing|paced|moving|changing))/i;
 const FEE = /\b(no fees?|free|without (?:a )?fee|zero fee|0 ?€|€ ?0)\b/i;
 
 function kindOf(text: string): ClaimKind | null {

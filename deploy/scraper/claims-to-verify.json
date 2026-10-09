@@ -504,15 +504,6 @@
     "text": "1-2 days"
   },
   {
-    "productId": "lhv-ee-b1",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee",
-    "id": "lhv-ee-b1:feature:fast-growing-companies-focus",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Fast-growing companies focus"
-  },
-  {
     "productId": "lhv-mortgage",
     "institution": "LHV Pank",
     "sourceUrl": "https://www.lhv.ee/en/home-loan",
