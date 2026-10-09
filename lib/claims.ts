@@ -14,6 +14,7 @@
 
 import { PRODUCTS, INSTITUTIONS } from './data';
 import { personalLoans, mortgageLoans, carLoans } from '../data/loans';
+import { describeFee } from './loan-cost';
 
 export type ClaimKind = 'speed' | 'fee';
 
@@ -56,24 +57,24 @@ export function collectClaims(): VerifiableClaim[] {
   // data/loans.ts — Estonya ağırlıklı canlı katalog: başvuru linki doğrudan kaynak
   for (const loan of [...personalLoans, ...mortgageLoans, ...carLoans]) {
     const base = { productId: loan.id, institution: loan.bankName, sourceUrl: loan.applyUrl || null };
-    push({
-      ...base,
-      id: `${loan.id}:processingTime`,
-      kind: 'speed',
-      field: 'processingTime',
-      text: loan.processingTime,
-    });
+    // "" = kanıt yok, kartta gösterilmiyor — doğrulanacak iddia da yok
+    if (loan.processingTime) {
+      push({
+        ...base,
+        id: `${loan.id}:processingTime`,
+        kind: 'speed',
+        field: 'processingTime',
+        text: loan.processingTime,
+      });
+    }
+    // Kartın gösterdiği metnin aynısı (lib/loan-cost describeFee)
+    const fee = describeFee(loan);
     push({
       ...base,
       id: `${loan.id}:fee`,
       kind: 'fee',
       field: 'fee',
-      text:
-        loan.feePercent > 0
-          ? `One-time fee ${loan.feePercent}%${loan.fee > 0 ? ` (min €${loan.fee})` : ''}`
-          : loan.fee > 0
-            ? `One-time fee €${loan.fee}`
-            : 'No one-time fee',
+      text: fee === null ? 'Fee not confirmed' : fee === 'None' ? 'No fees' : `Fees ${fee}`,
     });
     for (const f of loan.features) {
       const kind = kindOf(f);

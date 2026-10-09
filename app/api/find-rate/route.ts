@@ -7,6 +7,7 @@ import { logoFromBankId, monogram } from '@/lib/logos';
 
 // Product catalogs
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
+import { describeFee } from '@/lib/loan-cost';
 import { withLiveRates } from '@/lib/live-loan-offers';
 import {
   motorInsurance, cascoInsurance, homeInsurance, healthInsurance,
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
         return `${i + 1}. ${ins.companyName} — Example annual premium for a typical profile (not a quote): €${ins.annualPremiumMin}–€${ins.annualPremiumMax} (example: €${ins.representativePremium}), Excess: €${ins.excess}, Features: ${ins.features.join(', ')}`;
       } else {
         const loan = p as typeof personalLoans[number];
-        return `${i + 1}. ${loan.bankName} — Rate: ${loan.interestRateMin}%–${loan.interestRateMax}% (rep: ${loan.representativeRate}%), Amount: €${loan.minAmount}–€${loan.maxAmount}, Term: ${loan.minTermMonths}–${loan.maxTermMonths}mo, Fee: €${loan.fee}, Processing: ${loan.processingTime}`;
+        return `${i + 1}. ${loan.bankName} — Rate: ${loan.interestRateMin}%–${loan.interestRateMax}% (rep: ${loan.representativeRate}%), Amount: €${loan.minAmount}–€${loan.maxAmount}, Term: ${loan.minTermMonths}–${loan.maxTermMonths}mo, Fees: ${describeFee(loan) ?? 'not confirmed — check with bank'}, Processing: ${loan.processingTime || 'not stated'}`;
       }
     }).join('\n');
 
@@ -171,7 +172,7 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
             mono:              monogram(loan.bankName),
             badge:             loan.badge ?? null,
             representativeRate: loan.representativeRate,
-            processingTime:    loan.processingTime,
+            processingTime:    loan.processingTime || undefined,
             features:          loan.features.slice(0, 3),
             whyThis:           r.whyThis,
             applyUrl:          loan.applyUrl, // UTM'ler /go gateway'inde eklenir (rule set v1)
