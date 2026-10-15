@@ -3,7 +3,8 @@
 import { CheckCircle, Clock, ExternalLink, BarChart2, X, MessageCircle } from "lucide-react";
 import { LoanOffer } from "@/data/loans";
 import BankLogo from "@/components/ui/BankLogo";
-import { calculateMonthlyPayment, formatCurrency, calculateAPR } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { describeFee, loanCost } from "@/lib/loan-cost";
 import { buildGoLink } from "@/lib/affiliate";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useCompare } from "@/contexts/CompareContext";
@@ -31,9 +32,9 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
   const clampedAmount = Math.min(Math.max(amount, offer.minAmount), offer.maxAmount);
   const clampedTerm = Math.min(Math.max(termMonths, offer.minTermMonths), offer.maxTermMonths);
 
-  const monthly = calculateMonthlyPayment(clampedAmount, offer.representativeRate, clampedTerm);
-  const apr = calculateAPR(clampedAmount, offer.representativeRate, offer.fee, clampedTerm);
-  const totalCost = monthly * clampedTerm;
+  // Aylik ödeme hizmet ücretini, APR ve toplam tek seferlik ücreti içerir (lib/loan-cost)
+  const { monthly, apr, total: totalCost } = loanCost(offer, clampedAmount, clampedTerm);
+  const fee = describeFee(offer);
 
   const isEligible = amount >= offer.minAmount && amount <= offer.maxAmount &&
     termMonths >= offer.minTermMonths && termMonths <= offer.maxTermMonths;
@@ -53,10 +54,12 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
             <p className="font-bold text-gray-900">{offer.bankName}</p>
             {/* Editoryal rozetler ("Best Rate", "Most Popular") kaldirildi: siralama zaten
                 orana gore, populerlik verisi yok — kanitsiz ustunluk iddiasi (UCPD). */}
-            <div className="flex items-center gap-1 mt-1">
-              <Clock size={11} className="text-gray-400" />
-              <span className="text-xs text-gray-400">{offer.processingTime}</span>
-            </div>
+            {offer.processingTime && (
+              <div className="flex items-center gap-1 mt-1">
+                <Clock size={11} className="text-gray-400" />
+                <span className="text-xs text-gray-400">{offer.processingTime}</span>
+              </div>
+            )}
             <RateFreshness
               checkedAt={offer.isLiveRate ? offer.rateCheckedAt : null}
               sourceUrl={offer.rateSourceUrl}
@@ -133,8 +136,8 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
                     { label: "Monthly Payment", value: formatCurrency(monthly) },
                     { label: "APR", value: `${apr}%` },
                     { label: "Total Cost", value: formatCurrency(totalCost) },
-                    { label: "Processing Time", value: offer.processingTime },
-                    { label: "Setup Fee", value: offer.fee === 0 ? "None" : formatCurrency(offer.fee) },
+                    { label: "Processing Time", value: offer.processingTime || "Not stated" },
+                    { label: "Fees", value: fee ?? "Check with bank" },
                     { label: "Min Amount", value: formatCurrency(offer.minAmount) },
                     { label: "Max Amount", value: formatCurrency(offer.maxAmount) },
                   ],
@@ -164,7 +167,7 @@ export default function LoanOfferCard({ offer, amount, termMonths }: Props) {
             <MessageCircle size={11} /> Ask AI about this
           </button>
           <p className="text-xs text-center text-gray-400">
-            {offer.fee > 0 ? `Setup fee: ${formatCurrency(offer.fee)}` : t.loans.noSetupFee}
+            {fee === null ? "Fees: check with bank" : fee === "None" ? t.loans.noSetupFee : `Fees: ${fee}`}
           </p>
         </div>
       </div>

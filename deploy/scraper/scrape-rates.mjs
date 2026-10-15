@@ -28,6 +28,9 @@ import {
   extractIsFixedRates,
   parseDaysCsv,
   depositParseOk,
+  failureSnippet,
+  findPdfLink,
+  pdfLinks,
   RATE_PATTERNS,
   MARGIN_PATTERN,
   APRC_PATTERNS,
@@ -195,6 +198,21 @@ async function insertRow(url, key, row) {
   }
 }
 
+/**
+ * Hata (HTTP, timeout, PDF linki yok) da bir satır bırakır: eskiden yalnız konsola
+ * yazılıyordu, SSH'sız oturum Landsbankinn'in iki gün boyunca neden hiç satır
+ * yazmadığını göremedi (2026-10-07/08). parse_ok=false → canlı orana etkisi yok,
+ * /admin "Rate Feed Health" ve Supabase sorgusu nedeni görür.
+ */
+async function recordFailure(url, key, row, err) {
+  const msg = err instanceof Error ? err.message : String(err);
+  try {
+    await insertRow(url, key, { rate_min: null, aprc: null, parse_ok: false, ...row, raw_snippet: `[error] ${msg}`.slice(0, 1500) });
+  } catch (e) {
+    console.error('[scraper] could not record failure:', e instanceof Error ? e.message : e);
+  }
+}
+
 async function insertDepositRow(url, key, row) {
   const res = await fetch(`${url}/rest/v1/scraped_deposit_rates`, {
     method: 'POST',
@@ -309,7 +327,7 @@ async function scrapeSeMortgages(browser, url, key, dryRun) {
           rate_min:     r?.min ?? null,
           aprc:         null,
           source_url:   bank.url,
-          raw_snippet:  r?.snippet ?? text.slice(0, 300),
+          raw_snippet:  r?.snippet ?? failureSnippet(text),
           parse_ok:     r !== null,
         });
       }
@@ -322,6 +340,9 @@ async function scrapeSeMortgages(browser, url, key, dryRun) {
       }
     } catch (err) {
       console.error(`[scraper] ERROR ${bank.bankId}/mortgage:`, err instanceof Error ? err.message : err);
+      if (!dryRun) {
+        await recordFailure(url, key, { bank_id: bank.bankId, product_type: 'mortgage', source_url: bank.url }, err);
+      }
     }
     await new Promise((r) => setTimeout(r, 3000));
   }
@@ -347,7 +368,7 @@ const IS_MORTGAGE_BANKS = [
   {
     bankId: 'landsbankinn-is',
     pageUrl: 'https://www.landsbankinn.is/en/interest-rates-and-fees',
-    pdfPattern: /https?:\/\/[^"' ]*vextir\/vaxtaakvordun-[0-9]{6}-enska\.pdf/i,
+    pdfPattern: /\/vaxtaakvordun-[0-9]{6}-enska\.pdf$/i,
     // "1. Housing mortgages" bolumu -> "Loan to value up to 55%" satiri:
     // 1/3/5 yil sabit oranlar; en dusugu (5 yil) "from" olarak kullanilir.
     sectionStart: /1\.\s*Housing mortgages/i,
@@ -358,7 +379,7 @@ const IS_MORTGAGE_BANKS = [
   {
     bankId: 'islandsbanki-is',
     pageUrl: 'https://www.islandsbanki.is/en/article/interest-table',
-    pdfPattern: /https?:\/\/[^"' ]*islandsbanki_interest_rate_table_external_web\.pdf/i,
+    pdfPattern: /\/islandsbanki_interest_rate_table_external_web\.pdf$/i,
     sectionStart: /Non-indexed mortgage\s+3 Year Fixed/i,
     // DIKKAT: /Indexed mortgage/ basligi "Non-indexed mortgage" icinde de eslesir
     // ve bolumu aninda keser — satir basina sabitlenmeli (2026-09-22 hatasi).
@@ -382,10 +403,12 @@ async function scrapeIsMortgages(url, key, dryRun) {
     try {
       console.log(`[scraper] ${cfg.bankId}/mortgage → ${cfg.pageUrl}`);
       const html = await (await fetch(cfg.pageUrl, { headers: { 'user-agent': UA } })).text();
-      const m = html.match(cfg.pdfPattern);
-      if (!m) throw new Error('PDF linki sayfada bulunamadi (yapi degismis olabilir)');
-
-      const pdfUrl = m[0];
+      // Link mutlak, göreli ya da JSON içinde kaçışlı olabilir; dosya adına göre eşlenir
+      const pdfUrl = findPdfLink(html, cfg.pageUrl, cfg.pdfPattern);
+      if (!pdfUrl) {
+        const seen = pdfLinks(html, cfg.pageUrl).map((u) => u.split('/').pop()).slice(0, 8);
+        throw new Error(`PDF linki sayfada bulunamadi — sayfadaki PDF'ler: ${seen.join(', ') || 'yok (JS ile yukleniyor olabilir)'} · HTML ${html.length} bayt`);
+      }
       const buf = Buffer.from(await (await fetch(pdfUrl, { headers: { 'user-agent': UA } })).arrayBuffer());
       const tmp = path.join(os.tmpdir(), `nr-${cfg.bankId}.pdf`);
       fs.writeFileSync(tmp, buf);
@@ -421,6 +444,9 @@ async function scrapeIsMortgages(url, key, dryRun) {
       }
     } catch (err) {
       console.error(`[scraper] ERROR ${cfg.bankId}/mortgage:`, err instanceof Error ? err.message : err);
+      if (!dryRun) {
+        await recordFailure(url, key, { bank_id: cfg.bankId, product_type: 'mortgage', source_url: cfg.pageUrl }, err);
+      }
     }
     await new Promise((r) => setTimeout(r, 3000));
   }
@@ -466,7 +492,8 @@ async function main() {
 
         // Marj işareti: override katmanının /euribor/i tespiti için snippet'e eklenir.
         // Ürün yapısı (marj + Euribor) sayfa incelemesiyle manuel doğrulandı.
-        let snippet = rate?.snippet ?? text.slice(0, 300);
+        // Okunamadıysa ilk 300 karakter (çerez bandı) değil, sayfadaki oran cümleleri
+        let snippet = rate?.snippet ?? failureSnippet(text);
         if (parseOk && target.marginPlusEuribor && !/euribor/i.test(snippet)) {
           snippet += ' [margin + 6-month Euribor — page-flagged]';
         }
@@ -492,6 +519,9 @@ async function main() {
       } catch (err) {
         failures++;
         console.error(`[scraper] ERROR ${bank.bankId}/${target.productType}:`, err instanceof Error ? err.message : err);
+        if (!dryRun) {
+          await recordFailure(url, key, { bank_id: bank.bankId, product_type: target.productType, source_url: target.url }, err);
+        }
       }
       await new Promise((r) => setTimeout(r, 3000));
     }

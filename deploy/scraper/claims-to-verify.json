@@ -42,7 +42,7 @@
     "id": "banknorwegian-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "banknorwegian-personal",
@@ -57,46 +57,10 @@
     "productId": "bigbank-car",
     "institution": "Bigbank",
     "sourceUrl": "https://www.bigbank.ee/autolaen/",
-    "id": "bigbank-car:feature:instant-online-decision",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Instant online decision"
-  },
-  {
-    "productId": "bigbank-car",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee/autolaen/",
     "id": "bigbank-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
-  },
-  {
-    "productId": "bigbank-car",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee/autolaen/",
-    "id": "bigbank-car:processingTime",
-    "kind": "speed",
-    "field": "processingTime",
-    "text": "Same day"
-  },
-  {
-    "productId": "bigbank-ee-a1",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee",
-    "id": "bigbank-ee-a1:feature:fast-approval",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Fast approval"
-  },
-  {
-    "productId": "bigbank-ee-p1",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee",
-    "id": "bigbank-ee-p1:feature:instant-decision",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Instant decision"
+    "text": "Fee not confirmed"
   },
   {
     "productId": "bigbank-personal-lv",
@@ -114,7 +78,7 @@
     "id": "bigbank-personal-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "bigbank-personal-lv",
@@ -129,28 +93,10 @@
     "productId": "bigbank-personal",
     "institution": "Bigbank",
     "sourceUrl": "https://www.bigbank.ee/",
-    "id": "bigbank-personal:feature:quick-approval",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Quick approval"
-  },
-  {
-    "productId": "bigbank-personal",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee/",
     "id": "bigbank-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
-  },
-  {
-    "productId": "bigbank-personal",
-    "institution": "Bigbank",
-    "sourceUrl": "https://www.bigbank.ee/",
-    "id": "bigbank-personal:processingTime",
-    "kind": "speed",
-    "field": "processingTime",
-    "text": "Instant"
+    "text": "Fee not confirmed"
   },
   {
     "productId": "bluor-lv-p1",
@@ -177,7 +123,7 @@
     "id": "citadele-car-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "citadele-car-lv",
@@ -213,7 +159,7 @@
     "id": "citadele-mortgage-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €175"
+    "text": "Fees €175"
   },
   {
     "productId": "citadele-mortgage-lv",
@@ -240,7 +186,7 @@
     "id": "citadele-personal-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "citadele-personal-lv",
@@ -258,7 +204,7 @@
     "id": "coop-mortgage:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €200"
+    "text": "Fees €100"
   },
   {
     "productId": "coop-mortgage",
@@ -276,7 +222,7 @@
     "id": "coop-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "Fees 2% (min €35) + €1.50/mo"
   },
   {
     "productId": "coop-personal",
@@ -303,7 +249,7 @@
     "id": "credit24-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "credit24-personal",
@@ -357,7 +303,7 @@
     "id": "ferratum-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "Fee not confirmed"
   },
   {
     "productId": "ferratum-personal",
@@ -381,10 +327,10 @@
     "productId": "inbank-car",
     "institution": "Inbank",
     "sourceUrl": "https://www.inbank.ee/en/loan/car-loan",
-    "id": "inbank-car:feature:fast-approval",
+    "id": "inbank-car:feature:instant-credit-decision",
     "kind": "speed",
     "field": "feature",
-    "text": "Fast approval"
+    "text": "Instant credit decision"
   },
   {
     "productId": "inbank-car",
@@ -393,7 +339,7 @@
     "id": "inbank-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "Fees 2% (min €95) + €2.90/mo"
   },
   {
     "productId": "inbank-car",
@@ -414,31 +360,31 @@
     "text": "Fast approval"
   },
   {
-    "productId": "inbank-mortgage",
+    "productId": "inbank-home-small-loan",
     "institution": "Inbank",
     "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
-    "id": "inbank-mortgage:feature:pre-approval-in-24h",
+    "id": "inbank-home-small-loan:feature:instant-credit-decision",
     "kind": "speed",
     "field": "feature",
-    "text": "Pre-approval in 24h"
+    "text": "Instant credit decision"
   },
   {
-    "productId": "inbank-mortgage",
+    "productId": "inbank-home-small-loan",
     "institution": "Inbank",
     "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
-    "id": "inbank-mortgage:fee",
+    "id": "inbank-home-small-loan:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €150"
+    "text": "Fees 1.5% (min €75) + €3.90/mo"
   },
   {
-    "productId": "inbank-mortgage",
+    "productId": "inbank-home-small-loan",
     "institution": "Inbank",
     "sourceUrl": "https://www.inbank.ee/en/loan/small-home-loan",
-    "id": "inbank-mortgage:processingTime",
+    "id": "inbank-home-small-loan:processingTime",
     "kind": "speed",
     "field": "processingTime",
-    "text": "5-10 days"
+    "text": "1 working day"
   },
   {
     "productId": "inbank-personal-lt",
@@ -456,7 +402,7 @@
     "id": "inbank-personal-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "inbank-personal-lt",
@@ -483,7 +429,7 @@
     "id": "inbank-personal-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "inbank-personal-lv",
@@ -510,7 +456,7 @@
     "id": "inbank-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "Fees 2% (min €50) + €3.90/mo"
   },
   {
     "productId": "inbank-personal",
@@ -519,7 +465,7 @@
     "id": "inbank-personal:processingTime",
     "kind": "speed",
     "field": "processingTime",
-    "text": "Instant"
+    "text": "1 working day"
   },
   {
     "productId": "jyske-dk-p1",
@@ -534,10 +480,10 @@
     "productId": "lhv-car",
     "institution": "LHV Pank",
     "sourceUrl": "https://www.lhv.ee/en/car-loan",
-    "id": "lhv-car:feature:quick-approval",
+    "id": "lhv-car:feature:2-minute-application",
     "kind": "speed",
     "field": "feature",
-    "text": "Quick approval"
+    "text": "2-minute application"
   },
   {
     "productId": "lhv-car",
@@ -546,7 +492,7 @@
     "id": "lhv-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €100"
+    "text": "Fees 2% (min €29.90) + €3.99/mo"
   },
   {
     "productId": "lhv-car",
@@ -558,31 +504,13 @@
     "text": "1-2 days"
   },
   {
-    "productId": "lhv-ee-b1",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee",
-    "id": "lhv-ee-b1:feature:fast-growing-companies-focus",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Fast-growing companies focus"
-  },
-  {
-    "productId": "lhv-mortgage",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee/en/home-loan",
-    "id": "lhv-mortgage:feature:free-property-valuation",
-    "kind": "fee",
-    "field": "feature",
-    "text": "Free property valuation"
-  },
-  {
     "productId": "lhv-mortgage",
     "institution": "LHV Pank",
     "sourceUrl": "https://www.lhv.ee/en/home-loan",
     "id": "lhv-mortgage:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €300"
+    "text": "Fees €300"
   },
   {
     "productId": "lhv-mortgage",
@@ -597,10 +525,19 @@
     "productId": "lhv-personal",
     "institution": "LHV Pank",
     "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
-    "id": "lhv-personal:feature:instant-decision",
+    "id": "lhv-personal:feature:2-minute-application",
     "kind": "speed",
     "field": "feature",
-    "text": "Instant decision"
+    "text": "2-minute application"
+  },
+  {
+    "productId": "lhv-personal",
+    "institution": "LHV Pank",
+    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
+    "id": "lhv-personal:feature:free-early-repayment",
+    "kind": "fee",
+    "field": "feature",
+    "text": "Free early repayment"
   },
   {
     "productId": "lhv-personal",
@@ -609,7 +546,7 @@
     "id": "lhv-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "Fees 2% (min €29.90) + €3.99/mo"
   },
   {
     "productId": "lhv-personal",
@@ -627,7 +564,7 @@
     "id": "luminor-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "luminor-car",
@@ -654,7 +591,7 @@
     "id": "luminor-mortgage-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €150"
+    "text": "Fees €150"
   },
   {
     "productId": "luminor-mortgage-lt",
@@ -672,7 +609,7 @@
     "id": "luminor-mortgage-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €150"
+    "text": "Fees €150"
   },
   {
     "productId": "luminor-mortgage-lv",
@@ -690,7 +627,7 @@
     "id": "luminor-mortgage:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €150"
+    "text": "Fees €150"
   },
   {
     "productId": "luminor-mortgage",
@@ -708,7 +645,7 @@
     "id": "luminor-personal-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "luminor-personal-lt",
@@ -726,7 +663,7 @@
     "id": "luminor-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "luminor-personal",
@@ -780,7 +717,7 @@
     "id": "resurs-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No one-time fee"
+    "text": "No fees"
   },
   {
     "productId": "resurs-personal",
@@ -816,7 +753,7 @@
     "id": "seb-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €50"
+    "text": "Fees 1.5% (min €75)"
   },
   {
     "productId": "seb-car",
@@ -834,7 +771,7 @@
     "id": "seb-mortgage-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €200"
+    "text": "Fees €200"
   },
   {
     "productId": "seb-mortgage-lv",
@@ -852,7 +789,7 @@
     "id": "seb-mortgage:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €200"
+    "text": "Fees €200"
   },
   {
     "productId": "seb-mortgage",
@@ -870,7 +807,7 @@
     "id": "seb-personal-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €25"
+    "text": "Fees €25"
   },
   {
     "productId": "seb-personal-lt",
@@ -897,7 +834,7 @@
     "id": "seb-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €30"
+    "text": "Fees 1.5%"
   },
   {
     "productId": "seb-personal",
@@ -915,7 +852,7 @@
     "id": "siauliu-mortgage-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €150"
+    "text": "Fees €150"
   },
   {
     "productId": "siauliu-mortgage-lt",
@@ -933,7 +870,7 @@
     "id": "siauliu-personal-lt:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €30"
+    "text": "Fees €30"
   },
   {
     "productId": "siauliu-personal-lt",
@@ -951,7 +888,7 @@
     "id": "swedbank-car:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee 1.5%"
+    "text": "Fees 1.5% (min €100)"
   },
   {
     "productId": "swedbank-car",
@@ -961,15 +898,6 @@
     "kind": "speed",
     "field": "processingTime",
     "text": "Same day"
-  },
-  {
-    "productId": "swedbank-ee-p1",
-    "institution": "Swedbank Eesti",
-    "sourceUrl": "https://www.swedbank.ee",
-    "id": "swedbank-ee-p1:feature:same-day-decision",
-    "kind": "speed",
-    "field": "feature",
-    "text": "Same-day decision"
   },
   {
     "productId": "swedbank-lt-p1",
@@ -987,7 +915,7 @@
     "id": "swedbank-mortgage:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €250"
+    "text": "Fees €250"
   },
   {
     "productId": "swedbank-mortgage",
@@ -1005,7 +933,7 @@
     "id": "swedbank-personal-lv:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €40"
+    "text": "Fees €40"
   },
   {
     "productId": "swedbank-personal-lv",
@@ -1023,7 +951,7 @@
     "id": "swedbank-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "One-time fee €50"
+    "text": "Fees €50"
   },
   {
     "productId": "swedbank-personal",

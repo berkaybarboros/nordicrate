@@ -27,7 +27,7 @@
 
 import { chromium } from 'playwright';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { EVIDENCE_TERMS, evidenceSnippets } from './parsers.mjs';
+import { EVIDENCE_TERMS, evidenceSnippets, pickRegisterCategories, registerEntities } from './parsers.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -35,11 +35,12 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const DELAY_MS = 3000; // scrape-rates.mjs ile aynı nezaket aralığı
 const UA = 'NordicRateSourceAudit/1.0 (+https://nordicrate.com/listing-policy)';
 
-// fi.ee "supervised entities" — sayfalı liste. HTML yapısı cloud'dan görülemediği için
-// ayrıştırmıyoruz: ana metni alıp kurum türü kelimelerini içeren satırları rapora döküyoruz.
+// fi.ee "supervised entities": ana sayfa yalnız kategori başlıklarını ve birkaç şubeyi
+// gösteriyor (2026-10-08 raporu: lisanslı Estonya bankalarının hiçbiri gelmedi). Kategori
+// linkleri izlenir, her kategori ayrı sayfalanır; kurum adları metinden tüzel kişilik
+// ekiyle ayıklanır (parsers.mjs registerEntities) — DOM yapısını cloud'dan göremiyoruz.
 const REGISTER_URL = 'https://www.fi.ee/en/supervised-entities';
-const REGISTER_TERMS = ['credit institution', 'krediidiasutus', 'insurance', 'kindlustus', 'branch', 'filiaal'];
-const REGISTER_MAX_PAGES = 200;
+const REGISTER_MAX_PAGES = 30;
 
 function parseArgs(argv) {
   const args = { tld: null, register: true, claims: resolve(HERE, 'claims-to-verify.json'), out: resolve(HERE, `out/source-audit-${new Date().toISOString().slice(0, 10)}.md`) };
@@ -109,34 +110,56 @@ async function auditClaims(page, claims) {
 }
 
 async function auditRegister(page) {
-  const lines = ['## Finantsinspektsioon register (raw lines)', '', `Source: ${REGISTER_URL}`, ''];
-  const seen = new Set();
-  let pages = 0;
-  for (let n = 0; n < REGISTER_MAX_PAGES; n++) {
-    const url = n === 0 ? REGISTER_URL : `${REGISTER_URL}?page=${n}`;
-    let result;
-    try {
-      result = await pageText(page, url);
-    } catch (err) {
-      lines.push(`Stopped at page ${n}: ${String(err).slice(0, 160)}`);
-      break;
-    }
-    if (result.status >= 400) {
-      lines.push(`Stopped at page ${n}: HTTP ${result.status}`);
-      break;
-    }
-    const before = seen.size;
-    for (const raw of result.text.split('\n')) {
-      const line = raw.trim();
-      if (line.length < 4 || line.length > 200 || seen.has(line)) continue;
-      if (REGISTER_TERMS.some((t) => line.toLowerCase().includes(t))) seen.add(line);
-    }
-    pages++;
-    if (seen.size === before && n > 0) break; // yeni satır yok → liste bitti
-    await sleep(1500);
+  const lines = ['## Finantsinspektsioon register', '', `Source: ${REGISTER_URL}`, ''];
+  const excerpt = (text) => ['```', text.replace(/\n{3,}/g, '\n\n').slice(0, 1500), '```', ''];
+  let home;
+  try {
+    home = await pageText(page, REGISTER_URL);
+  } catch (err) {
+    lines.push(`Could not open the register: ${String(err).split('\n')[0].slice(0, 160)}`, '');
+    return { markdown: lines.join('\n'), entries: 0 };
   }
-  lines.push(`Pages read: ${pages}`, '', ...[...seen].map((l) => `- ${l}`), '');
-  return { markdown: lines.join('\n'), entries: seen.size };
+  const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ text: a.textContent ?? '', href: a.href })));
+  const categories = pickRegisterCategories(links);
+  if (categories.length === 0) {
+    // Yapı değişti: bir sonraki düzeltme için sayfanın kendisini rapora koy
+    lines.push(`No category links found (HTTP ${home.status}). Page text:`, '', ...excerpt(home.text));
+    return { markdown: lines.join('\n'), entries: 0 };
+  }
+
+  let entries = 0;
+  for (const cat of categories) {
+    const names = [];
+    let first = '';
+    let pages = 0;
+    let stop = '';
+    for (let n = 0; n < REGISTER_MAX_PAGES; n++) {
+      const url = new URL(cat.href);
+      if (n > 0) url.searchParams.set('page', String(n));
+      let result;
+      try {
+        result = await pageText(page, url.toString());
+      } catch (err) {
+        stop = String(err).split('\n')[0].slice(0, 160);
+        break;
+      }
+      if (result.status >= 400) {
+        stop = `HTTP ${result.status}`;
+        break;
+      }
+      if (n === 0) first = result.text;
+      pages++;
+      const before = names.length;
+      for (const name of registerEntities(result.text)) if (!names.includes(name)) names.push(name);
+      if (names.length === before) break; // yeni ad yok → son sayfa (ya da sayfalama yok)
+      await sleep(1500);
+    }
+    entries += names.length;
+    lines.push(`### ${cat.label} (${names.length})`, '', `${cat.href} · pages read: ${pages}${stop ? ` · stopped: ${stop}` : ''}`, '');
+    if (names.length) lines.push(...names.map((nm) => `- ${nm}`), '');
+    else lines.push('No names recognised — page text:', '', ...excerpt(first));
+  }
+  return { markdown: lines.join('\n'), entries };
 }
 
 export function loadClaims(file, tld) {

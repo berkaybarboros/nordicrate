@@ -120,3 +120,73 @@ describe('Icelandic rate tables (PDF text)', () => {
     expect(extractIsFixedRates('Some other document', config)).toBeNull();
   });
 });
+
+// ─── Failure evidence and register crawl (no SSH: this is all we see) ─────────
+
+import { failureSnippet, findPdfLink, pdfLinks, pickRegisterCategories, registerEntities } from '../deploy/scraper/parsers.mjs';
+
+describe('failureSnippet', () => {
+  it('keeps the rate sentences, not the cookie banner that opens the page', () => {
+    const page = `Kasutame küpsiseid. ${'Nõustu kõigiga. '.repeat(30)} Kodulaen Intress alates 1,9% + 6 kuu Euribor. Lepingutasu 0,5%.`;
+    const s = failureSnippet(page);
+    expect(s.startsWith('[parse failed]')).toBe(true);
+    expect(s).toContain('1,9%');
+    expect(s.length).toBeLessThanOrEqual(1500);
+  });
+
+  it('falls back to the page start when nothing rate-like is there', () => {
+    expect(failureSnippet('Access denied')).toBe('[parse failed] Access denied');
+  });
+});
+
+describe('findPdfLink', () => {
+  const page = 'https://www.landsbankinn.is/en/interest-rates-and-fees';
+  const file = /\/vaxtaakvordun-[0-9]{6}-enska\.pdf$/i;
+
+  it('resolves a relative href against the page', () => {
+    expect(findPdfLink('<a href="/vextir/vaxtaakvordun-260901-enska.pdf">EN</a>', page, file)).toBe(
+      'https://www.landsbankinn.is/vextir/vaxtaakvordun-260901-enska.pdf',
+    );
+  });
+
+  it('finds a link escaped inside embedded JSON', () => {
+    const html = '{"file":{"url":"https:\\/\\/cdn.landsbankinn.is\\/media\\/vaxtaakvordun-261001-enska.pdf"}}';
+    expect(findPdfLink(html, page, file)).toBe('https://cdn.landsbankinn.is/media/vaxtaakvordun-261001-enska.pdf');
+  });
+
+  it('ignores other PDFs and reports what it saw', () => {
+    const html = '<a href="/gjaldskra.pdf">fees</a><a href="/vaxtaakvordun-260901-islenska.pdf">IS</a>';
+    expect(findPdfLink(html, page, file)).toBeNull();
+    expect(pdfLinks(html, page).map((u) => u.split('/').pop())).toEqual(['gjaldskra.pdf', 'vaxtaakvordun-260901-islenska.pdf']);
+  });
+});
+
+describe('fi.ee register', () => {
+  it('follows the category links, not the headers on the landing page', () => {
+    const links = [
+      { text: 'Insurance', href: 'https://www.fi.ee/en/supervised-entities/insurance' },
+      { text: ' Licensed credit institutions in Estonia ', href: 'https://www.fi.ee/en/x/credit-institutions' },
+      { text: 'Insurance companies', href: 'https://www.fi.ee/en/x/insurance-companies' },
+      { text: 'Insurance intermediaries', href: 'https://www.fi.ee/en/x/intermediaries' },
+    ];
+    expect(pickRegisterCategories(links).map((c) => c.label)).toEqual([
+      'Licensed credit institutions in Estonia',
+      'Insurance companies',
+    ]);
+  });
+
+  // Lines as the 2026-10-08 run captured them, plus the names it missed
+  it('reads institution names by legal form, skipping headers and prose', () => {
+    const text = [
+      'Licensed credit institutions in Estonia',
+      'AS LHV Pank',
+      'Bigbank AS',
+      'AS Citadele banka Eesti filiaal',
+      'Branches of foreign E-money institutions',
+      'ERGO Insurance SE',
+      'We use cookies as described in our policy',
+      'info@fi.ee',
+    ].join('\n');
+    expect(registerEntities(text)).toEqual(['AS LHV Pank', 'Bigbank AS', 'AS Citadele banka Eesti filiaal', 'ERGO Insurance SE']);
+  });
+});

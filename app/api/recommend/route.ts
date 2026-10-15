@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
         return `#${i + 1} ${ins.companyName}: example annual premium €${ins.representativePremium} (typical profile, not a quote), excess €${ins.excess}, features: ${ins.features.slice(0, 3).join(', ')}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
       }
       const loan = item.product as typeof personalLoans[number];
-      return `#${i + 1} ${loan.bankName}: rate ${loan.representativeRate}%, processing ${loan.processingTime}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
+      return `#${i + 1} ${loan.bankName}: rate ${loan.representativeRate}%, processing ${loan.processingTime || 'not stated'}. Popularity score: ${item.totalScore.toFixed(1)}. ${item.reasons.join('. ')}`;
     }).join('\n');
 
     const systemPrompt = `You are a real-time financial advisor for NordicRate.
@@ -281,7 +281,7 @@ Write 1-2 sentences for each product explaining WHY it's recommended for this sp
         logo:               loan.bankLogo,
         badge:              loan.badge ?? null,
         representativeRate: loan.representativeRate,
-        processingTime:     loan.processingTime,
+        processingTime:     loan.processingTime || undefined,
         features:           loan.features.slice(0, 3),
         applyUrl:           loan.applyUrl,
         score:              item.totalScore,

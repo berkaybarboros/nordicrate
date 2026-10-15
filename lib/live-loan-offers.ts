@@ -49,7 +49,8 @@ export async function withLiveRates(offers: LoanOffer[]): Promise<LiveLoanOffer[
   }
 
   return offers.map((offer) => {
-    const productType = TYPE_MAP[offer.type];
+    // liveRateType: null → teklifin kendi canlı feed'i yok (bkz. inbank-home-small-loan)
+    const productType = offer.liveRateType !== undefined ? offer.liveRateType : TYPE_MAP[offer.type];
     const o = productType ? live.get(`${offer.bankId}:${productType}`) : undefined;
 
     // ÜLKE KORUMASI (2026-09-13, üretimde yakalandı): data/loans.ts'te Letonya ve
