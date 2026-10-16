@@ -94,13 +94,14 @@ const BANKS = [
   {
     // Bigbank EE: robots.txt açık; EN site kapandı, sayfalar Estonca —
     // pattern'ler 'intress/alates' desteğiyle zaten uyumlu (2026-07-19).
-    // kodulaen scrape edilir ama katalogda ürünü YOK (max limit yayınlanmıyor,
-    // uydurmayız) — ürün doğrulanmış limitle eklendiği gün otomatik canlanır.
+    // kodulaen 2026-10-16'da çıkarıldı: sayfa artık marj yayınlamıyor ("Intressimäär
+    // koosneb individuaalsest marginaalist ja 3, 6 või 12 kuu Euriborist"; lepingutasu
+    // 0,4%, min 150 €) — okunacak oran yok, her gün parse_ok=false yazıyordu. Sayfa
+    // yeniden "marginaal alates X%" yayınlarsa hedef geri eklenir.
     bankId: 'bigbank',
     targets: [
       { productType: 'personal', url: 'https://www.bigbank.ee/vaikelaen/', band: BAND_RATE, waitMs: 5000 },
       { productType: 'auto',     url: 'https://www.bigbank.ee/autolaen/', band: BAND_RATE, waitMs: 5000 },
-      { productType: 'mortgage', url: 'https://www.bigbank.ee/kodulaen/', marginPlusEuribor: true, band: BAND_MARGIN, waitMs: 5000 },
     ],
   },
   {
@@ -368,7 +369,9 @@ const IS_MORTGAGE_BANKS = [
   {
     bankId: 'landsbankinn-is',
     pageUrl: 'https://www.landsbankinn.is/en/interest-rates-and-fees',
-    pdfPattern: /\/vaxtaakvordun-[0-9]{6}-enska\.pdf$/i,
+    // 2026-10-16: vaxtaakvordun-YYMMDD-enska.pdf sayfadan kalktı; yerine sabit adlı
+    // landsbankinn-interest-rates.pdf geldi (scraped_rates hata satırındaki PDF listesi)
+    pdfPattern: /\/(?:vaxtaakvordun-[0-9]{6}-enska|landsbankinn-interest-rates)\.pdf$/i,
     // "1. Housing mortgages" bolumu -> "Loan to value up to 55%" satiri:
     // 1/3/5 yil sabit oranlar; en dusugu (5 yil) "from" olarak kullanilir.
     sectionStart: /1\.\s*Housing mortgages/i,
@@ -421,7 +424,8 @@ async function scrapeIsMortgages(url, key, dryRun) {
         value = r.min;
         snippet = `${r.snippet} — ${pdfUrl.split('/').pop()}`;
       } else {
-        snippet = `parse failed — ${pdfUrl.split('/').pop()}`;
+        // PDF düzeni değiştiyse ertesi gün parser'ı yazabilmek için tablonun kendisi
+        snippet = `${failureSnippet(text)} — ${pdfUrl.split('/').pop()}`;
       }
 
       if (!dryRun) {
@@ -431,7 +435,7 @@ async function scrapeIsMortgages(url, key, dryRun) {
           rate_min: value,
           aprc: null,
           source_url: cfg.pageUrl,
-          raw_snippet: snippet.slice(0, 500),
+          raw_snippet: snippet.slice(0, 1500),
           parse_ok: value !== null,
         });
       }

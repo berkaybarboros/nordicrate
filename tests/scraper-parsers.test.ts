@@ -123,7 +123,15 @@ describe('Icelandic rate tables (PDF text)', () => {
 
 // ─── Failure evidence and register crawl (no SSH: this is all we see) ─────────
 
-import { failureSnippet, findPdfLink, pdfLinks, pickRegisterCategories, registerEntities } from '../deploy/scraper/parsers.mjs';
+import {
+  failureSnippet,
+  findPdfLink,
+  pdfLinks,
+  pickRegisterCategories,
+  registerCandidateLinks,
+  registerEntities,
+  REGISTER_CATEGORIES,
+} from '../deploy/scraper/parsers.mjs';
 
 describe('failureSnippet', () => {
   it('keeps the rate sentences, not the cookie banner that opens the page', () => {
@@ -172,6 +180,31 @@ describe('fi.ee register', () => {
     expect(pickRegisterCategories(links).map((c) => c.label)).toEqual([
       'Licensed credit institutions in Estonia',
       'Insurance companies',
+    ]);
+  });
+
+  // 2026-10-16: insurers came through, credit institutions did not — the heading is not a
+  // link on the landing page, so the crawl looks one level down, on "Credit institutions"
+  it('finds a category on its parent page when the landing page only shows it as text', () => {
+    const credit = REGISTER_CATEGORIES.filter((c) => c.key.startsWith('credit'));
+    const parentPage = [
+      { text: 'Licensed credit institutions in Estonia', href: 'https://www.fi.ee/en/x/credit/licensed' },
+      { text: 'Affiliated branches of foreign credit institutions', href: 'https://www.fi.ee/en/x/credit/branches' },
+    ];
+    expect(pickRegisterCategories(parentPage, credit).map((c) => c.key)).toEqual(['credit', 'credit-branches']);
+    expect(credit.every((c) => c.via.test('Credit institutions'))).toBe(true);
+  });
+
+  it('reports candidate links when a category is still missing', () => {
+    const links = [
+      { text: 'Home', href: '/' },
+      { text: ' Credit  institutions ', href: '/a' },
+      { text: 'Credit institutions', href: '/a' },
+      { text: 'Krediidiasutused', href: '/b' },
+    ];
+    expect(registerCandidateLinks(links)).toEqual([
+      { text: 'Credit institutions', href: '/a' },
+      { text: 'Krediidiasutused', href: '/b' },
     ]);
   });
 

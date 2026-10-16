@@ -373,21 +373,36 @@ export function pdfLinks(html, pageUrl) {
 
 /* ─── fi.ee sicili (source-audit.mjs) ──────────────────────────────────────── */
 
-// Ana sayfadaki kategori linkleri; sıra rapordaki sıradır. Yalnız kredi kuruluşları ve
-// sigortacılar — aracılar/acenteler karşılaştırma kataloğunun konusu değil.
+// İzlenecek kategoriler; sıra rapordaki sıradır. Yalnız kredi kuruluşları ve sigortacılar —
+// aracılar/acenteler karşılaştırma kataloğunun konusu değil. `via`: kategori ana sayfada
+// link değilse önce açılacak üst sayfa (2026-10-16: "Licensed credit institutions in
+// Estonia" ana sayfada başlık olarak görünüyor ama link değil; sigortacılar ise doğrudan
+// linkli).
 export const REGISTER_CATEGORIES = [
-  /^licensed credit institutions in estonia$/i,
-  /^affiliated branches of foreign credit institutions$/i,
-  /^insurance companies$/i,
-  /^(?:affiliated )?branches of foreign insurance (?:companies|undertakings|insurers)$/i,
+  { key: 'credit', label: /^licensed credit institutions(?: in estonia)?$/i, via: /^credit institutions$/i },
+  { key: 'credit-branches', label: /^(?:affiliated )?branches of foreign credit institutions$/i, via: /^credit institutions$/i },
+  { key: 'insurance', label: /^insurance companies$/i, via: /^insurance$/i },
+  { key: 'insurance-branches', label: /^(?:affiliated )?branches of foreign insurance (?:companies|undertakings|insurers)$/i, via: /^insurance$/i },
 ];
 
-/** {text, href}[] → sicilde izlenecek kategori sayfaları (href'e göre tekil) */
-export function pickRegisterCategories(links) {
+/** {text, href}[] → bu sayfada linki bulunan kategoriler (href'e göre tekil) */
+export function pickRegisterCategories(links, wanted = REGISTER_CATEGORIES) {
   const out = [];
-  for (const re of REGISTER_CATEGORIES) {
-    const hit = links.find((l) => re.test(l.text.trim()) && !out.some((o) => o.href === l.href));
-    if (hit) out.push({ label: hit.text.trim(), href: hit.href });
+  for (const cat of wanted) {
+    const hit = links.find((l) => cat.label.test(l.text.trim()) && !out.some((o) => o.href === l.href));
+    if (hit) out.push({ key: cat.key, label: hit.text.trim(), href: hit.href });
+  }
+  return out;
+}
+
+/** Bulunamayan kategoriler için rapora konacak aday linkler */
+export function registerCandidateLinks(links, max = 30) {
+  const out = [];
+  for (const l of links) {
+    const text = l.text.trim().replace(/\s+/g, ' ');
+    if (!text || text.length > 120 || !/credit|insurance|krediidi|kindlust/i.test(text)) continue;
+    if (!out.some((o) => o.text === text)) out.push({ text, href: l.href });
+    if (out.length >= max) break;
   }
   return out;
 }

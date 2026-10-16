@@ -89,8 +89,10 @@ git push origin main
 5. Test: `/api/cron/*` auth, `calculateEligibility()`
 
 ### Bilinen Issues 🔴
-- **Bigbank EE konut kredisi**: 2026-10-06'dan beri parse edilemiyor (sayfa yapısı değişti) →
-  48 sa sonra otomatik "indicative"e düştü; parser güncellemesi sayfayı görmeyi gerektiriyor
+- **Bigbank EE konut kredisi**: sayfa 2026-10 başından beri marj yayınlamıyor (marj bireysel) →
+  scraper hedefi kaldırıldı, oran "indicative" kalır
+- **Landsbankinn IS**: faiz PDF'inin adı değişti (2026-10-07'den beri veri yok) → yeni ad eklendi,
+  PDF düzeni farklıysa ertesi günün `parse_ok=false` satırı tabloyu gösterir
 - Cloud ortamının ağ politikası `.ee` alan adlarını ve fi.ee'yi engelliyor (allowlist uygulanmadı)
 - 116 hız/ücret iddiası ("Instant decision", "No fees"…) banka sayfasında doğrulanmadı
 - "Editor's pick" bandı 13 üründe — yazılı editoryal ölçütü yok (karar bekliyor)
