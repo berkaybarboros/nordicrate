@@ -5,6 +5,7 @@ import { useFetchJson } from "@/lib/use-fetch-json";
 import { ArrowUpDown } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import InsuranceDisclaimer from "@/components/insurance/InsuranceDisclaimer";
+import UnpricedInsurers from "@/components/insurance/UnpricedInsurers";
 import AIProductSection from "@/components/AIProductSection";
 import AIPageBanner from "@/components/AIPageBanner";
 import SmartRateWidget from "@/components/SmartRateWidget";
@@ -135,6 +136,7 @@ export default function CascoContent() {
 
             {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
 
+            <UnpricedInsurers type="casco" />
             <InsuranceDisclaimer factors="vehicle value and age, and your driving history" />
           </div>
         </div>
