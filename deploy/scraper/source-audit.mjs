@@ -27,7 +27,14 @@
 
 import { chromium } from 'playwright';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { EVIDENCE_TERMS, evidenceSnippets, pickRegisterCategories, registerEntities } from './parsers.mjs';
+import {
+  EVIDENCE_TERMS,
+  evidenceSnippets,
+  pickRegisterCategories,
+  registerCandidateLinks,
+  registerEntities,
+  REGISTER_CATEGORIES,
+} from './parsers.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -119,17 +126,45 @@ async function auditRegister(page) {
     lines.push(`Could not open the register: ${String(err).split('\n')[0].slice(0, 160)}`, '');
     return { markdown: lines.join('\n'), entries: 0 };
   }
-  const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ text: a.textContent ?? '', href: a.href })));
-  const categories = pickRegisterCategories(links);
+  const pageLinks = () => page.$$eval('a[href]', (as) => as.map((a) => ({ text: a.textContent ?? '', href: a.href })));
+  const homeLinks = await pageLinks();
+  const seenLinks = [...homeLinks];
+  const categories = pickRegisterCategories(homeLinks);
+
+  // Ana sayfada link olmayan kategori → üst sayfasını ("Credit institutions") aç, orada ara
+  const missing = () => REGISTER_CATEGORIES.filter((c) => !categories.some((f) => f.key === c.key));
+  const vias = [...new Set(missing().map((c) => c.via.source))];
+  for (const source of vias) {
+    const wanted = missing().filter((c) => c.via.source === source);
+    const parent = homeLinks.find((l) => wanted[0].via.test(l.text.trim()));
+    if (!parent || wanted.length === 0) continue;
+    try {
+      await pageText(page, parent.href);
+      const links = await pageLinks();
+      seenLinks.push(...links);
+      categories.push(...pickRegisterCategories(links, wanted));
+    } catch {
+      // aşağıda "not found" olarak raporlanır
+    }
+    await sleep(1500);
+  }
+  categories.sort((a, b) => REGISTER_CATEGORIES.findIndex((c) => c.key === a.key) - REGISTER_CATEGORIES.findIndex((c) => c.key === b.key));
+
+  if (missing().length) {
+    // Yapı değişti: bir sonraki düzeltme için aday linkleri rapora koy
+    lines.push(`Not found: ${missing().map((c) => c.key).join(', ')} (HTTP ${home.status}). Candidate links:`, '');
+    for (const l of registerCandidateLinks(seenLinks)) lines.push(`- ${l.text} — ${l.href}`);
+    lines.push('');
+  }
   if (categories.length === 0) {
-    // Yapı değişti: bir sonraki düzeltme için sayfanın kendisini rapora koy
-    lines.push(`No category links found (HTTP ${home.status}). Page text:`, '', ...excerpt(home.text));
+    lines.push('Page text:', '', ...excerpt(home.text));
     return { markdown: lines.join('\n'), entries: 0 };
   }
 
   let entries = 0;
   for (const cat of categories) {
     const names = [];
+    const pageOf = new Map(); // ad → sayfa no: sigortada 1. sayfa yerli şirketler, sonrası sınır ötesi
     let first = '';
     let pages = 0;
     let stop = '';
@@ -150,13 +185,27 @@ async function auditRegister(page) {
       if (n === 0) first = result.text;
       pages++;
       const before = names.length;
-      for (const name of registerEntities(result.text)) if (!names.includes(name)) names.push(name);
+      for (const name of registerEntities(result.text)) {
+        if (names.includes(name)) continue;
+        names.push(name);
+        pageOf.set(name, n + 1);
+      }
       if (names.length === before) break; // yeni ad yok → son sayfa (ya da sayfalama yok)
       await sleep(1500);
     }
     entries += names.length;
     lines.push(`### ${cat.label} (${names.length})`, '', `${cat.href} · pages read: ${pages}${stop ? ` · stopped: ${stop}` : ''}`, '');
-    if (names.length) lines.push(...names.map((nm) => `- ${nm}`), '');
+    if (names.length) {
+      let current = 0;
+      for (const nm of names) {
+        if (pages > 1 && pageOf.get(nm) !== current) {
+          current = pageOf.get(nm);
+          lines.push(`Page ${current}:`);
+        }
+        lines.push(`- ${nm}`);
+      }
+      lines.push('');
+    }
     else lines.push('No names recognised — page text:', '', ...excerpt(first));
   }
   return { markdown: lines.join('\n'), entries };

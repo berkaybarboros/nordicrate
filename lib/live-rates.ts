@@ -96,7 +96,8 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   seb: new Set(['personal', 'mortgage', 'auto']),
   swedbank: new Set(['personal', 'auto']),
   inbank: new Set(['personal', 'auto']),
-  bigbank: new Set(['personal', 'auto', 'mortgage']),
+  // mortgage çıkarıldı (2026-10-16): Bigbank kodulaen marj yayınlamıyor, marj bireysel
+  bigbank: new Set(['personal', 'auto']),
   citadele: new Set(['personal', 'mortgage']),
   'citadele-ee': new Set(['personal', 'auto', 'mortgage']),
   'swedbank-lv': new Set(['personal']),

@@ -142,11 +142,13 @@ example" olarak etiketli.
 
 **Canlı veri (31 feed, 2026-09-25)**
 - Estonya: LHV (personal, mortgage, auto), Coop (personal, mortgage, auto), SEB (personal,
-  mortgage, auto), Swedbank (personal, auto), Inbank (personal, auto), Bigbank (personal, auto,
-  mortgage), Citadele EE (personal, auto, mortgage) + 6 banka vadeli mevduat
+  mortgage, auto), Swedbank (personal, auto), Inbank (personal, auto), Bigbank (personal, auto;
+  kodulaen 2026-10-16'dan beri marj yayınlamıyor), Citadele EE (personal, auto, mortgage) + 6 banka vadeli mevduat
 - Letonya: Citadele LV (personal, mortgage), Swedbank LV (personal)
 - İsveç: SBAB, Nordea, Swedbank, Länsförsäkringar — konut kredisi *listränta* (snittränta değil)
 - İzlanda: Landsbankinn, Íslandsbanki — PDF faiz tablosundan endekssiz (óverðtryggt) sabit oran
+- Bozulan feed: `scraped_rates` `parse_ok=false` satırı nedeni taşır (oran cümleleri ya da
+  `[error] …`) — SSH'sız teşhis buradan
 - Cron: `30 6 * * *` (deploy/scraper/scrape-rates.mjs) · sağlık paneli `/admin` → Rate Feed Health
 
 **2026-09'da tamamlananlar**
