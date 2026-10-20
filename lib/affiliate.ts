@@ -46,7 +46,7 @@ import { INSTITUTIONS } from '@/lib/data';
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
 import {
   motorInsurance, cascoInsurance, homeInsurance,
-  healthInsurance, travelInsurance, lifeInsurance, deposits,
+  healthInsurance, travelInsurance, lifeInsurance, deposits, UNPRICED_INSURERS,
 } from '@/data/insurance';
 
 function hostOf(u?: string): string | null {
@@ -71,6 +71,7 @@ export const ALLOWED_APPLY_HOSTS: ReadonlySet<string> = (() => {
     for (const o of arr) { add(o.applyUrl); add(o.websiteUrl); }
   }
   for (const d of deposits) add(d.applyUrl);
+  for (const i of UNPRICED_INSURERS) add(i.websiteUrl);
 
   return hosts;
 })();

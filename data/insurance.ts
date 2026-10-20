@@ -888,6 +888,61 @@ export function listedInsurers(): { companyId: string; name: string; logo: strin
 }
 
 /**
+ * Fiyatı OLMAYAN ama Estonya'da lisanslı sigortacılar — fiyatlı tekliflerle karışmaz.
+ *
+ * Neden ayrı liste: InsuranceOffer bir örnek prim taşır ve sıralama, "Examples from €X",
+ * karşılaştırma ve AI uçları ona dayanır. Bu kurumlar için prim kaynağı yok; rakam
+ * yazmak uydurmak olur. Kartları sayfanın altında "fiyat verisi yok" bölümünde, yalnız
+ * kurum, doğrulanmış ürün türü ve sigortacının kendi sitesine link olarak görünür.
+ *
+ * `types` yalnız sigortacının kendi sitesinde kanıtı bulunan türlerdir (`sources`).
+ * Lisans: fi.ee "Insurance companies" sicili, source_audits 2026-10-16.
+ */
+export interface UnpricedInsurer {
+  companyId: string;
+  companyName: string;
+  /** fi.ee sicilindeki tüzel kişi adı */
+  registeredAs: string;
+  types: InsuranceType[];
+  websiteUrl: string;
+  /** Türlerin kanıtı — sigortacının kendi sayfaları */
+  sources: string[];
+  checkedAt: string;
+}
+
+export const UNPRICED_INSURERS: UnpricedInsurer[] = [
+  {
+    companyId: "balcia",
+    companyName: "Balcia",
+    registeredAs: "Balcia Insurance SE Eesti filiaal",
+    // MTPL (liikluskindlustus) + CASCO ana sayfada, seyahat şartları PDF'i balcia.ee'de.
+    // Konut sigortası için kanıt yetersiz — eklenmedi.
+    types: ["motor", "casco", "travel"],
+    websiteUrl: "https://www.balcia.ee/en/",
+    sources: [
+      "https://www.balcia.ee/en/",
+      "https://www.balcia.ee/en/faq",
+      "https://www.balcia.ee/uploads/blocks/travel-insurance-terms-and-conditions-no-ee-18-02-02-valid-from-26-08-2024-69130ae4e4698.pdf",
+    ],
+    checkedAt: "2026-10-20",
+  },
+  {
+    companyId: "pzu",
+    companyName: "PZU",
+    registeredAs: "AB “Lietuvos draudimas“ Eesti filiaal",
+    // Kasko şartları S100 2026 pzu.ee'de. Trafik ve konut sigortası için kanıt bulunamadı.
+    types: ["casco"],
+    websiteUrl: "https://pzu.ee/en/",
+    sources: ["https://pzu.ee/wp-content/uploads/2026/03/Kaskokindlustuse-tingimused-S100-2026-EST.pdf"],
+    checkedAt: "2026-10-20",
+  },
+];
+
+export function unpricedInsurersFor(type: InsuranceType): UnpricedInsurer[] {
+  return UNPRICED_INSURERS.filter((i) => i.types.includes(type));
+}
+
+/**
  * Vadeli mevduat kataloğu — YALNIZCA meta veri (banka adı, linkler, koşullar).
  *
  * 2026-09-13 yeniden yazıldı. Önceki katalog gerçeğin ~2 katı oran gösteriyordu

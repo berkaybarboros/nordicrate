@@ -6,6 +6,7 @@ import { ArrowUpDown, AlertCircle, CheckCircle } from "lucide-react";
 import AIPageBanner from "@/components/AIPageBanner";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import InsuranceDisclaimer from "@/components/insurance/InsuranceDisclaimer";
+import UnpricedInsurers from "@/components/insurance/UnpricedInsurers";
 import AIProductSection from "@/components/AIProductSection";
 import SmartRateWidget from "@/components/SmartRateWidget";
 import PersonalizedRecs from "@/components/PersonalizedRecs";
@@ -149,6 +150,7 @@ export default function MotorInsuranceContent() {
 
             {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
 
+            <UnpricedInsurers type="motor" />
             <InsuranceDisclaimer factors="the vehicle, the driver and claims history" />
           </div>
         </div>

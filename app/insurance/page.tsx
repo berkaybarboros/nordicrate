@@ -5,7 +5,7 @@ import DeepContentBlock from "@/components/seo/DeepContentBlock";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildFaqJsonLd } from "@/lib/seo";
 import { DEEP_CONTENT } from "@/lib/deep-content";
-import { listedInsurers, lowestExamplePremium, type InsuranceType } from "@/data/insurance";
+import { listedInsurers, lowestExamplePremium, UNPRICED_INSURERS, type InsuranceType } from "@/data/insurance";
 
 // Alt sigorta sayfalari CategorySeoBlock ile kendi icerigine sahip;
 // hub burada "hangisi zorunlu, hangisi degil" acisini alir.
@@ -194,6 +194,12 @@ export default function InsurancePage() {
               </div>
             ))}
           </div>
+          {UNPRICED_INSURERS.length > 0 && (
+            <p className="text-xs text-gray-500 mt-4">
+              Also listed without price data:{" "}
+              {UNPRICED_INSURERS.map((i) => `${i.companyName} (${i.types.map((t) => TYPE_LABEL[t]).join(", ")})`).join(" · ")}
+            </p>
+          )}
           <p className="text-xs text-gray-400 mt-4 pt-4 border-t border-gray-50">
             Some insurers operate in Estonia as branches of EU insurers supervised in their home
             country. Check any insurer&apos;s authorisation in the{" "}

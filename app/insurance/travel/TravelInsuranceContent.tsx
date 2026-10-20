@@ -5,6 +5,7 @@ import { useFetchJson } from "@/lib/use-fetch-json";
 import { ArrowUpDown, CheckCircle, Plane } from "lucide-react";
 import InsuranceOfferCard from "@/components/insurance/InsuranceOfferCard";
 import InsuranceDisclaimer from "@/components/insurance/InsuranceDisclaimer";
+import UnpricedInsurers from "@/components/insurance/UnpricedInsurers";
 import AIProductSection from "@/components/AIProductSection";
 import AIPageBanner from "@/components/AIPageBanner";
 import SmartRateWidget from "@/components/SmartRateWidget";
@@ -142,6 +143,8 @@ export default function TravelInsuranceContent() {
             )}
 
             {!loading && offers.map((offer) => <InsuranceOfferCard key={offer.id} offer={offer} />)}
+
+            <UnpricedInsurers type="travel" />
 
             {!loading && offers.length > 0 && (
               <InsuranceDisclaimer factors="trip length, destination, traveller age and declared activities" />

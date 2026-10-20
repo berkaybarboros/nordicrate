@@ -65,7 +65,7 @@ git push origin main
 
 ### Rakamlar (kod + canlı DB)
 - Katalog: 8 ülke, 58 kurum, 110 ürün (`lib/data.ts`) + Estonya canlı katalogu 37 kredi teklifi
-  (`data/loans.ts`); 12 sigortacı / 37 örnek prim; 30+ devlet/EU programı
+  (`data/loans.ts`); 12 sigortacı / 37 örnek prim + 2 fiyatsız lisanslı sigortacı (Balcia, PZU); 30+ devlet/EU programı
 - Canlı feed: 27 kredi feed'i son 48 saatte başarılı + 6 bankanın vadeli mevduatı; scraper
   2026-07-03'ten beri çalışıyor
 - 71 yayınlanmış blog yazısı · `affiliate_links` boş → henüz affiliate geliri yok
