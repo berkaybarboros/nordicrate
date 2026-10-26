@@ -124,6 +124,7 @@ describe('Icelandic rate tables (PDF text)', () => {
 // ─── Failure evidence and register crawl (no SSH: this is all we see) ─────────
 
 import {
+  candidateProductLinks,
   failureSnippet,
   findPdfLink,
   pdfLinks,
@@ -221,5 +222,29 @@ describe('fi.ee register', () => {
       'info@fi.ee',
     ].join('\n');
     expect(registerEntities(text)).toEqual(['AS LHV Pank', 'Bigbank AS', 'AS Citadele banka Eesti filiaal', 'ERGO Insurance SE']);
+  });
+});
+
+describe('candidateProductLinks', () => {
+  // Holm Bank / TF Bank: in the register, not in the catalogue. The audit follows the
+  // site's own menu instead of guessing URL paths it cannot see from the cloud.
+  it('keeps same-site product links from the menu, once, and nothing else', () => {
+    const links = [
+      { text: 'Väikelaen', href: 'https://holmbank.ee/eraklient/vaikelaen' },
+      { text: 'Väikelaen', href: 'https://holmbank.ee/eraklient/vaikelaen#calc' },
+      { text: 'Hoius', href: 'https://www.holmbank.ee/eraklient/hoius' },
+      { text: 'Kontakt', href: 'https://holmbank.ee/kontakt' },
+      { text: 'Loan on Facebook', href: 'https://facebook.com/holmbank' },
+      { text: 'Avaleht', href: 'https://holmbank.ee/' },
+    ];
+    expect(candidateProductLinks(links, 'https://holmbank.ee/')).toEqual([
+      { text: 'Väikelaen', href: 'https://holmbank.ee/eraklient/vaikelaen' },
+      { text: 'Hoius', href: 'https://www.holmbank.ee/eraklient/hoius' },
+    ]);
+  });
+
+  it('stops at the limit', () => {
+    const links = Array.from({ length: 10 }, (_, i) => ({ text: `Laen ${i}`, href: `https://tfbank.ee/laen-${i}` }));
+    expect(candidateProductLinks(links, 'https://tfbank.ee/', 3)).toHaveLength(3);
   });
 });
