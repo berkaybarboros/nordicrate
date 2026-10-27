@@ -81,20 +81,18 @@ git push origin main
 - Sunucu deploy'u cron + rollback ile otomatik (`deploy/release.sh`)
 
 ### Sıradaki 📋
-1. PR #2 merge → canlı; `source_audits` migration'ı; ilk denetim raporu → hız/ücret iddialarında
-   tut/düzelt/sil, fi.ee sicilinden eksik Estonya bankaları (TBB, Holm, Luminor adayları — doğrulanmadı)
+1. Holm Bank + TF Bank kataloğa (fi.ee'de lisanslı; denetimin "Candidate institutions" bölümü
+   koşulları getirir). Denetimle düzeltme turu ve fi.ee sicili tamamlandı (2026-10)
 2. İlk gelir: Adtraction/Awin banka programları → onaylanınca `affiliate_links` satırı
 3. Canlı kapsam: LV/LT, Finlandiya (ECB MIR ortalaması), Estonya'da banka dışı sağlayıcılar
 4. Sigorta: kapsam karşılaştırması (prim yok) + sigortacı fiyat feed'i görüşmeleri
-5. Test: `/api/cron/*` auth, `calculateEligibility()`
+5. Test: API route iş mantığı (find-rate, recommend, /go) ve component'lar
 
 ### Bilinen Issues 🔴
-- **Bigbank EE konut kredisi**: sayfa 2026-10 başından beri marj yayınlamıyor (marj bireysel) →
-  scraper hedefi kaldırıldı, oran "indicative" kalır
-- **Landsbankinn IS**: faiz PDF'inin adı değişti (2026-10-07'den beri veri yok) → yeni ad eklendi,
-  PDF düzeni farklıysa ertesi günün `parse_ok=false` satırı tabloyu gösterir
+- **Bigbank EE konut kredisi**: sayfa marj yayınlamıyor (marj bireysel) → scraper hedefi yok,
+  oran "indicative"
 - Cloud ortamının ağ politikası `.ee` alan adlarını ve fi.ee'yi engelliyor (allowlist uygulanmadı)
-- 116 hız/ücret iddiası ("Instant decision", "No fees"…) banka sayfasında doğrulanmadı
+- Luminor EE sayfaları denetime 403 veriyor → Luminor ücret/hız iddiaları doğrulanmadı
 - "Editor's pick" bandı 13 üründe — yazılı editoryal ölçütü yok (karar bekliyor)
 - Swedbank EE konut kredisi ve Luminor EE oran yayınlamıyor; Bigbank LV/LT, Skandia SE sunucu IP'sini 403'lüyor
 - İşletme kredisi ve devlet programları statik; Imprint'te işyeri adresi yok
@@ -139,11 +137,10 @@ git push origin main
 - Ürün: founding engineer — kullanıcı güveni + gelir modeli
 
 ## 10. Aktif Bağlam
-**Son güncelleme**: 2026-10-07
-**Odak**: güven/dürüstlük katmanını kaynak doğrulamasıyla kapatmak; ilk affiliate geliri
-**Açık PR**: #2 (`claude/festive-davinci-149bqn`) — build/lint düzeltmeleri, sigorta ve site
-dürüstlük turu, kaynak denetimi; CI yeşil, merge bekliyor
-**Blocker'lar**: cloud ağ allowlist'i; SSH Kasım'a kadar yok; affiliate programı onayları
+**Son güncelleme**: 2026-10-27
+**Odak**: kapsam (Holm, TF Bank) + ilk affiliate geliri
+**Durum**: cloud dönemi (PR #2–#6) main'de ve canlı; Windows makinesine dönüldü, SSH yeniden var
+**Blocker'lar**: affiliate programı onayları
 **Son kararlar**:
 - Deploy yalnız `main` → cron `release.sh` (rollback'li); SSH gerekmez
 - Kaynak denetimi sunucuda cron ile, rapor Supabase'de; karar insanda

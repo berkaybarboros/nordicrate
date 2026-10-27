@@ -135,12 +135,12 @@ ADMIN_TOKEN=...                # /admin login — güçlü random string üret
 - Chat live rates module-level cache (1 saat TTL) — "her mesajda HTTP round-trip" issue kapandı
 
 ## Aktif Bağlam
-**Son güncelleme**: 2026-09-25
+**Son güncelleme**: 2026-10-27 (cloud dönemi kapandı → Windows'a dönüş)
 **Mevcut durum**: nordicrate.com canlı. Oranlar günlük olarak bankaların kendi sayfalarından
 okunuyor; gösterilen her rakam ya "checked X ago · kaynak" damgası taşıyor ya da "indicative /
 example" olarak etiketli.
 
-**Canlı veri (31 feed, 2026-09-25)**
+**Canlı veri (27 kredi feed'i, 2026-10-21'den beri her gün 27/27 OK)**
 - Estonya: LHV (personal, mortgage, auto), Coop (personal, mortgage, auto), SEB (personal,
   mortgage, auto), Swedbank (personal, auto), Inbank (personal, auto), Bigbank (personal, auto;
   kodulaen 2026-10-16'dan beri marj yayınlamıyor), Citadele EE (personal, auto, mortgage) + 6 banka vadeli mevduat
@@ -150,6 +150,18 @@ example" olarak etiketli.
 - Bozulan feed: `scraped_rates` `parse_ok=false` satırı nedeni taşır (oran cümleleri ya da
   `[error] …`) — SSH'sız teşhis buradan
 - Cron: `30 6 * * *` (deploy/scraper/scrape-rates.mjs) · sağlık paneli `/admin` → Rate Feed Health
+
+**2026-10'da tamamlananlar (cloud oturumu, PR #2–#6)**
+- Kaynak denetimi: `source-audit.mjs` haftalık (scraper cron'unda) → `source_audits`; fi.ee
+  sicili (8 lisanslı banka + 5 şube, sigortacılar) ve aday kurumların ürün sayfaları
+- Denetime göre ücretler düzeltildi (çoğu "No one-time fee" yanlıştı); `lib/loan-cost.ts` tek
+  maliyet/APR hesabı (kart APR'yi yanlış argüman sırasıyla hesaplıyordu); `fee: null` =
+  doğrulanmadı ("check with bank"), `monthlyFee`, `liveRateType`
+- Inbank "home small loan" konut kredisi değil → kişisel kredi (`inbank-home-small-loan`)
+- Scraper: bozulan feed `parse_ok=false` satırına nedenini yazar; Landsbankinn yeni PDF;
+  Bigbank kodulaen çıkarıldı (marj yayınlamıyor)
+- Sigorta: Balcia + PZU fiyatsız listede (`UNPRICED_INSURERS`) — prim kaynağı yok
+- Eligibility: gelir + tutar olmadan skor yok; testler 86 (cron auth, eligibility, loan-cost…)
 
 **2026-09'da tamamlananlar**
 - Dürüstlük katmanı: kanıtsız "Best Rate/Most Popular" rozetleri veri kaynağından silindi,
@@ -164,6 +176,9 @@ example" olarak etiketli.
 - `/api/cron/founder-facts`: pitch/başvuru rakamlarının tek kaynağı
 
 **Sıradaki**
+- Holm Bank + TF Bank'ı kataloğa ekle: fi.ee'de lisanslı, bireysel ürünleri var. Sonraki haftalık
+  denetimin "Candidate institutions" bölümü ürün koşullarını getirir (ya da Windows'tan siteleri
+  doğrudan oku) → `data/loans.ts`
 - İlk ödeme yapan partner: Adtraction/Awin ağlarında banka programlarına katılım (hesaplar onaylı,
   program başvuruları bekliyor) → onaylanan programın satırı `affiliate_links`'e eklenir
 - Canlı kapsam: LV/LT (Bigbank engelliyor), Finlandiya (bankalar oran yayınlamıyor → ECB MIR
