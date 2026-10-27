@@ -28,6 +28,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import {
+  candidateProductLinks,
   EVIDENCE_TERMS,
   evidenceSnippets,
   pickRegisterCategories,
@@ -63,8 +64,26 @@ function parseArgs(argv) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+async function goto(page, url) {
+  try {
+    return await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  } catch (err) {
+    // Ağ hatasından sonra Chromium hata sayfasına (chrome-error://) KENDİSİ geçer; beklemeden
+    // devam edilirse o geçiş bir sonraki goto'yu keser ve bir sitenin çökmesi ardındaki
+    // tüm sayfaları düşürür (yerelde ERR_NAME_NOT_RESOLVED ile yeniden üretildi).
+    await page.waitForLoadState('load', { timeout: 5000 }).catch(() => {});
+    throw err;
+  }
+}
+
 async function pageText(page, url) {
-  const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  let res;
+  try {
+    res = await goto(page, url);
+  } catch (err) {
+    if (!/interrupted by another navigation/.test(String(err))) throw err;
+    res = await goto(page, url);
+  }
   await page.waitForTimeout(2500); // JS ile gelen fiyat tabloları
   const status = res?.status() ?? 0;
   const text = await page.locator('body').innerText().catch(() => '');
@@ -211,6 +230,60 @@ async function auditRegister(page) {
   return { markdown: lines.join('\n'), entries };
 }
 
+/*
+ * Aday kurumlar: fi.ee sicilinde olup katalogda olmayan, bireysel ürünü olan bankalar.
+ * Ürün verisi bankanın kendi sayfası okunmadan yazılmaz (CLAUDE.md) ve cloud oturumu bu
+ * sitelere erişemiyor — denetim sunucudan okuyup koşulları rapora koyar, ekleme kararı
+ * insanda. Kataloğa eklenen kurum buradan çıkarılır.
+ */
+export const CANDIDATES = [
+  // fi.ee "Licensed credit institutions in Estonia" (2026-10-24): tüketici kredisi, kart, mevduat
+  { name: 'Holm Bank AS', url: 'https://holmbank.ee/' },
+  // fi.ee "Affiliated branches of foreign credit institutions" (2026-10-24): tüketici kredisi
+  { name: 'TF Bank AB (publ.) Eesti filiaal', url: 'https://www.tfbank.ee/' },
+];
+
+async function auditCandidates(page, candidates) {
+  const lines = ['## Candidate institutions (in the register, not in the catalogue)', ''];
+  for (const cand of candidates) {
+    lines.push(`### ${cand.name}`, '');
+    let home;
+    try {
+      home = await pageText(page, cand.url);
+    } catch (err) {
+      lines.push(`**fetch-failed** — ${String(err).split('\n')[0].replace(/\x1b\[[0-9;]*m/g, '').slice(0, 160)}`, '');
+      continue;
+    }
+    if (home.status >= 400 || !home.text) {
+      lines.push(`**fetch-failed** — HTTP ${home.status}`, '');
+      continue;
+    }
+    const links = await page.$$eval('a[href]', (as) => as.map((a) => ({ text: a.textContent ?? '', href: a.href })));
+    const products = candidateProductLinks(links, home.finalUrl);
+    lines.push(`${home.finalUrl} · product pages: ${products.map((p) => p.text).join(', ') || 'none found'}`, '');
+    for (const target of [{ text: 'Home page', href: home.finalUrl, text0: home.text }, ...products]) {
+      let text = target.text0;
+      if (!text) {
+        await sleep(DELAY_MS);
+        try {
+          const r = await pageText(page, target.href);
+          text = r.status < 400 ? r.text : '';
+          if (!text) lines.push(`#### ${target.text} — HTTP ${r.status}`, '');
+        } catch {
+          text = '';
+        }
+        if (!text) continue;
+      }
+      const snips = evidenceSnippets(text, [...EVIDENCE_TERMS.terms, ...EVIDENCE_TERMS.fee], 6);
+      lines.push(`#### ${target.text}`, '', target.href, '');
+      if (snips.length === 0) lines.push('_No rate, amount or fee sentences on this page._', '');
+      for (const sn of snips) lines.push(`> ${sn}`, '');
+    }
+    await sleep(DELAY_MS);
+  }
+  return lines.join('\n');
+}
+
 export function loadClaims(file, tld) {
   const all = JSON.parse(readFileSync(file, 'utf8'));
   return tld
@@ -219,12 +292,16 @@ export function loadClaims(file, tld) {
 }
 
 /** Tek koşu: verilen tarayıcıyla iddiaları (ve istenirse sicili) denetler, raporu döner. */
-export async function runAudit(browser, { tld = null, register = true, claimsFile = resolve(HERE, 'claims-to-verify.json') } = {}) {
+export async function runAudit(
+  browser,
+  { tld = null, register = true, claimsFile = resolve(HERE, 'claims-to-verify.json'), candidates = CANDIDATES } = {},
+) {
   const claims = loadClaims(claimsFile, tld);
   const page = await browser.newPage({ userAgent: UA });
   try {
     const claimRun = await auditClaims(page, claims);
     const reg = register ? await auditRegister(page) : null;
+    const candidateMd = register && candidates.length ? await auditCandidates(page, candidates) : null;
     const markdown = [
       `# Source audit — ${new Date().toISOString()}`,
       '',
@@ -236,6 +313,7 @@ export async function runAudit(browser, { tld = null, register = true, claimsFil
       '',
       ...claimRun.sections,
       ...(reg ? [reg.markdown] : []),
+      ...(candidateMd ? [candidateMd] : []),
     ].join('\n');
     return {
       scope: tld ? `.${tld}` : 'all',

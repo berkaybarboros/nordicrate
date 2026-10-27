@@ -300,6 +300,11 @@ export const EVIDENCE_TERMS = {
     // fi / sv / da / no / is
     'palkkio', 'kulu', 'maksuton', 'avgift', 'gebyr', 'gratis', 'kostnad', 'gjald',
   ],
+  // Aday kurumun ürün koşulları (oran, tutar, vade) — kataloğa eklemeden önce okunur
+  terms: [
+    'intress', 'interest', 'krediidi kulukuse', 'annual percentage', 'laenusumma', 'loan amount',
+    'limiit', 'periood', 'tähtaeg', 'kuud', 'months', 'hoius', 'deposit',
+  ],
 };
 
 /** Sayfa metninden, terimlerden birini içeren cümleleri (±160 karakter) çıkarır. */
@@ -381,8 +386,9 @@ export function pdfLinks(html, pageUrl) {
 export const REGISTER_CATEGORIES = [
   { key: 'credit', label: /^licensed credit institutions(?: in estonia)?$/i, via: /^credit institutions$/i },
   { key: 'credit-branches', label: /^(?:affiliated )?branches of foreign credit institutions$/i, via: /^credit institutions$/i },
+  // Yabancı sigorta şubeleri ayrı kategori değil: "Insurance companies" 1. sayfasında
+  // yerli şirketlerle birlikte listeleniyor (2026-10-16 ve 10-24 raporları)
   { key: 'insurance', label: /^insurance companies$/i, via: /^insurance$/i },
-  { key: 'insurance-branches', label: /^(?:affiliated )?branches of foreign insurance (?:companies|undertakings|insurers)$/i, via: /^insurance$/i },
 ];
 
 /** {text, href}[] → bu sayfada linki bulunan kategoriler (href'e göre tekil) */
@@ -418,6 +424,36 @@ export function registerEntities(text) {
     const line = raw.trim();
     if (line.length < 4 || line.length > 120 || /https?:|@|©/.test(line)) continue;
     if (LEGAL_FORM.test(line) && !out.includes(line)) out.push(line);
+  }
+  return out;
+}
+
+/* ─── Aday kurumlar (source-audit.mjs) ─────────────────────────────────────── */
+
+const PRODUCT_LINK = /laen|liising|järelmaks|krediit|hoius|loan|leasing|credit|deposit|card|kaart/i;
+
+/**
+ * Aday kurumun ana sayfasından okunacak ürün sayfaları: aynı alan adı, ürün kelimesi
+ * içeren link metni, tekil, en çok `max`. URL yapısını cloud'dan göremediğimiz için
+ * sayfa yolu tahmin edilmez — sitenin kendi menüsü izlenir.
+ */
+export function candidateProductLinks(links, homeUrl, max = 4) {
+  const home = new URL(homeUrl).hostname.replace(/^www\./, '');
+  const out = [];
+  for (const l of links) {
+    let u;
+    try {
+      u = new URL(l.href);
+    } catch {
+      continue;
+    }
+    const text = l.text.trim().replace(/\s+/g, ' ');
+    if (u.hostname.replace(/^www\./, '') !== home || !text || text.length > 60 || !PRODUCT_LINK.test(text)) continue;
+    u.hash = '';
+    const href = u.toString();
+    if (href === homeUrl || out.some((o) => o.href === href)) continue;
+    out.push({ text, href });
+    if (out.length >= max) break;
   }
   return out;
 }
