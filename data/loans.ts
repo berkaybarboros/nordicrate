@@ -38,6 +38,15 @@ export interface LoanOffer {
 // Ucret: fee + feePercent + monthlyFee; null = dogrulanamadi. processingTime "" = kanit yok.
 export const personalLoans: LoanOffer[] = [
   {
+    // 2026-10-29: LHV artik tuketici kredisi icin oran YAYINLAMIYOR. Sartlar
+    // tablosunda "Interest: Submit an application and get a personalised offer"
+    // yaziyor; sayfadaki tek oranlar temsili ornekte:
+    //   7 300 EUR degil, 2 400 EUR / 54 ay — %13,9 KALAN BAKIYEDEN  -> KKM %19,67
+    //                                       %7,9 ILK LAEN SUMMASINDAN -> KKM %19,9
+    // Eski satir rep. oran olarak 9,9 diyordu; bu sayi sayfada hic gecmiyor.
+    // min/max artik iki ornegin kendisi, rep. oran bakiyeden isleyen %13,9 —
+    // diger bankalarin oranlariyla karsilastirilabilir olan o.
+    // Vade: "up to 7,500 EUR - 6 months to 6 years; from 7,500 EUR - ... 10 years".
     id: "lhv-personal",
     bankId: "lhv",
     bankName: "LHV Pank",
@@ -46,14 +55,20 @@ export const personalLoans: LoanOffer[] = [
     minAmount: 200,
     maxAmount: 15000,
     minTermMonths: 6,
-    maxTermMonths: 84,
+    maxTermMonths: 120,
     interestRateMin: 7.9,
     interestRateMax: 13.9,
-    representativeRate: 9.9,
+    representativeRate: 13.9,
     fee: 29.9,
     feePercent: 2,
     monthlyFee: 3.99,
-    features: ["2-minute application", "Money to your account immediately", "Free early repayment", "No collateral"],
+    features: [
+      "Rate is personalised — LHV publishes no headline rate, only examples",
+      "Example: 13.9% on the outstanding balance, APRC 19.67% (€2,400 over 54 months)",
+      "Example: 7.9% on the initial loan amount, APRC 19.9% (same terms)",
+      "Contract fee 2% of the loan sum, from €29.90; service fee €3.99 per month",
+      "No collateral",
+    ],
     processingTime: "Instant",
     minAge: 18,
     requiresIncome: true,
@@ -763,6 +778,13 @@ export const mortgageLoans: LoanOffer[] = [
 
 export const carLoans: LoanOffer[] = [
   {
+    // 2026-10-29: LHV tasit kredisinde de oran yayinlamiyor — sartlar tablosunda
+    // "Interest: Personal interest", "Submit an application and get a personalised
+    // offer". Sayfadaki tek oranlar temsili ornekte (7 300 EUR):
+    //   %11,9 KALAN BAKIYEDEN -> yillik maliyet orani %14,65
+    //   %6,9 ILK LAEN SUMMASINDAN -> %15,03
+    // Eski satirdaki max 12,9 / rep. 8,9 sayfada gecmiyordu; "No down payment or
+    // CASCO required" iddiasi da sayfada yok — ucu de kaldirildi.
     id: "lhv-car",
     bankId: "lhv",
     bankName: "LHV Pank",
@@ -773,13 +795,19 @@ export const carLoans: LoanOffer[] = [
     minTermMonths: 6,
     maxTermMonths: 120,
     interestRateMin: 6.9,
-    interestRateMax: 12.9,
-    representativeRate: 8.9,
+    interestRateMax: 11.9,
+    representativeRate: 11.9,
     fee: 29.9,
     feePercent: 2,
     monthlyFee: 3.99,
-    features: ["New & used cars", "No down payment or CASCO required", "2-minute application"],
-    processingTime: "1-2 days",
+    features: [
+      "Rate is personalised — LHV publishes no headline rate, only examples",
+      "Example: 11.9% on the outstanding balance, 14.65% annual cost (€7,300)",
+      "Example: 6.9% on the initial loan amount, 15.03% annual cost (same terms)",
+      "Contract fee 2% of the loan sum, from €29.90; service fee €3.99 per month",
+      "Loan sum €200 to €25,000",
+    ],
+    processingTime: "",
     minAge: 21,
     requiresIncome: true,
     applyUrl: "https://www.lhv.ee/en/car-loan",

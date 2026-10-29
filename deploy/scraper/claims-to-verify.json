@@ -489,28 +489,10 @@
     "productId": "lhv-car",
     "institution": "LHV Pank",
     "sourceUrl": "https://www.lhv.ee/en/car-loan",
-    "id": "lhv-car:feature:2-minute-application",
-    "kind": "speed",
-    "field": "feature",
-    "text": "2-minute application"
-  },
-  {
-    "productId": "lhv-car",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee/en/car-loan",
     "id": "lhv-car:fee",
     "kind": "fee",
     "field": "fee",
     "text": "Fees 2% (min €29.90) + €3.99/mo"
-  },
-  {
-    "productId": "lhv-car",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee/en/car-loan",
-    "id": "lhv-car:processingTime",
-    "kind": "speed",
-    "field": "processingTime",
-    "text": "1-2 days"
   },
   {
     "productId": "lhv-mortgage",
@@ -529,24 +511,6 @@
     "kind": "speed",
     "field": "processingTime",
     "text": "5-10 days"
-  },
-  {
-    "productId": "lhv-personal",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
-    "id": "lhv-personal:feature:2-minute-application",
-    "kind": "speed",
-    "field": "feature",
-    "text": "2-minute application"
-  },
-  {
-    "productId": "lhv-personal",
-    "institution": "LHV Pank",
-    "sourceUrl": "https://www.lhv.ee/en/consumer-loan",
-    "id": "lhv-personal:feature:free-early-repayment",
-    "kind": "fee",
-    "field": "feature",
-    "text": "Free early repayment"
   },
   {
     "productId": "lhv-personal",

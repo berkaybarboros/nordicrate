@@ -93,7 +93,11 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
  * sayfada yalnızca fee'li örnek oran.
  */
 export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
-  lhv: new Set(['personal', 'mortgage', 'auto']),
+  // personal ve auto çıkarıldı (2026-10-29): LHV ikisinde de oran yayınlamayı
+  // bıraktı ("Submit an application and get a personalised offer"). Scraper son
+  // başarılı okumasında sayfadan %5,9 almıştı — LHV'nin hiçbir yerde yazmadığı
+  // bir sayı, siteye "checked 3 days ago" damgasıyla canlı oran olarak çıktı.
+  lhv: new Set(['mortgage']),
   coop: new Set(['personal', 'mortgage', 'auto']),
   seb: new Set(['personal', 'mortgage', 'auto']),
   swedbank: new Set(['personal', 'auto']),

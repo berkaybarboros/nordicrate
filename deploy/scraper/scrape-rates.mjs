@@ -47,10 +47,14 @@ const BANKS = [
   {
     bankId: 'lhv',
     targets: [
-      { productType: 'personal', url: 'https://www.lhv.ee/en/consumer-loan', band: BAND_RATE },
+      // personal + auto çıkarıldı (2026-10-29): LHV ikisinde de oranı kaldırdı,
+      // sartlar tablosu artik "Submit an application and get a personalised offer"
+      // diyor. 27 Ekim'den beri her gun PARSE FAILED veriyorlardi; 26 Ekim'deki
+      // son "basarili" okuma ise sayfada bulunmayan %5,9'u siteye basmisti.
+      // Sayfadaki tek oranlar temsili ornekte ve iki farkli bazda (bakiye / ilk
+      // summa) — katalogda ornek olarak duruyorlar, canli oran olarak degil.
       // LHV home loan sayfası marj yayınlıyor ("from 1.49%" + Euribor) — 2026-07-19 doğrulandı
       { productType: 'mortgage', url: 'https://www.lhv.ee/en/home-loan', marginPlusEuribor: true, band: BAND_MARGIN },
-      { productType: 'auto',     url: 'https://www.lhv.ee/en/car-loan', band: BAND_RATE },
     ],
   },
   {
