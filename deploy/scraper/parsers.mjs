@@ -134,8 +134,13 @@ const FEE_WORDS = /fee|contract|service (?:fee|charge)|tasu|lepingutasu|haldusta
  * ilerler; ücret/peşinat penceresi, "Euribor ... X%" alıntısı ve band dışı değerler
  * atlanır. Global-min yaklaşımı başka ürünlerin oranlarını çalıyordu (Coop 3.5
  * regresyonu, 2026-07-19) — belge sırası + band birlikte doğru değeri seçiyor.
+ *
+ * feeGuard: ücret filtresi yalnız FAİZ ararken doğru. KKM/APRC zaten ücretleri
+ * İÇEREN orandır ve bankalar onu hep "lepingutasu … haldustasu … on krediidi
+ * kulukuse määr 15,54%" gibi tek cümlelik temsili örnekte yayınlar — filtre o
+ * cümleyi ücret sanıp APRC'yi sessizce düşürüyordu (Holm, TF Bank 2026-10-27).
  */
-function extract(text, patterns, band = [0.5, 35]) {
+function extract(text, patterns, band = [0.5, 35], { feeGuard = true } = {}) {
   for (const re of patterns) {
     const global = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
     for (const m of text.matchAll(global)) {
@@ -154,7 +159,7 @@ function extract(text, patterns, band = [0.5, 35]) {
         .filter((x) => x !== -1);
       const segEnd = segEnds.length ? Math.min(...segEnds) : endOf + 60;
       const segment = text.slice(segStart, segEnd);
-      if (FEE_WORDS.test(segment)) continue;
+      if (feeGuard && FEE_WORDS.test(segment)) continue;
       // "Euribor ... 2.69%" alıntısı (sayıdan ÖNCE euribor) faiz tabanı değildir;
       // marj metinlerinde euribor sayıdan SONRA gelir ("1.35% + Euribor")
       if (/euribor/i.test(text.slice(Math.max(segStart, idx - 30), idx))) continue;

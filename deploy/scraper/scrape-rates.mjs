@@ -54,6 +54,24 @@ const BANKS = [
     ],
   },
   {
+    // 2026-10-27: fi.ee sicilinden gelen iki aday, sayfalari dogrulandi. Ikisinin de
+    // vitrin orani KAMPANYA (Holm 30.10.2026, TF 31.10.2026 lepingutasu) — statik
+    // kataloga yazip birakmak kasim basinda yanlis olurdu, bu yuzden gunluk okunuyor.
+    bankId: 'holm',
+    targets: [
+      // "Fikseeritud intress 7,99%" — sayfa estonca, intress deseni yakaliyor
+      { productType: 'personal', url: 'https://www.holmbank.ee/et/eraklient/laenud/holm-vaikelaen', band: BAND_RATE },
+    ],
+  },
+  {
+    bankId: 'tfbank',
+    targets: [
+      // "Intress alates 7,90%" — ayni sayfada ornek hesapta 9,9% de geciyor;
+      // belge sirasinda once gelen vitrin orani aliniyor
+      { productType: 'personal', url: 'https://tfbank.ee/vaikelaen', band: BAND_RATE },
+    ],
+  },
+  {
     bankId: 'coop',
     targets: [
       { productType: 'personal', url: 'https://www.cooppank.ee/en/private/small-loan', band: BAND_RATE },
@@ -491,7 +509,9 @@ async function main() {
         const rate = extract(text, ratePatterns, target.band);
         // aprcBand: sayfada başka ürünün APR örneği varsa (Citadele mortgage
         // sayfasındaki kredi kartı %14.76'sı gibi) yanlış yakalamayı band keser
-        const aprc = extract(text, APRC_PATTERNS, target.aprcBand ?? [0.5, 35]);
+        // feeGuard kapalı: KKM/APRC ücretleri zaten içerir ve bankalar onu hep
+        // ücret kelimeleri dolu temsili örnek cümlesinde yayınlar.
+        const aprc = extract(text, APRC_PATTERNS, target.aprcBand ?? [0.5, 35], { feeGuard: false });
         const parseOk = rate !== null;
 
         // Marj işareti: override katmanının /euribor/i tespiti için snippet'e eklenir.
