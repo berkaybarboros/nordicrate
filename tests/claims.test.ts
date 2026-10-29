@@ -19,7 +19,10 @@ describe('claims-to-verify.json', () => {
   it('matches the catalogue (run UPDATE_CLAIMS=1 npm test after changing product data)', () => {
     const json = JSON.stringify(claims, null, 2) + '\n';
     if (process.env.UPDATE_CLAIMS === '1') writeFileSync(FILE, json);
-    expect(readFileSync(FILE, 'utf8')).toBe(json);
+    // Compare content, not line endings: git hands this file to a Windows
+    // checkout with CRLF, so a raw comparison failed here and passed in CI —
+    // the worst way for a check to fail, since it says nothing about the data.
+    expect(readFileSync(FILE, 'utf8').replace(/\r\n/g, '\n')).toBe(json);
   });
 
   it('gives every claim a unique id and a source to check', () => {
