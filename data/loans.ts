@@ -60,6 +60,80 @@ export const personalLoans: LoanOffer[] = [
     applyUrl: "https://www.lhv.ee/en/consumer-loan",
   },
   {
+    // Holm Bank vaikelaen — sayfa okundu 2026-10-27.
+    // Sayfanin yazdigi: summa kuni 25 000 EUR, fikseeritud intress 7,99%,
+    // lepingutasu 0 EUR, haldustasu 0 EUR, lepingu pikkus 6-120 kuud. Hesap
+    // makinesi min/max: 500-25 000 EUR, 6-120 kuu.
+    // DIKKAT 1: 7,99% bir KAMPANYA orani — sayfa "Kampaania kehtib kuni
+    // 30.10.2026" diyor. Kampanya bitince scraper'in okudugu oran gecerli olur;
+    // buradaki deger yalnizca canli veri yokken gosterilen yedek.
+    // DIKKAT 2: faiz KALAN BAKIYEDEN degil LAEN SUMMASINDAN hesaplaniyor
+    // ("7,99% laenusummalt aastas"), bu yuzden KKM 15,54%. Bakiyeden faiz
+    // isleyen bankalarla yan yana sadece nominal orani karsilastirmak yaniltir —
+    // ozellik satirinda ikisi de yaziyor.
+    id: "holm-personal",
+    bankId: "holm",
+    bankName: "Holm Bank",
+    bankLogo: "🇪🇪",
+    type: "personal",
+    minAmount: 500,
+    maxAmount: 25000,
+    minTermMonths: 6,
+    maxTermMonths: 120,
+    interestRateMin: 7.99,
+    interestRateMax: 7.99,
+    representativeRate: 7.99,
+    fee: 0,
+    feePercent: 0,
+    monthlyFee: 0,
+    features: [
+      "Fixed 7.99% campaign rate, stated valid until 30 Oct 2026",
+      "Interest charged on the original loan amount, not the balance",
+      "APRC 15.54% on the bank's own example: €4,500 over 48 months, €5,923.42 total",
+      "Contract fee €0, monthly administration fee €0",
+      "Optional payment protection insurance (If P&C Insurance AS)",
+    ],
+    processingTime: "",
+    minAge: 18,
+    requiresIncome: true,
+    applyUrl: "https://www.holmbank.ee/et/eraklient/laenud/holm-vaikelaen",
+  },
+  {
+    // TF Bank vaikelaen — sayfa okundu 2026-10-27.
+    // Sayfanin yazdigi: 1000-25 000 EUR, 12-120 kuud, "Intress alates 7,90%"
+    // (fikseeritud, Euribor etkilemiyor), haldustasu 5,90 EUR/kuu.
+    // DIKKAT: lepingutasu normalde LAEN SUMMASININ %5'i; "0 EUR lepingutasu"
+    // 31.10.2026'ya kadar suren bir kampanya. Kalici fiyat yazildi (feePercent: 5),
+    // kampanya ozellik satirinda bitis tarihiyle duruyor — kampanya gecince kart
+    // kendiliginden dogru fiyati gosterir.
+    id: "tfbank-personal",
+    bankId: "tfbank",
+    bankName: "TF Bank",
+    bankLogo: "🇪🇪",
+    type: "personal",
+    minAmount: 1000,
+    maxAmount: 25000,
+    minTermMonths: 12,
+    maxTermMonths: 120,
+    interestRateMin: 7.9,
+    interestRateMax: 7.9,
+    representativeRate: 7.9,
+    fee: 0,
+    feePercent: 5,
+    monthlyFee: 5.9,
+    features: [
+      "Interest from 7.90%, fixed — Euribor moves do not change the payment",
+      "Contract fee 5% of the loan amount; €0 under a campaign stated to end 31 Oct 2026",
+      "APRC 13.12% on the bank's own example: €9,000 over 60 months at 9.9%, €250 contract fee",
+      "Monthly administration fee €5.90",
+      "No collateral",
+    ],
+    processingTime: "",
+    minAge: 18,
+    requiresIncome: true,
+    applyUrl: "https://tfbank.ee/vaikelaen",
+  },
+  {
     id: "swedbank-personal",
     bankId: "swedbank",
     bankName: "Swedbank",

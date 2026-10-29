@@ -8,7 +8,13 @@
 
 import { describe, it, expect } from 'vitest';
 // The scraper's pure parsing core: plain JS, no Playwright, so it imports here.
-import { extractSeListRates, extractIsFixedRates } from '../deploy/scraper/parsers.mjs';
+import {
+  extractSeListRates,
+  extractIsFixedRates,
+  extract,
+  RATE_PATTERNS,
+  APRC_PATTERNS,
+} from '../deploy/scraper/parsers.mjs';
 
 interface RateResult {
   min: number;
@@ -246,5 +252,70 @@ describe('candidateProductLinks', () => {
   it('stops at the limit', () => {
     const links = Array.from({ length: 10 }, (_, i) => ({ text: `Laen ${i}`, href: `https://tfbank.ee/laen-${i}` }));
     expect(candidateProductLinks(links, 'https://tfbank.ee/', 3)).toHaveLength(3);
+  });
+});
+
+describe('Estonian loan pages added 2026-10-27 (Holm, TF Bank)', () => {
+  // Both pages are in Estonian and lead with a campaign rate, so they are the
+  // first targets where the headline number has an expiry date printed next to
+  // it. The parser must take the advertised rate, not the one buried in the
+  // representative example, and the APRC must come from the example.
+  const BAND_RATE: [number, number] = [4, 25];
+  const rateOf = (text: string) => extract(text, RATE_PATTERNS, BAND_RATE);
+  // Same call the scraper makes: the fee filter is off for APRC, because an APRC
+  // is the all-in rate and always sits in a sentence full of fee words.
+  const aprcOf = (text: string) => extract(text, APRC_PATTERNS, [0.5, 35], { feeGuard: false });
+
+  // holmbank.ee/et/eraklient/laenud/holm-vaikelaen, as innerText gave it.
+  // The rate sits on its own line under its label, and "Lepingutasu 0 €" (a fee)
+  // is the very next line — close enough to swallow the rate if the fee filter
+  // worked on a fixed character window instead of the line.
+  const holm = [
+    'Väikelaen',
+    'Kampaania kehtib kuni 30.10.2026',
+    'Laenusumma',
+    'kuni 25 000 €',
+    'Fikseeritud intress',
+    '7,99%',
+    'Lepingutasu',
+    '0 €',
+    'Lepingu pikkus',
+    '6–120 kuud',
+    'Haldustasu',
+    '0 €',
+    'Väikelaenu intress on fikseeritud kogu laenuperioodi ajaks ning Euribori muutumine Sinu laenumakseid ei mõjuta.',
+    'Krediidi kulukuse määr on 15,54% aastas järgmistel näidistingimustel: laenusumma 4 500 €, lepingutasu 0 €, haldustasu 0 € kuus, lepingu kestus 48 kuud, fikseeritud intressimäär 7,99% laenusummalt aastas, makstav kogusumma 5 923,42 €, tagasimaksete summa 5 923,42 € ja tagasimaksete arv 48.',
+  ].join('\n');
+
+  it('reads Holm’s advertised rate and the APRC from its own example', () => {
+    expect(rateOf(holm)?.value).toBe(7.99);
+    expect(aprcOf(holm)?.value).toBe(15.54);
+  });
+
+  // tfbank.ee/vaikelaen. The bullet list carries the advertised rate; further
+  // down a worked example quotes 9,9% for a different product mix. Reading the
+  // example would quote a rate two points above what the bank advertises.
+  const tfbank = [
+    'LEPINGUTASU 0€ · KUNI 25 000 € · LAEN 12-120 KUUKS',
+    'Miks valida väikelaen?',
+    '✔ Ei vaja tagatist',
+    '✔ 0 € lepingutasu oktoobris',
+    '✔ Intress alates 7,90%. Intress on fikseeritud ja Euribori muutus ei suurenda laenumakset',
+    '✔ Laenusumma 1000–25 000 €',
+    '✔ Lepingutasu on 5% laenu summast',
+    '✔ Haldustasu 5,9 €',
+    '✔ Tagasimaksmise periood 12–120 kuud',
+    'Näiteks, 9000 € laenu puhul 60 kuuks fikseeritud intressiga 9,9%, lepingutasuga 250 € ja igakuise laenuhaldustasuga 5,9 € on krediidi kulukuse määr 13,12%, tagasimaksete arv 60 makset, tarbija poolt makstav kogusumma ja laenu tagasimaksete summa 12 118,80€.',
+  ].join('\n');
+
+  it('takes TF Bank’s advertised rate, not the example further down the page', () => {
+    expect(rateOf(tfbank)?.value).toBe(7.9);
+    expect(aprcOf(tfbank)?.value).toBe(13.12);
+  });
+
+  it('never reads a contract fee percentage as the interest rate', () => {
+    // "Lepingutasu on 5% laenu summast" is the only percentage on this page.
+    const feeOnly = ['Miks valida väikelaen?', '✔ Lepingutasu on 5% laenu summast'].join('\n');
+    expect(rateOf(feeOnly)).toBeNull();
   });
 });

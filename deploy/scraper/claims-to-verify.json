@@ -315,6 +315,15 @@
     "text": "Same day"
   },
   {
+    "productId": "holm-personal",
+    "institution": "Holm Bank",
+    "sourceUrl": "https://www.holmbank.ee/et/eraklient/laenud/holm-vaikelaen",
+    "id": "holm-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "No fees"
+  },
+  {
     "productId": "if-fi-p1",
     "institution": "If Vahinkovakuutus",
     "sourceUrl": "https://www.if.fi",
@@ -970,5 +979,14 @@
     "kind": "speed",
     "field": "feature",
     "text": "Quick decision"
+  },
+  {
+    "productId": "tfbank-personal",
+    "institution": "TF Bank",
+    "sourceUrl": "https://tfbank.ee/vaikelaen",
+    "id": "tfbank-personal:fee",
+    "kind": "fee",
+    "field": "fee",
+    "text": "Fees 5% + €5.90/mo"
   }
 ]

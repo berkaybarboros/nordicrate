@@ -69,6 +69,8 @@ export const BANK_TO_INSTITUTION: Record<string, string> = {
   swedbank: 'swedbank-ee',
   inbank: 'inbank-ee',
   bigbank: 'bigbank-ee',
+  holm: 'holm-ee',
+  tfbank: 'tfbank-ee',
   citadele: 'citadele-lv',
   'citadele-ee': 'citadele-ee',
   'swedbank-lv': 'swedbank-lv',
@@ -98,6 +100,10 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   inbank: new Set(['personal', 'auto']),
   // mortgage çıkarıldı (2026-10-16): Bigbank kodulaen marj yayınlamıyor, marj bireysel
   bigbank: new Set(['personal', 'auto']),
+  // Holm ve TF Bank yalnız väikelaen yayınlıyor; Holm'un kodulaen/liising ve TF'in
+  // sõidukilaen sayfaları doğrulanmadı, oranları bu ürüne basılmasın.
+  holm: new Set(['personal']),
+  tfbank: new Set(['personal']),
   citadele: new Set(['personal', 'mortgage']),
   'citadele-ee': new Set(['personal', 'auto', 'mortgage']),
   'swedbank-lv': new Set(['personal']),

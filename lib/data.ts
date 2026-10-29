@@ -68,6 +68,11 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'luminor-ee', name: 'Luminor Estonia', shortName: 'Luminor', type: 'bank', country: 'EE', description: 'Baltic banking group with pan-Baltic presence', founded: 2017, website: 'https://www.luminor.ee' },
   { id: 'bigbank-ee', name: 'Bigbank', shortName: 'Bigbank', type: 'bank', country: 'EE', description: 'Estonian consumer credit specialist operating in Baltics', founded: 1992, website: 'https://www.bigbank.ee' },
   { id: 'inbank-ee', name: 'Inbank', shortName: 'Inbank', type: 'bank', country: 'EE', description: 'Estonian digital consumer bank operating in EE, LV, LT, PL', founded: 2015, website: 'https://www.inbank.ee', isDigitalFriendly: true },
+  // 2026-10-27: fi.ee sicilindeki Estonya krediidiasutused listesinden eklendi, iki
+  // kurum da kendi sayfasindan dogrulandi. Holm: Ariregistrikood 14080830, tegevusluba
+  // 02.04.2019. TF Bank: Isvec TF Bank AB'nin Eesti filiaali (Avarda Group).
+  { id: 'holm-ee', name: 'Holm Bank AS', shortName: 'Holm Bank', type: 'bank', country: 'EE', description: 'Estonian consumer bank — small loans, instalment credit (Liisi) and deposits', founded: 2019, website: 'https://www.holmbank.ee', isDigitalFriendly: true },
+  { id: 'tfbank-ee', name: 'TF Bank AB Eesti filiaal', shortName: 'TF Bank', type: 'bank', country: 'EE', description: 'Estonian branch of the Swedish consumer lender TF Bank AB', website: 'https://tfbank.ee', isDigitalFriendly: true },
   // citadele.ee sayfa doğrulaması 2026-08-05 (consumer + autocredit + mortgage)
   { id: 'citadele-ee', name: 'Citadele Estonia', shortName: 'Citadele', type: 'bank', country: 'EE', description: 'Estonian branch of the Baltic Citadele group', founded: 2010, website: 'https://www.citadele.ee', isDigitalFriendly: true },
 
