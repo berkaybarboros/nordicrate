@@ -266,30 +266,39 @@ describe('Estonian loan pages added 2026-10-27 (Holm, TF Bank)', () => {
   // is the all-in rate and always sits in a sentence full of fee words.
   const aprcOf = (text: string) => extract(text, APRC_PATTERNS, [0.5, 35], { feeGuard: false });
 
-  // holmbank.ee/et/eraklient/laenud/holm-vaikelaen, as innerText gave it.
-  // The rate sits on its own line under its label, and "Lepingutasu 0 €" (a fee)
-  // is the very next line — close enough to swallow the rate if the fee filter
-  // worked on a fixed character window instead of the line.
+  // holmbank.ee/et/eraklient/laenud/holm-vaikelaen on 2026-10-31, the day after
+  // its campaign ended — the whole block was rewritten overnight: the headline
+  // went from a fixed 7.99% to "alates 5,99%", and the two 0 € fees came back as
+  // 50 € and 0,99 €. The rate still sits on its own line under its label with a
+  // fee label on the next line, which is what the per-line fee filter has to get
+  // right; now the fee lines carry real numbers, so a looser filter would read
+  // one of them as the rate.
   const holm = [
     'Väikelaen',
-    'Kampaania kehtib kuni 30.10.2026',
     'Laenusumma',
     'kuni 25 000 €',
-    'Fikseeritud intress',
-    '7,99%',
-    'Lepingutasu',
-    '0 €',
+    'Intress alates',
+    '5,99%',
+    'Lepingutasu alates',
+    '50 €',
     'Lepingu pikkus',
     '6–120 kuud',
-    'Haldustasu',
-    '0 €',
+    'Haldustasu alates',
+    '0,99 €',
     'Väikelaenu intress on fikseeritud kogu laenuperioodi ajaks ning Euribori muutumine Sinu laenumakseid ei mõjuta.',
-    'Krediidi kulukuse määr on 15,54% aastas järgmistel näidistingimustel: laenusumma 4 500 €, lepingutasu 0 €, haldustasu 0 € kuus, lepingu kestus 48 kuud, fikseeritud intressimäär 7,99% laenusummalt aastas, makstav kogusumma 5 923,42 €, tagasimaksete summa 5 923,42 € ja tagasimaksete arv 48.',
+    'Krediidi kulukuse määr on 19,79% aastas järgmistel näidistingimustel: laenusumma 4 500 €, lepingutasu 67,50 €, haldustasu 0,99 € kuus, lepingu kestus 48 kuud, fikseeritud intressimäär 9,40% laenusummalt aastas, makstav kogusumma 6 289,64 €, tagasimaksete summa 6 222,14 € ja tagasimaksete arv 48.',
   ].join('\n');
 
   it('reads Holm’s advertised rate and the APRC from its own example', () => {
-    expect(rateOf(holm)?.value).toBe(7.99);
-    expect(aprcOf(holm)?.value).toBe(15.54);
+    expect(rateOf(holm)?.value).toBe(5.99);
+    expect(aprcOf(holm)?.value).toBe(19.79);
+  });
+
+  it('does not mistake Holm’s fee lines for the rate', () => {
+    // 50 € and 0,99 € are euro amounts, but 9,40% inside the example is a
+    // percentage on a fee-heavy line, and 1.5% is what that 67,50 € works out
+    // to — neither is the advertised rate.
+    expect(rateOf(holm)?.snippet).toContain('5,99');
   });
 
   // tfbank.ee/vaikelaen. The bullet list carries the advertised rate; further

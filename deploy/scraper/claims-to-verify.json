@@ -321,7 +321,7 @@
     "id": "holm-personal:fee",
     "kind": "fee",
     "field": "fee",
-    "text": "No fees"
+    "text": "Fees 1.5% (min €50) + €0.99/mo"
   },
   {
     "productId": "if-fi-p1",

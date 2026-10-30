@@ -75,17 +75,19 @@ export const personalLoans: LoanOffer[] = [
     applyUrl: "https://www.lhv.ee/en/consumer-loan",
   },
   {
-    // Holm Bank vaikelaen — sayfa okundu 2026-10-27.
-    // Sayfanin yazdigi: summa kuni 25 000 EUR, fikseeritud intress 7,99%,
-    // lepingutasu 0 EUR, haldustasu 0 EUR, lepingu pikkus 6-120 kuud. Hesap
-    // makinesi min/max: 500-25 000 EUR, 6-120 kuu.
-    // DIKKAT 1: 7,99% bir KAMPANYA orani — sayfa "Kampaania kehtib kuni
-    // 30.10.2026" diyor. Kampanya bitince scraper'in okudugu oran gecerli olur;
-    // buradaki deger yalnizca canli veri yokken gosterilen yedek.
-    // DIKKAT 2: faiz KALAN BAKIYEDEN degil LAEN SUMMASINDAN hesaplaniyor
-    // ("7,99% laenusummalt aastas"), bu yuzden KKM 15,54%. Bakiyeden faiz
-    // isleyen bankalarla yan yana sadece nominal orani karsilastirmak yaniltir —
-    // ozellik satirinda ikisi de yaziyor.
+    // Holm Bank vaikelaen — sayfa okundu 2026-10-31 (ilk kayit 2026-10-27).
+    // 30.10.2026'da biten kampanya ("fikseeritud intress 7,99%, lepingutasu 0 EUR,
+    // haldustasu 0 EUR") sona erdi ve sayfa bastan yazildi. Bugunun fiyati:
+    //   Intress ALATES 5,99% (artik sabit degil, kisisellestirilmis)
+    //   Lepingutasu alates 50 EUR · Haldustasu alates 0,99 EUR/ay
+    //   Temsili ornek: 4 500 EUR / 48 ay, lepingutasu 67,50 EUR (=%1,5),
+    //   haldustasu 0,99 EUR/ay, sabit %9,40 LAEN SUMMASINDAN -> KKM %19,79
+    // Kampanyanin bitisi bu satirin neden canli feed'e bagli oldugunu gosteriyor:
+    // nominal oran DUSTU (7,99 -> 5,99) ama ucretler geri geldigi icin gercek
+    // maliyet YUKSELDI (KKM 15,54 -> 19,79). Yalniz orana bakan karsilastirma
+    // yanlis yone isaret ederdi.
+    // DIKKAT: faiz kalan bakiyeden degil laen summasindan isliyor — bakiyeden
+    // faiz isleyen bankalarla kiyaslanabilir olan sayi KKM, nominal oran degil.
     id: "holm-personal",
     bankId: "holm",
     bankName: "Holm Bank",
@@ -95,17 +97,17 @@ export const personalLoans: LoanOffer[] = [
     maxAmount: 25000,
     minTermMonths: 6,
     maxTermMonths: 120,
-    interestRateMin: 7.99,
-    interestRateMax: 7.99,
-    representativeRate: 7.99,
-    fee: 0,
-    feePercent: 0,
-    monthlyFee: 0,
+    interestRateMin: 5.99,
+    interestRateMax: 9.4,
+    representativeRate: 9.4,
+    fee: 50,
+    feePercent: 1.5,
+    monthlyFee: 0.99,
     features: [
-      "Fixed 7.99% campaign rate, stated valid until 30 Oct 2026",
+      "Rate from 5.99%, personalised — the bank's example uses 9.40%",
       "Interest charged on the original loan amount, not the balance",
-      "APRC 15.54% on the bank's own example: €4,500 over 48 months, €5,923.42 total",
-      "Contract fee €0, monthly administration fee €0",
+      "APRC 19.79% on that example: €4,500 over 48 months, €6,289.64 total",
+      "Contract fee from €50 (1.5% in the example); administration fee from €0.99 per month",
       "Optional payment protection insurance (If P&C Insurance AS)",
     ],
     processingTime: "",
