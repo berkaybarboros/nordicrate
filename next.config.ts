@@ -33,6 +33,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Bu repo bir git worktree içinde de açılıyor ve o zaman iki package-lock.json
+  // görünür oluyor; Next kökü ÜST dizin sanıp worktree'deki route'ları bulamıyor.
+  // Belirtisi yanıltıcı: `npm run dev` ayağa kalkıyor, ana sayfa geliyor, ama
+  // /loans, /deposits, /countries — hepsi 404. Kökü config'in bulunduğu yere
+  // sabitliyoruz; hangi checkout'tan çalıştırılırsa çalıştırılsın doğru.
+  outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
   images: {
     remotePatterns: [

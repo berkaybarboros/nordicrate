@@ -81,6 +81,20 @@ interface FeedbackRow {
   source: string | null;
 }
 
+interface DemandRow {
+  created_at: string;
+  product_type: string | null;
+  country: string | null;
+  amount: number | null;
+  term_months: number | null;
+  result_count: number;
+  live_count: number | null;
+  note: string | null;
+  email: string | null;
+  page: string;
+  source: string | null;
+}
+
 interface DepositRateRow {
   bank_id: string;
   rates: Record<string, number> | null;
@@ -110,6 +124,7 @@ const EMPTY_DATA = {
   depositRates: [] as DepositRateRow[],
   feedback: [] as FeedbackRow[],
   applications: [] as ApplicationRow[],
+  demand: [] as DemandRow[],
   failedAttempts: [] as FailedAttemptRow[],
   onboardingSteps: [] as OnboardingStepRow[],
 };
@@ -131,7 +146,7 @@ async function loadDataInner() {
 
   const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 
-  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes, fbRes, appsRes] = await Promise.all([
+  const [leadsRes, eventsRes, alertsRes, scrapedRes, onbRes, depRes, loanFailRes, depFailRes, fbRes, demandRes, appsRes] = await Promise.all([
     client
       .from('leads')
       .select('*')
@@ -187,6 +202,14 @@ async function loadDataInner() {
       .gte('created_at', since30d)
       .order('created_at', { ascending: false })
       .limit(200),
+    // Karsilanmamis talep (2026-10-31): bos donen aramalar. user_feedback alti
+    // haftada tek satir topladi; bu tablo kullanicinin yazmasini beklemiyor.
+    client
+      .from('demand_signals')
+      .select('created_at, product_type, country, amount, term_months, result_count, live_count, note, email, page, source')
+      .gte('created_at', since30d)
+      .order('created_at', { ascending: false })
+      .limit(500),
     // Hizlandirici/yatirimci basvurulari — tablo yoksa sessizce bos doner
     client
       .from('startup_applications')
@@ -206,6 +229,7 @@ async function loadDataInner() {
     depositRates: (depRes.data ?? []) as DepositRateRow[],
     feedback: (fbRes.data ?? []) as FeedbackRow[],
     applications: (appsRes.data ?? []) as ApplicationRow[],
+    demand: (demandRes.data ?? []) as DemandRow[],
     failedAttempts: [
       ...((loanFailRes.data ?? []) as FailedAttemptRow[]),
       ...((depFailRes.data ?? []) as FailedAttemptRow[]).map((r) => ({ ...r, product_type: 'deposit' })),
@@ -231,7 +255,7 @@ function pct(n: number, of: number): string {
 export default async function AdminDashboard() {
   if (!(await isAdminAuthed())) redirect('/admin/login');
 
-  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps, feedback, applications } = await loadData();
+  const { usingServiceRole, leads, leadsError, events, eventsError, alertCount, scrapedRates, depositRates, failedAttempts, onboardingSteps, feedback, applications, demand } = await loadData();
   const appsOpen = applications
     .filter((a) => a.status !== 'skipped' && a.fit !== 'not_eligible')
     .sort((a, b) => {
@@ -239,6 +263,23 @@ export default async function AdminDashboard() {
       const db = b.deadline ? new Date(b.deadline).getTime() : Infinity;
       return da - db;
     });
+  // Karsilanmamis talep: ayni (urun, ulke, vade) kombinasyonunu kac kez bos
+  // dondurduk. Siralama = urun backlog'u; ayni zamanda bir bankaya gosterilecek
+  // tek somut kanit ("47 kisi Finlandiya konut kredisi aradi, 47'si bos dondu").
+  const unmet = demand.filter((d) => d.result_count === 0);
+  const unmetRanked = Array.from(
+    unmet.reduce((map, d) => {
+      const key = [d.product_type ?? '?', d.country ?? '-', d.term_months ? `${d.term_months}m` : ''].filter(Boolean).join(' · ');
+      const prev = map.get(key) ?? { key, count: 0, notes: [] as string[], emails: 0 };
+      prev.count += 1;
+      if (d.note) prev.notes.push(d.note);
+      if (d.email) prev.emails += 1;
+      map.set(key, prev);
+      return map;
+    }, new Map<string, { key: string; count: number; notes: string[]; emails: number }>()).values(),
+  ).sort((a, b) => b.count - a.count);
+  const demandWithContact = demand.filter((d) => d.email || d.note);
+
   const fbYes = feedback.filter((f) => f.helpful === true).length;
   const fbNo = feedback.filter((f) => f.helpful === false).length;
   const fbMessages = feedback.filter((f) => f.message);
@@ -563,6 +604,47 @@ export default async function AdminDashboard() {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Unmet demand (2026-10-31). user_feedback alti haftada 1 satir topladi;
+          bu tablo kullanicinin yazmasini beklemiyor — bos donen her arama bir satir. */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-extrabold text-slate-900">Unmet Demand · 30d</h2>
+          <span className="text-xs text-slate-500">
+            <strong className="text-amber-700">{unmet.length}</strong> empty searches · {demandWithContact.length} left a note or email
+          </span>
+        </div>
+        <p className="text-xs text-slate-400 mb-4">
+          What people filtered for and we had nothing to show. Top of this list is what to add next —
+          and it is the one piece of evidence a lender actually responds to.
+        </p>
+        {unmetRanked.length === 0 ? (
+          <p className="text-sm text-slate-400">No empty searches recorded yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                  <th className="py-2 pr-4">Searched for</th>
+                  <th className="py-2 pr-4">Times</th>
+                  <th className="py-2 pr-4">Left email</th>
+                  <th className="py-2">In their words</th>
+                </tr>
+              </thead>
+              <tbody>
+                {unmetRanked.slice(0, 25).map((row) => (
+                  <tr key={row.key} className="border-b border-slate-50 last:border-0 align-top">
+                    <td className="py-2 pr-4 text-slate-800 whitespace-nowrap font-medium">{row.key}</td>
+                    <td className="py-2 pr-4 text-slate-900 font-bold">{row.count}</td>
+                    <td className="py-2 pr-4 text-slate-500">{row.emails || '-'}</td>
+                    <td className="py-2 text-slate-600 max-w-md">{row.notes.slice(0, 3).join(' · ') || '-'}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

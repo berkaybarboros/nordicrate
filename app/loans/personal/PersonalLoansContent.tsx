@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useFetchJson } from "@/lib/use-fetch-json";
+import DemandCapture from "@/components/DemandCapture";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Info, ArrowUpDown, Bell } from "lucide-react";
@@ -265,6 +266,20 @@ function PersonalLoansInner() {
                   termMonths={termMonths}
                 />
               ))}
+
+            {/* Boş dönen arama ürün backlog'u. Tutar/vade filtresi hiçbir teklife
+                uymadığında bize eksik olanı söylüyor — kullanıcının yazmasına gerek yok. */}
+            {!loading && offers.length === 0 && (
+              <DemandCapture
+                what={`a ${formatCurrency(amount)} personal loan over ${termMonths} months`}
+                page="/loans/personal"
+                productType="personal"
+                amount={amount}
+                termMonths={termMonths}
+                resultCount={0}
+                liveCount={liveCount}
+              />
+            )}
 
             {!loading && offers.length > 0 && (
               <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">

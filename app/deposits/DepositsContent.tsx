@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useFetchJson } from "@/lib/use-fetch-json";
+import DemandCapture from "@/components/DemandCapture";
 import { PiggyBank, Lock, TrendingUp, ExternalLink, BarChart2, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { buildGoLink } from "@/lib/affiliate";
@@ -357,10 +358,24 @@ export default function DepositsContent() {
             ))}
 
           {!loading && offers.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <PiggyBank size={48} className="mx-auto mb-3 text-gray-300" />
-              <p>No banks offer {selectedTerm}-month deposits. Try a different term.</p>
-            </div>
+            <>
+              <div className="text-center py-10 text-gray-500">
+                <PiggyBank size={48} className="mx-auto mb-3 text-gray-300" />
+                <p>No banks offer {selectedTerm}-month deposits. Try a different term.</p>
+              </div>
+              {/* Boş dönen arama ürün backlog'u: ne arandığı kaydedilir, kullanıcı
+                  bir şey yazmak zorunda değil. */}
+              <DemandCapture
+                what={`${selectedTerm}-month deposits`}
+                page="/deposits"
+                productType="deposit"
+                country="EE"
+                amount={amount}
+                termMonths={selectedTerm}
+                resultCount={0}
+                liveCount={meta?.liveCount ?? null}
+              />
+            </>
           )}
 
           <p className="text-xs text-gray-400 text-center py-4 leading-relaxed">
