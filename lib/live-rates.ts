@@ -122,6 +122,27 @@ export const ALLOWED_TYPES_BY_BANK: Record<string, Set<string>> = {
   'islandsbanki-is': new Set(['mortgage']),
 };
 
+/**
+ * Sayfadaki sayının MARJ olduğu ürünler — gösterilecek oran marj + 6 aylık Euribor.
+ *
+ * Bu karar eskiden snippet'te "euribor" kelimesi geçiyor mu diye bakılarak
+ * veriliyordu. TF Bank'in väikelaen sayfası "Intress on fikseeritud ja Euribori
+ * muutus ei suurenda laenumakset" yazıyor — Euribor'un etkilemediğini söylüyor —
+ * ve kod bunu "bu bir marj" diye okuyup sabit %7,90'a 2,92 ekledi; site 30 Ekim
+ * boyunca TF Bank'i %10,82 ile listeledi. Sayfanın kelimesinden çıkarım yapmak
+ * yerine yapılandırmaya bakıyoruz.
+ *
+ * deploy/scraper/parsers.mjs içindeki MARGIN_PLUS_EURIBOR ile aynı olmalı;
+ * tests/scraper-parsers.test.ts ikisini karşılaştırıyor.
+ */
+export const MARGIN_PLUS_EURIBOR = new Set([
+  'lhv:mortgage',
+  'coop:mortgage',
+  'seb:mortgage',
+  'citadele:mortgage',
+  'citadele-ee:mortgage',
+]);
+
 export interface LiveLoanRate {
   /** Kullanıcıya gösterilecek taban oran (marjlı ürünlerde marj + canlı Euribor 6M) */
   rate: number;
@@ -148,7 +169,7 @@ export async function getLiveLoanRates(): Promise<Map<string, LiveLoanRate>> {
 
   // Marj tabanlı oranlar için canlı EURIBOR 6M (rate_snapshots — kendi cron'umuz besliyor)
   let euribor6m: number | null = null;
-  if (rows.some((r) => /euribor/i.test(r.raw_snippet ?? ''))) {
+  if (rows.some((r) => MARGIN_PLUS_EURIBOR.has(`${r.bank_id}:${r.product_type}`))) {
     const snap = await pgRest<Array<{ rate: number | string }>>(
       'rate_snapshots?select=rate&key=eq.euribor6m&order=fetched_at.desc&limit=1'
     );
@@ -165,7 +186,7 @@ export async function getLiveLoanRates(): Promise<Map<string, LiveLoanRate>> {
     if (!Number.isFinite(rate)) continue;
 
     // Marj + Euribor → gerçek taban oran. Canlı Euribor yoksa marjı APR gibi basma (UCPD)
-    if (/euribor/i.test(r.raw_snippet ?? '')) {
+    if (MARGIN_PLUS_EURIBOR.has(`${r.bank_id}:${r.product_type}`)) {
       if (euribor6m == null) continue;
       rate = Math.round((rate + euribor6m) * 100) / 100;
     }

@@ -14,6 +14,7 @@ import {
   extract,
   RATE_PATTERNS,
   APRC_PATTERNS,
+  MARGIN_PLUS_EURIBOR,
 } from '../deploy/scraper/parsers.mjs';
 
 interface RateResult {
@@ -129,6 +130,7 @@ describe('Icelandic rate tables (PDF text)', () => {
 
 // ─── Failure evidence and register crawl (no SSH: this is all we see) ─────────
 
+import { MARGIN_PLUS_EURIBOR as LIVE_MARGIN_PLUS_EURIBOR } from '../lib/live-rates';
 import {
   candidateProductLinks,
   failureSnippet,
@@ -326,5 +328,31 @@ describe('Estonian loan pages added 2026-10-27 (Holm, TF Bank)', () => {
     // "Lepingutasu on 5% laenu summast" is the only percentage on this page.
     const feeOnly = ['Miks valida väikelaen?', '✔ Lepingutasu on 5% laenu summast'].join('\n');
     expect(rateOf(feeOnly)).toBeNull();
+  });
+});
+
+describe('margin-plus-Euribor products', () => {
+  // The scraper and the site each hold a copy of this list, one in plain JS and
+  // one in TypeScript, because neither can import the other. They must agree:
+  // a product in one and not the other is either a margin shown as if it were
+  // the whole rate, or a rate with a Euribor added on top of it.
+  it('is the same list in the scraper and in lib/live-rates', () => {
+    expect([...MARGIN_PLUS_EURIBOR].sort()).toEqual([...LIVE_MARGIN_PLUS_EURIBOR].sort());
+  });
+
+  // Every entry is "bank_id:product_type", the key both sides build from a
+  // scraped row. A typo here silently stops the Euribor being added.
+  it('uses bank_id:product_type keys', () => {
+    for (const key of MARGIN_PLUS_EURIBOR) {
+      expect(key).toMatch(/^[a-z-]+:(personal|mortgage|auto)$/);
+    }
+  });
+
+  // The bug this list replaced: TF Bank's page says a Euribor move does NOT
+  // change the payment, and the old check read the word "euribor" in that
+  // sentence as proof the scraped number was a margin.
+  it('does not include the fixed-rate consumer lenders', () => {
+    expect(MARGIN_PLUS_EURIBOR.has('tfbank:personal')).toBe(false);
+    expect(MARGIN_PLUS_EURIBOR.has('holm:personal')).toBe(false);
   });
 });

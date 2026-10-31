@@ -260,6 +260,27 @@ function extractIsFixedRates(pdfText, cfg) {
 }
 
 
+/**
+ * Sayfadaki sayının MARJ olduğu ürünler — gösterilecek oran marj + 6 aylık Euribor.
+ * `bank_id:product_type`.
+ *
+ * Bu liste neden var: lib/live-rates.ts eskiden kararı snippet'te "euribor"
+ * kelimesi geçip geçmediğine bakarak veriyordu. TF Bank'in sayfasi "Intress on
+ * fikseeritud ja Euribori muutus ei suurenda laenumakset" diyor — yani tam
+ * TERSİ — ve kod sabit %7,90'a Euribor ekleyip siteye %10,82 bastı. Hangi ürünün
+ * marjlı olduğu bir yazım tesadüfü değil, yapılandırma bilgisi; burada duruyor.
+ *
+ * Yeni marjlı hedef eklerken BURAYA da ekle: tests/scraper-parsers.test.ts bu
+ * listeyle lib/live-rates.ts'deki kopyanın aynı olmasını şart koşuyor.
+ */
+export const MARGIN_PLUS_EURIBOR = new Set([
+  'lhv:mortgage',
+  'coop:mortgage',
+  'seb:mortgage',
+  'citadele:mortgage',
+  'citadele-ee:mortgage',
+]);
+
 export {
   extract,
   extractDepositRates,

@@ -34,6 +34,7 @@ import {
   RATE_PATTERNS,
   MARGIN_PATTERN,
   APRC_PATTERNS,
+  MARGIN_PLUS_EURIBOR,
   MIN_AMOUNT,
 } from './parsers.mjs';
 
@@ -509,7 +510,10 @@ async function main() {
         await page.waitForTimeout(target.waitMs ?? 3000);
         const text = await page.evaluate(() => document.body.innerText);
 
-        const ratePatterns = target.marginPlusEuribor ? [...RATE_PATTERNS, MARGIN_PATTERN] : RATE_PATTERNS;
+        // Tek kaynak: hangi ürünün sayfadaki sayısı marjdır. Hedefteki eski
+        // `marginPlusEuribor: true` bayrağıyla birlikte tutulur, ikisi ayrışamasın.
+        const isMargin = MARGIN_PLUS_EURIBOR.has(`${bank.bankId}:${target.productType}`);
+        const ratePatterns = isMargin ? [...RATE_PATTERNS, MARGIN_PATTERN] : RATE_PATTERNS;
         const rate = extract(text, ratePatterns, target.band);
         // aprcBand: sayfada başka ürünün APR örneği varsa (Citadele mortgage
         // sayfasındaki kredi kartı %14.76'sı gibi) yanlış yakalamayı band keser
@@ -518,12 +522,12 @@ async function main() {
         const aprc = extract(text, APRC_PATTERNS, target.aprcBand ?? [0.5, 35], { feeGuard: false });
         const parseOk = rate !== null;
 
-        // Marj işareti: override katmanının /euribor/i tespiti için snippet'e eklenir.
-        // Ürün yapısı (marj + Euribor) sayfa incelemesiyle manuel doğrulandı.
+        // Marj işareti artık yalnızca insan okusun diye: override katmanı kararını
+        // MARGIN_PLUS_EURIBOR listesinden veriyor, snippet'teki kelimeden değil.
         // Okunamadıysa ilk 300 karakter (çerez bandı) değil, sayfadaki oran cümleleri
         let snippet = rate?.snippet ?? failureSnippet(text);
-        if (parseOk && target.marginPlusEuribor && !/euribor/i.test(snippet)) {
-          snippet += ' [margin + 6-month Euribor — page-flagged]';
+        if (parseOk && isMargin) {
+          snippet += ' [margin + 6-month Euribor]';
         }
 
         if (!dryRun) {
@@ -539,7 +543,7 @@ async function main() {
         }
 
         if (parseOk) {
-          console.log(`[scraper] OK — rate ${rate.value}%${aprc ? `, APRC ${aprc.value}%` : ''}${target.marginPlusEuribor ? ' (margin)' : ''}`);
+          console.log(`[scraper] OK — rate ${rate.value}%${aprc ? `, APRC ${aprc.value}%` : ''}${isMargin ? ' (margin)' : ''}`);
         } else {
           failures++;
           console.warn(`[scraper] PARSE FAILED — oran deseni bulunamadı (selector drift?). parse_ok=false.`);
