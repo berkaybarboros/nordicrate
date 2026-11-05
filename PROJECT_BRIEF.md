@@ -24,7 +24,7 @@ yüzden EU AI Act yüksek-risk kategorisinin dışında. Sigortada gerçek fiyat
   user_profiles, affiliate_links, blog_posts, user_feedback, company_profile, startup_applications
 - **Canlı veri**: Playwright scraper (`deploy/scraper/scrape-rates.mjs`, cron 06:30) + ECB SDMX
   (EURIBOR) + Norges Bank API
-- **AI**: Groq — llama-3.3-70b-versatile (streaming SSE)
+- **AI**: Groq — model ids in `lib/groq.ts` (streaming SSE)
 - **Hosting**: Hetzner VPS `46.62.166.105`, PM2 cluster (port 3001), Nginx Proxy Manager + Let's
   Encrypt, Cloudflare (Full Strict)
 - **Test/CI**: vitest (`tests/`), GitHub Actions `ci.yml` — typecheck, lint, test, build

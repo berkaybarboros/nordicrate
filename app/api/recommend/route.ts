@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
 import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { enforceRateLimit, isValidSessionId, clampNumber } from '@/lib/security';
+import { callGroq } from '@/lib/groq';
 
 // Product catalogs (static data — gerçek banka verileri)
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
@@ -219,22 +220,14 @@ Write 1-2 sentences for each product explaining WHY it's recommended for this sp
     let marketSummary = '';
 
     try {
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: 'Explain each recommendation.' },
-          ],
-          temperature: 0.4,
-          max_tokens: 600,
-          response_format: { type: 'json_object' },
-        }),
+      const groqRes = await callGroq('recommend', {
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'Explain each recommendation.' },
+        ],
+        temperature: 0.4,
+        max_tokens: 600,
+        response_format: { type: 'json_object' },
       });
 
       if (groqRes.ok) {

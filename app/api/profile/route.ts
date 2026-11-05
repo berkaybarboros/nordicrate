@@ -1,6 +1,7 @@
 import type { UserProfile } from '@/lib/profile';
 import type { CorporateProfile } from '@/lib/corporate-profile';
 import { enforceRateLimit, sanitizeChatMessages } from '@/lib/security';
+import { callGroq } from '@/lib/groq';
 
 export const runtime = 'nodejs';
 
@@ -53,21 +54,13 @@ export async function POST(req: Request) {
       .map((m) => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
       .join('\n');
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 256,
-        temperature: 0,
-        messages: [
-          { role: 'system', content: extractPrompt },
-          { role: 'user', content: conversation },
-        ],
-      }),
+    const res = await callGroq('profile', {
+      max_tokens: 256,
+      temperature: 0,
+      messages: [
+        { role: 'system', content: extractPrompt },
+        { role: 'user', content: conversation },
+      ],
     });
 
     if (!res.ok) return Response.json({});

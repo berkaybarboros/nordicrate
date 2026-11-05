@@ -2,6 +2,7 @@ import { buildSystemPrompt, type AssistantMode, type OnboardingContext } from '@
 import type { LiveRatesData } from '@/lib/types';
 import { matchPrograms, type CorporateProfile } from '@/lib/corporate-profile';
 import { enforceRateLimit, sanitizeChatMessages } from '@/lib/security';
+import { callGroq } from '@/lib/groq';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -72,31 +73,16 @@ export async function POST(req: Request) {
 
     const systemPrompt = buildSystemPrompt(mode, liveRates, topProgramsText, onboardingProfile);
 
-    const callGroq = (model: string) =>
-      fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1024,
-          stream: true,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages.map((m) => ({ role: m.role, content: m.content })),
-          ],
-        }),
-      });
-
-    let res = await callGroq('llama-3.3-70b-versatile');
-
-    // Groq TPM limiti dolduysa: küçük model AYRI kota kullanır — kullanıcı kesinti görmez
-    if (res.status === 429) {
-      console.warn('[chat] 70b TPM limit — falling back to 8b-instant');
-      res = await callGroq('llama-3.1-8b-instant');
-    }
+    // callGroq, TPM limiti dolan ya da kaldırılan modeli ikinci modele devreder —
+    // ayrı kota, kullanıcı kesinti görmez. Model id'leri lib/groq.ts'te.
+    const res = await callGroq('chat', {
+      max_tokens: 1024,
+      stream: true,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.map((m) => ({ role: m.role, content: m.content })),
+      ],
+    });
 
     if (res.status === 429) {
       // Her iki model de dolu — dürüst mesaj + Retry-After

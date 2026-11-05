@@ -9,6 +9,7 @@
 
 import { NextRequest } from 'next/server';
 import { enforceRateLimit, sanitizeChatMessages, clampString } from '@/lib/security';
+import { callGroq } from '@/lib/groq';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -112,29 +113,16 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'messages and compareItems required' }, { status: 400 });
     }
 
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      return Response.json({ error: 'AI not configured' }, { status: 503 });
-    }
-
     const systemPrompt = buildCompareSystemPrompt(compareItems, userCtx);
 
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
-        temperature: 0.5,
-        max_tokens: 400,
-        stream: true,
-      }),
+    const groqRes = await callGroq('compare-chat', {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.5,
+      max_tokens: 400,
+      stream: true,
     });
 
     if (!groqRes.ok) {

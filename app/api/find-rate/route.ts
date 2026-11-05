@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
 import { enforceRateLimit, isValidEmail, isValidSessionId, clampNumber } from '@/lib/security';
+import { callGroq, MODEL_VERSION } from '@/lib/groq';
 
 export const runtime = 'nodejs';
 import { logoFromBankId, monogram } from '@/lib/logos';
 
 // Product catalogs
 import { personalLoans, mortgageLoans, carLoans } from '@/data/loans';
-import { describeFee } from '@/lib/loan-cost';
+import { describeFee, loanCost } from '@/lib/loan-cost';
 import { withLiveRates } from '@/lib/live-loan-offers';
 import {
   motorInsurance, cascoInsurance, homeInsurance, healthInsurance,
@@ -28,6 +29,55 @@ async function getProducts(productType: string) {
     case 'health':    return healthInsurance.map(p => ({ ...p, category: 'insurance' }));
     default:          return [];
   }
+}
+
+// ─── Ranking without the AI ─────────────────────────────────────────────────────
+// 2026-11-01: Groq retired the model this route named, so the AI call answered
+// 404, the route threw, and "Find your best rate" returned "Internal server
+// error" to everyone who clicked it. Ranking cheapest-first needs no model at
+// all — the AI only ever wrote the prose around it. So when the model is
+// unavailable the picks still come back, with the summary saying plainly that
+// they are ordered by cost rather than explained.
+function rankByCost(
+  products: { category: string }[],
+  isInsurance: boolean,
+  amount: number | undefined,
+  termMonths: number | undefined,
+): { rank: number; productIndex: number; whyThis: string }[] {
+  const scored = products.map((p, productIndex) => {
+    if (isInsurance) {
+      const ins = p as unknown as typeof motorInsurance[number];
+      return { productIndex, score: ins.representativePremium, eligible: true };
+    }
+    const loan = p as unknown as typeof personalLoans[number];
+    // Ranking has to use the same amount and term the visitor asked for: a fee
+    // of €100 is nothing on €100k and a fifth of the cost on a €2k loan.
+    const amt = amount && amount > 0 ? amount : loan.minAmount;
+    const months = termMonths && termMonths > 0 ? termMonths : loan.minTermMonths;
+    const eligible =
+      (!amount || (amount >= loan.minAmount && amount <= loan.maxAmount)) &&
+      (!termMonths || (termMonths >= loan.minTermMonths && termMonths <= loan.maxTermMonths));
+    return { productIndex, score: loanCost(loan, amt, months).apr, eligible };
+  });
+
+  // An offer whose limits exclude the request is kept, but behind every offer
+  // that fits — better than showing nothing when nothing fits exactly.
+  return scored
+    .sort((a, b) => Number(b.eligible) - Number(a.eligible) || a.score - b.score)
+    .slice(0, 3)
+    .map((s, i) => ({
+      rank: i + 1,
+      productIndex: s.productIndex,
+      // Rank-aware: only the first pick is the cheapest, and saying "lowest" on
+      // all three would be a claim the ranking does not support.
+      whyThis: isInsurance
+        ? i === 0
+          ? 'Lowest example premium among the insurers we list for this cover.'
+          : `${i === 1 ? 'Second' : 'Third'}-lowest example premium among the insurers we list.`
+        : s.eligible
+          ? `${i === 0 ? 'Lowest' : i === 1 ? 'Second-lowest' : 'Third-lowest'} total cost for €${(amount ?? 0).toLocaleString()} over ${termMonths ?? 0} months, fees included.`
+          : 'Among the cheapest we list, though its limits do not cover the amount or term you entered.',
+    }));
 }
 
 // ─── POST /api/find-rate ────────────────────────────────────────────────────────
@@ -112,35 +162,36 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
 }`;
 
     // ─── Groq call (non-streaming, JSON mode) ────────────────────────────────────
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: 'Give me the top 3 recommendations.' },
-        ],
-        temperature: 0.3,
-        max_tokens: 800,
-        response_format: { type: 'json_object' },
-      }),
+    const groqRes = await callGroq('find-rate', {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: 'Give me the top 3 recommendations.' },
+      ],
+      temperature: 0.3,
+      max_tokens: 800,
+      response_format: { type: 'json_object' },
     });
 
-    if (!groqRes.ok) throw new Error(`Groq API error: ${groqRes.status}`);
-    const groqData = await groqRes.json() as { choices: { message: { content: string } }[] };
-    const raw = groqData.choices[0]?.message?.content ?? '{}';
     let parsed: {
       summary?: string;
       recommendations?: { rank: number; productIndex: number; whyThis: string }[];
     } = {};
-    try { parsed = JSON.parse(raw); } catch { /* fallback below */ }
+    if (groqRes.ok) {
+      const groqData = await groqRes.json() as { choices: { message: { content: string } }[] };
+      try { parsed = JSON.parse(groqData.choices[0]?.message?.content ?? '{}'); } catch { /* ranked below */ }
+    } else {
+      console.error(`[find-rate] Groq unavailable (${groqRes.status}) — ranking by cost instead`);
+    }
 
-    const aiSummary = parsed.summary ?? 'Here are our top picks based on your requirements.';
-    const recs      = parsed.recommendations ?? [];
+    const aiRecs = parsed.recommendations ?? [];
+    const usedAI = aiRecs.length > 0;
+    const recs = usedAI ? aiRecs : rankByCost(products, isInsurance, amount, termMonths);
+
+    const aiSummary = usedAI
+      ? parsed.summary ?? 'Here are our top picks based on your requirements.'
+      : isInsurance
+        ? 'Ranked by example premium for a typical profile — the insurer gives your actual quote. Personalised commentary is unavailable right now.'
+        : 'Ranked by total cost over the amount and term you entered, fees included. Personalised commentary is unavailable right now.';
 
     // ─── Build recommendation objects ────────────────────────────────────────────
     const recommendations = recs
@@ -213,7 +264,7 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
           user_id:        user?.id ?? null,
           lead_id:        leadId,
           product_type:   productType,
-          model_version:  'groq-llama-3.3-70b',
+          model_version:  usedAI ? MODEL_VERSION : 'cost-ranking-fallback',
           recommendations: recommendations.map(r => ({
             rank:        r.rank,
             product_id:  r.productId,

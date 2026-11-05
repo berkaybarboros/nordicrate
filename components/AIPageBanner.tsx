@@ -239,7 +239,9 @@ export default function AIPageBanner({ productType, context, className = "" }: P
           </div>
 
           <p className="text-[10px] text-white/30 text-center">
-            Powered by NordicAI · llama-3.3-70b · Not financial advice
+            {/* Model adı burada yazılıydı; model kaldırılınca etiket aylarca yanlış
+                kalır (2026-11-01'de öyle oldu) ve ziyaretçiye bir şey katmıyor. */}
+            Powered by NordicAI · Not financial advice
           </p>
         </div>
       )}

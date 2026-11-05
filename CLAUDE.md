@@ -9,7 +9,8 @@ NordicRate, 8 ülkede (5 Nordic + 3 Baltic) faaliyet gösteren banka, sigorta ve
 ## Stack
 - **Framework**: Next.js 16.1.6 App Router, TypeScript strict
 - **Styling**: Tailwind CSS v4
-- **AI**: Groq API (llama-3.3-70b-versatile) — streaming SSE
+- **AI**: Groq API — model id'leri `lib/groq.ts` (tek kaynak; 2026-11'de llama-3.3-70b
+  kaldırıldı, beş route'ta kopyalıydı). Streaming SSE.
 - **Live Data**: ECB SDMX API (EURIBOR), Norges Bank API
 - **Process Manager**: PM2 (cluster mode, port 3001)
 - **Reverse Proxy**: Nginx Proxy Manager (Docker) + Let's Encrypt SSL
