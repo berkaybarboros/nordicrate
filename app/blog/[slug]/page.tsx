@@ -91,7 +91,12 @@ export default async function BlogPostPage({ params }: PageProps) {
           [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:text-slate-900 [&_h2]:mt-8 [&_h2]:mb-3
           [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:mt-6 [&_h3]:mb-2
           [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5
-          [&_blockquote]:border-l-4 [&_blockquote]:border-sky-200 [&_blockquote]:pl-4 [&_blockquote]:text-slate-500 [&_blockquote]:italic"
+          [&_blockquote]:border-l-4 [&_blockquote]:border-sky-200 [&_blockquote]:pl-4 [&_blockquote]:text-slate-500 [&_blockquote]:italic
+          [&_.nr-table-wrap]:overflow-x-auto [&_.nr-table-wrap]:my-6 [&_.nr-table-wrap]:rounded-xl [&_.nr-table-wrap]:border [&_.nr-table-wrap]:border-slate-200
+          [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse
+          [&_thead]:bg-slate-50
+          [&_th]:text-left [&_th]:font-bold [&_th]:text-slate-900 [&_th]:px-4 [&_th]:py-2.5 [&_th]:whitespace-nowrap
+          [&_td]:px-4 [&_td]:py-2.5 [&_td]:border-t [&_td]:border-slate-100 [&_td]:align-top"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content_md) }}
       />
 
