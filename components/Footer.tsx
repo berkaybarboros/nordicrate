@@ -25,19 +25,24 @@ function RateAlertStrip() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes('@') || loading || !consent) return;
     setLoading(true);
+    setFailed(false);
     try {
-      await fetch('/api/alerts', {
+      // Eskiden yanıt okunmadan setDone(true) yapılıyordu: oran uyarısı kaydedilmemişken
+      // de "You're on the list" görünüyordu (2026-11, RLS insert'i reddediyordu).
+      const res = await fetch('/api/alerts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, product: 'personal-loan', targetRate: null }),
       });
+      if (!res.ok) throw new Error('alert not saved');
       setDone(true);
-    } catch { /* silent */ }
+    } catch { setFailed(true); }
     finally { setLoading(false); }
   }
 
@@ -80,6 +85,11 @@ function RateAlertStrip() {
                   {loading ? 'Saving…' : 'Notify Me'}
                 </button>
               </div>
+              {failed && (
+                <p className="text-amber-300 text-xs mt-2">
+                  We could not save your alert. Please try again.
+                </p>
+              )}
               {/* GDPR: açık onay — işaretlenmeden gönderilmez */}
               <label className="flex items-start gap-2 mt-2 cursor-pointer">
                 <input

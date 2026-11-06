@@ -36,27 +36,11 @@ export async function getProducts(): Promise<LoanProduct[]> {
 }
 
 // ── Rate Alerts ───────────────────────────────────────────────
-export async function createRateAlert(
-  email: string,
-  product: string,          // maps to rate_key column
-  targetRate?: number | null,
-): Promise<{ id?: string; error?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) return { error: SUPABASE_NOT_CONFIGURED };
-  const { data, error } = await supabase
-    .from('rate_alerts')
-    .insert({
-      email,
-      rate_key:  product,
-      threshold: targetRate ?? 0,   // 0 = notify on any change
-      direction: 'below',
-      // user_id intentionally omitted — anon RLS policy allows null
-    })
-    .select('id')
-    .single();
-  if (error) return { error: error.message };
-  return { id: (data as { id: string } | null)?.id };
-}
+// createRateAlert kaldırıldı (2026-11). Anon client ile insert ediyordu ve RLS
+// reddediyordu — "user_id intentionally omitted — anon RLS policy allows null"
+// yorumu doğru değildi, rate_alerts 0 satırdaydı. Yazma işi app/api/alerts/route.ts
+// içinde service-role client ile yapılıyor; bu dosyayı client component'lar import
+// ettiği için service-role buraya giremez.
 
 // ── Leads ─────────────────────────────────────────────────────
 export interface LeadInput {
