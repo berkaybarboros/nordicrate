@@ -1,6 +1,7 @@
 import type { CountryInfo } from '@/lib/types';
 import Link from 'next/link';
 import CountryFlag from './CountryFlag';
+import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 
 interface CountryCardProps {
   country: CountryInfo;
@@ -94,7 +95,7 @@ export default function CountryCard({
 
         {/* CTA */}
         <Link
-          href={`/loans?country=${country.code}`}
+          href={`/loans/${COUNTRY_SLUG_BY_CODE[country.code]}`}
           className="block text-center bg-slate-900 hover:bg-sky-700 text-white text-sm font-medium py-2 rounded-xl transition-colors"
         >
           View {country.name} Rates →

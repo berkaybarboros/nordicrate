@@ -90,7 +90,7 @@ export default async function HomePage() {
     [
       { type: 'personal', href: '/loans', desc: 'Unsecured personal finance' },
       { type: 'mortgage', href: '/mortgage', desc: 'Home & property loans' },
-      { type: 'auto', href: '/loans?type=auto', desc: 'Vehicle financing' },
+      { type: 'auto', href: '/loans/car', desc: 'Vehicle financing' },
       { type: 'business', href: '/business', desc: 'SME & corporate credit' },
     ] as const
   ).map(({ type, href, desc }) => {

@@ -10,6 +10,7 @@ import { Calculator, BarChart3, CheckCircle2 } from 'lucide-react';
 import { COUNTRIES, INSTITUTIONS, PRODUCTS } from '@/lib/data';
 import { getInstitution, getCountry, formatRate } from '@/lib/utils';
 import CountryFlag from '@/components/CountryFlag';
+import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 import RateFreshness from '@/components/RateFreshness';
 import { applyScrapedOverrides } from '@/lib/scraped-overrides';
 import { rateFreshness } from '@/lib/live-rates';
@@ -173,7 +174,7 @@ export default async function LocalizedHome({ dict }: { dict: HomeDict }) {
             {COUNTRIES.map((c) => (
               <Link
                 key={c.code}
-                href={`/loans?country=${c.code}`}
+                href={`/loans/${COUNTRY_SLUG_BY_CODE[c.code]}`}
                 className="flex items-center gap-2 bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-xl px-4 py-2.5 transition-colors text-sm font-medium text-slate-700"
               >
                 <CountryFlag code={c.code} size={22} rounded="sm" />

@@ -153,7 +153,7 @@ export default async function CountryLoansPage({ params }: PageProps) {
         {products.length > 12 && (
           <div className="text-center mt-8">
             <Link
-              href={`/loans?country=${info.code}`}
+              href={`/loans/${landing.slug}`}
               className="inline-block bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-xl transition-colors"
             >
               See all {products.length} products →

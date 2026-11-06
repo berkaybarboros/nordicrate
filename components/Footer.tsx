@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Bell, CheckCircle } from 'lucide-react';
 import CountryFlag from './CountryFlag';
+import { COUNTRY_SLUG_BY_CODE } from '@/lib/country-content';
 
 const COUNTRY_CODES = [
   { code: 'DK', name: 'Denmark' },
@@ -128,7 +129,7 @@ export default function Footer() {
               {COUNTRY_CODES.map(({ code, name }) => (
                 <Link
                   key={code}
-                  href={`/loans?country=${code}`}
+                  href={`/loans/${COUNTRY_SLUG_BY_CODE[code as keyof typeof COUNTRY_SLUG_BY_CODE]}`}
                   title={`Loans in ${name}`}
                   aria-label={`View loans in ${name}`}
                   className="opacity-80 hover:opacity-100 transition-opacity"
@@ -146,7 +147,7 @@ export default function Footer() {
               <li><Link href="/loans" className="hover:text-white transition-colors">Personal Loans</Link></li>
               <li><Link href="/mortgage" className="hover:text-white transition-colors">Mortgage Rates</Link></li>
               <li><Link href="/business" className="hover:text-white transition-colors">Business Loans</Link></li>
-              <li><Link href="/loans?type=auto" className="hover:text-white transition-colors">Auto Finance</Link></li>
+              <li><Link href="/loans/car" className="hover:text-white transition-colors">Auto Finance</Link></li>
               <li><Link href="/programs" className="hover:text-white transition-colors">🚀 Gov. Programs</Link></li>
             </ul>
           </div>
