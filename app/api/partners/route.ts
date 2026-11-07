@@ -4,7 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createLead } from '@/lib/db';
+// Server route: createLead() yerine doğrudan insertLead() — kendi API'sine HTTP
+// isteği atmanın anlamı yok ve service-role yazma zaten burada mümkün.
+import { insertLead } from '@/lib/leads-server';
 import { enforceRateLimit, isValidEmail, clampString } from '@/lib/security';
 
 export const runtime = 'nodejs';
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
     message && `message: ${message}`,
   ].filter(Boolean);
 
-  const { id, error } = await createLead({
+  const { id, error } = await insertLead({
     email,
     name: company,
     mode: 'corporate',
@@ -50,10 +52,16 @@ export async function POST(req: NextRequest) {
     source,
   });
 
-  if (error) {
+  if (error || !id) {
+    // Eskiden burada `ok: true` dönülüyordu ("iç hatayı sızdırma" gerekçesiyle).
+    // Sonuç: banka/broker başvuruları kaydedilmedi ve form teşekkür etti. İç hata
+    // mesajı hâlâ sızmıyor, ama başarısızlık başarı gibi görünmüyor.
     console.error('[partners] lead insert failed:', error);
-    // Kullanıcıya iç hatayı sızdırma — kabul et, logla
+    return NextResponse.json(
+      { error: 'Could not save your details. Please try again.' },
+      { status: 503 },
+    );
   }
 
-  return NextResponse.json({ ok: true, id: id ?? null });
+  return NextResponse.json({ ok: true, id });
 }

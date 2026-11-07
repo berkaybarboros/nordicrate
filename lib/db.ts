@@ -60,35 +60,34 @@ export interface LeadInput {
   matchedProgramIds?: string[];
   conversationSummary?: string;
   source?: string;
+  /** Sadece server tarafı doldurur (oturum varsa); client bu alanı göndermez. */
+  userId?: string | null;
 }
 
+/**
+ * Lead kaydı — `/api/leads`'e POST eder.
+ *
+ * 2026-11-07'ye kadar burada anon client ile insert ediyordu ve RLS yüzünden hiç
+ * yazmıyordu (gerekçe: lib/leads-server.ts). Yazma artık server-side service-role
+ * ile; bu dosyayı client component'lar import ettiği için service-role buraya
+ * giremez, o yüzden fetch. İmza aynı kaldı: çağıranlar değişmedi.
+ *
+ * Server route'ları bunu DEĞİL, doğrudan `insertLead()`'i çağırmalı — kendi
+ * kendine HTTP isteği atmanın anlamı yok ve relative URL server'da çözülmez.
+ */
 export async function createLead(input: LeadInput): Promise<{ id?: string; error?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) return { error: SUPABASE_NOT_CONFIGURED };
-  const { data, error } = await supabase
-    .from('leads')
-    .insert({
-      email:                input.email,
-      name:                 input.name,
-      phone:                input.phone,
-      country:              input.country,
-      loan_type:            input.loanType,
-      loan_amount:          input.loanAmount,
-      monthly_income:       input.monthlyIncome,
-      employment_type:      input.employmentType,
-      mode:                 input.mode ?? 'personal',
-      business_stage:       input.businessStage,
-      funding_needed:       input.fundingNeeded,
-      sector:               input.sector,
-      matched_product_ids:  input.matchedProductIds ?? [],
-      matched_program_ids:  input.matchedProgramIds ?? [],
-      conversation_summary: input.conversationSummary,
-      source:               input.source ?? 'nordicrate',
-    })
-    .select('id')
-    .single();
-  if (error) return { error: error.message };
-  return { id: (data as { id: string } | null)?.id };
+  try {
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    const data = (await res.json()) as { id?: string; error?: string };
+    if (!res.ok || !data.id) return { error: data.error ?? `lead not saved (${res.status})` };
+    return { id: data.id };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'lead request failed' };
+  }
 }
 
 // ── User Profiles ─────────────────────────────────────────────

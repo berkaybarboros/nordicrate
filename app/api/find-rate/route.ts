@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { createSupabaseAdmin } from '@/lib/supabase-admin';
 import { enforceRateLimit, isValidEmail, isValidSessionId, clampNumber } from '@/lib/security';
 import { callGroq, MODEL_VERSION } from '@/lib/groq';
 
@@ -232,13 +233,22 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
       });
 
     // ─── Save lead + model_outputs to Supabase ──────────────────────────────────
+    // 2026-11-07: burası anon client kullanıyor ve `error`'u hiç okumuyordu.
+    // `leads`'in SELECT politikası anon satırı geri okumaya izin vermediği için
+    // `.select('id')` ile yapılan insert'in tamamı hata veriyordu — tablo aylarca
+    // 3 satırda kaldı, log'a tek satır düşmedi. Yazma artık service-role ile ve
+    // hata log'lanıyor. İstek yine düşmüyor: ziyaretçi önerilerini alır, ama
+    // kaybedilen lead artık sessiz değil.
     let leadId: string | null = null;
     try {
-      const supabase = await createSupabaseServer();
-      const { data: { user } } = await supabase.auth.getUser();
+      const authed = await createSupabaseServer();
+      const { data: { user } } = await authed.auth.getUser();
+
+      const supabase = createSupabaseAdmin();
+      if (!supabase) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
 
       // 1. Insert lead
-      const { data: lead } = await supabase
+      const { data: lead, error: leadErr } = await supabase
         .from('leads')
         .insert({
           session_id:        sessionId,
@@ -255,11 +265,13 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
         .select('id')
         .single();
 
+      if (leadErr) throw new Error(`lead insert: ${leadErr.message}`);
       leadId = lead?.id ?? null;
+      if (!leadId) throw new Error('lead insert returned no id');
 
       // 2. Insert model_outputs row (one per lead — recommendations as JSONB)
-      if (leadId && recommendations.length > 0) {
-        await supabase.from('model_outputs').insert({
+      if (recommendations.length > 0) {
+        const { error: outErr } = await supabase.from('model_outputs').insert({
           session_id:     sessionId,
           user_id:        user?.id ?? null,
           lead_id:        leadId,
@@ -275,10 +287,12 @@ Respond with ONLY valid JSON (no markdown, no explanation outside JSON):
           clicked_product: null,
           converted:      false,
         });
+        if (outErr) throw new Error(`model_outputs insert: ${outErr.message}`);
       }
     } catch (dbErr) {
-      console.error('[find-rate] Supabase insert failed:', dbErr);
-      // Don't fail the request — DB write is non-blocking for UX
+      // Yazma UX'i bloke etmiyor — ziyaretçi önerilerini alır. Ama bu satır
+      // olmadan lead kaybı görünmezdi, o yüzden log zorunlu.
+      console.error('[find-rate] lead/model_outputs write failed:', dbErr);
     }
 
     return NextResponse.json({ leadId, recommendations, aiSummary });

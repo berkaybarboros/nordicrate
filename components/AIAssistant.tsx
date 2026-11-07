@@ -147,6 +147,7 @@ export default function AIAssistant() {
   const [leadEmail, setLeadEmail] = useState('');
   const [leadSaving, setLeadSaving] = useState(false);
   const [leadSaved, setLeadSaved] = useState(false);
+  const [leadError, setLeadError] = useState(false);
 
   // Load Supabase profile once on mount
   useEffect(() => {
@@ -414,8 +415,12 @@ export default function AIAssistant() {
     e.preventDefault();
     if (!leadEmail.includes('@') || leadSaving) return;
     setLeadSaving(true);
+    setLeadError(false);
     try {
-      await createLead({
+      // 2026-11: sonuç atılıyordu. Yazma başarısızken bile "Saved!" gösteriliyor
+      // ve localStorage'a nr-lead-captured yazılıyordu — yani ziyaretçiye bir daha
+      // hiç sorulmuyordu. Lead kaybının en pahalı hali.
+      const { error: leadErr } = await createLead({
         email:          leadEmail,
         mode,
         country:        mode === 'personal' ? userProfile.country : corporateProfile.country,
@@ -428,6 +433,7 @@ export default function AIAssistant() {
         sector:         corporateProfile.sector,
         source:         'ai_chat',
       });
+      if (leadErr) throw new Error(leadErr);
       await fetch('/api/alerts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -440,7 +446,7 @@ export default function AIAssistant() {
       setLeadCaptured(true);
       localStorage.setItem('nr-lead-captured', 'true');
       track('find_rate_submit', { mode, source: 'ai_chat' });
-    } catch { /* silent */ }
+    } catch { setLeadError(true); }
     finally { setLeadSaving(false); }
   }, [leadEmail, leadSaving, mode, userProfile, corporateProfile]);
 
@@ -689,6 +695,11 @@ export default function AIAssistant() {
                         {leadSaving ? '…' : 'Save →'}
                       </button>
                     </div>
+                    {leadError && (
+                      <p className="text-[11px] text-rose-600 font-semibold mt-1.5">
+                        Could not save your details. Please try again.
+                      </p>
+                    )}
                     {/* GDPR bilgilendirme — submit = onay (tek amaçlı form) */}
                     <p className="text-[10px] text-violet-500/80 mt-1.5 leading-snug">
                       By saving, you agree to receive rate alerts. See our{' '}
